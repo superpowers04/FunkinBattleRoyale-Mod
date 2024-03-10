@@ -313,8 +313,7 @@ class SickMenuState extends ScriptMusicBeatState
 
 		var bullShit:Int = 0;
 
-		for (item in grpControls.members)
-		{
+		for (item in grpControls.members) {
 			item.targetY = bullShit - curSelected;
 			bullShit++;
 

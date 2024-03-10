@@ -10,4 +10,3 @@ haxelib install flixel-addons
 haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc
 haxelib git linc_luajit https://github.com/superpowers04/linc_luajit
 haxelib git flxanimate https://github.com/ShadowMario/flxanimate dev
-haxelib git hscript-improved https://github.com/FNF-CNE-Devs/hscript-improved

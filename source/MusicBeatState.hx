@@ -20,6 +20,7 @@ import flixel.FlxObject;
 import flixel.FlxBasic;
 import Overlay.Console;
 import se.extensions.flixel.FlxSpriteLockScale;
+import haxe.Timer;
 
 import flixel.group.FlxGroup.FlxTypedGroup;
 
@@ -31,6 +32,9 @@ class MusicBeatState extends FlxUIState {
 	public var curStep:Int = 0;
 	public var curStepProgress:Float = 0;
 	public var curBeat:Int = 0;
+ 
+	public var lastUpdateTime:Float = 0;
+
 	private var controls(get, never):Controls;
 	var forceQuit = true;
 	public static var lastClassList:Array<Class<Dynamic>> = [];
@@ -128,6 +132,10 @@ class MusicBeatState extends FlxUIState {
 
 		tranIn();
 	}
+	override function destroy(){
+		instance = null;
+		super.destroy();
+	}
 	
 	// var tempMessBacking:FlxSprite;
 	// var tempMessage:FlxText;
@@ -168,7 +176,7 @@ class MusicBeatState extends FlxUIState {
 			tempMessBacking.y = lastBacking.y + lastBacking.height;
 			tempMessage.y = tempMessBacking.y + 2;
 		};
-		tempMessages.push([time,tempMessage,tempMessBacking]);
+		tempMessages.push([Sys.time() + time,tempMessage,tempMessBacking]);
 		}catch(e){trace(e);}
 	}
 	public function showTempBanner(str:String,?color:FlxColor = FlxColor.LIME,?time:Float = 5,?center:Bool = true,?trac:Bool = true){
@@ -207,7 +215,8 @@ class MusicBeatState extends FlxUIState {
 	var oldBeat:Int = 0;
 	var oldStep:Int = 0;
 	override function update(elapsed:Float) {
-		if(tempMessages[0] != null && (tempMessages[0][0] -= elapsed) < 0){
+		lastUpdateTime = Sys.time();
+		if(tempMessages[0] != null && (tempMessages[0][0] < lastUpdateTime)){
 			try{
 				var msg = tempMessages.shift();
 				remove(msg[1]);

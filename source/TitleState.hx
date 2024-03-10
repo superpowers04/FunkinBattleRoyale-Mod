@@ -141,7 +141,7 @@ class TitleState extends MusicBeatState
 			new NoteAssets(SESave.data.noteAsset,forced2);
 		}
 	}
-	public static function findChar(char:String,?retBF:Bool = true,?ignoreNSCheck:Bool = false):Null<CharInfo>{
+	public static function findChar(char:String,?retBF:Bool = true,?ignoreNSCheck:Bool = false,?fuzzySearch:Bool = true):Null<CharInfo>{
 		if(char == ""){
 			trace('Empty character search, returning BF');
 			if(retBF) return defaultChar;
@@ -152,7 +152,7 @@ class TitleState extends MusicBeatState
 		if(!ignoreNSCheck && char.contains('|')){
 
 			var _e = char.split('|');
-			return findCharNS(_e[1],_e[0],-1,retBF);
+			return findCharNS(_e[1],_e[0],-1,retBF,fuzzySearch);
 		}
 		if(char == "" || char == "automatic"){
 			trace('Tried to get a blank character!');
@@ -173,7 +173,7 @@ class TitleState extends MusicBeatState
 		}
 		char = char.replace(' ',"-").replace('_',"-").toLowerCase();
 		
-		if(char.contains("-")){
+		if(char.contains("-") && fuzzySearch){
 			var splitChar = char.split('-');
 			var splitCharMap:Map<String,Int> = [];
 			var curStr = "";
@@ -221,7 +221,7 @@ class TitleState extends MusicBeatState
 		return findChar(char);
 	}
 	// This prioritises characters from a specific namespace, if it finds one outside of the namespace, then they'll be used instead
-	public static function findCharNS(char,?namespace:String = "",?nameSpaceType:Int = -1,?retBF:Bool = true){
+	public static function findCharNS(char,?namespace:String = "",?nameSpaceType:Int = -1,?retBF:Bool = true,?fuzzySearch:Bool = true){
 		if(namespace == "INVALID"){
 			return findInvalidChar(char);
 		}
@@ -233,7 +233,7 @@ class TitleState extends MusicBeatState
 		var currentChar:CharInfo = null;
 		char = char.replace(' ',"-").replace('_',"-").toLowerCase();
 		
-		if(char.contains("-")){
+		if(char.contains("-") && fuzzySearch){
 			var splitChar = char.split('-');
 			var splitCharMap:Map<String,Int> = [];
 			var curStr = "";
@@ -291,9 +291,9 @@ class TitleState extends MusicBeatState
 		if(namespace == "" || namespace.toLowerCase() == "null") return findChar(char,retBF,true);
 		return findCharNS(char,namespace,nameSpaceType,retBF);
 	}
-	public static function retChar(char:String):String{
-		var char = findChar(char,false);
-		return (if(char != null) char.id else "");
+	public static function retChar(char:String,fuzzySearch:Bool = true):String{
+		var char = findChar(char,false,false,fuzzySearch);
+		return ((char == null) ? "" : char.id);
 	}
 	public static function getCharFromList(list:Array<String>,nameSpace:String = ""):CharInfo{
 		trace(list);

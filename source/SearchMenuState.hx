@@ -97,16 +97,28 @@ class SearchMenuState extends ScriptMusicBeatState {
 	// var bgColor:FlxColor = 0xFFFF6E6E;
 	@:keep inline static public function resetVars(){
 		LoadingScreen.loadingText = "Resetting Variables";
-		if (ChartingState.charting) ChartingState.charting = false;
 		if (/*SESave.data.songUnload && */PlayState.SONG != null) {PlayState.SONG = null;} // I'm not even sure if this is needed but whatever
-		PlayState.songDifficulties = [];PlayState.nameSpace = "";PlayState.scripts = [];PlayState.hsBrTools = null;onlinemod.OfflinePlayState.instFile = onlinemod.OfflinePlayState.voicesFile = "";
+		ChartingState.charting = false;
+		PlayState.songDifficulties = [];
+		PlayState.nameSpace = "";
+		PlayState.scripts = [];
+		PlayState.hsBrTools = null;
+		PlayState.isStoryMode = false;
+		PlayState.songDiff = "";
+		PlayState.storyDifficulty = 1;
+		PlayState.actualSongName = "";
+		PlayState.hsBrToolsPath = "";
+		onlinemod.OfflinePlayState.nameSpace = 
+			onlinemod.OfflinePlayState.chartFile = 
+			onlinemod.OfflinePlayState.instFile = 
+			onlinemod.OfflinePlayState.voicesFile = "";
+		onlinemod.OfflinePlayState.instFile = onlinemod.OfflinePlayState.voicesFile = null;
 		HSBrTools.shared = [];
 		SickMenuState.chgTime = true;
 		if(Note.noteNames[0] == null){Note.noteNames = ["purple","blue","green",'red'];}
 		if(Note.noteAnims[0] == null){Note.noteAnims = ["singLEFT","singDOWN","singUP",'singRIGHT'];}
 		if(Note.noteDirections[0] == null){Note.noteDirections = ["LEFT","DOWN","UP",'RIGHT','NONE'];}
 		Conductor.offset = 0;
-		onlinemod.OfflinePlayState.nameSpace = "";
 		if(!SESave.data.persistBF && PlayState.boyfriend != null){
 			try{PlayState.boyfriend.destroy();}catch(e){}
 			PlayState.boyfriend = null;

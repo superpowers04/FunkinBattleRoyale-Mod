@@ -422,6 +422,7 @@ class ConsoleInput extends TextField{
 		MINUS => "_",
 		PLUS => "+",
 	];
+	var buffer:Array<FlxKey> = [];
 	var caretPos:Int = 0;
 	inline function updateShownText(){
 		if(caretPos > actualText.length) caretPos = actualText.length;
@@ -480,18 +481,23 @@ class ConsoleInput extends TextField{
 			caretPos = 0;
 			updateShownText();
 		}else{
-
+			var newBuffer = [];
 			for(key => char in keyList){
 				@:privateAccess
 				if(Reflect.getProperty(FlxG.keys.justPressed,key)){
-					if(FlxG.keys.pressed.SHIFT){
-						char = (keyListUpper[key] != null ? keyListUpper[key] : char.toUpperCase());
+					newBuffer.push(key);
+					if(!buffer.contains(key)){
+
+						if(FlxG.keys.pressed.SHIFT){
+							char = (keyListUpper[key] != null ? keyListUpper[key] : char.toUpperCase());
+						}
+						addTextAtCaret(char);
+						caretPos++;
+						updateShownText();
 					}
-					addTextAtCaret(char);
-					caretPos++;
-					updateShownText();
 				}
 			}
+			buffer = newBuffer;
 		}
 
 

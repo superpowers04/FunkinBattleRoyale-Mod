@@ -113,9 +113,10 @@
 
 	<!-- <haxedef name='FLXRUNTIMESHADER' if='desktop'> -->
 
-	<haxelib name="hscript-improved" />
+	<!-- <haxelib name="hscript-improved" /> -->
 	<!-- <haxelib name="hscript-ex"/> -->
 	<haxelib name="flxanimate" />
+	<haxedef name="hscript-improved" />
 	<haxedef name="hscriptPos" />
 
 	<!-- Expects https://github.com/superpowers04/linc_luajit, Nebula's fork will not work!-->

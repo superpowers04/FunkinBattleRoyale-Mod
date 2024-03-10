@@ -446,12 +446,13 @@ class Note extends FlxSprite
 		}
 		super.destroy();
 	}
-	public function updateCanHit():Bool{
+	public function updateCanHit(?comparisonTime:Float = -1):Bool{
+		if(comparisonTime == -1) comparisonTime = Conductor.songPosition;
 		if(shouldntBeHit){
-			return canBeHit = (strumTime - Conductor.songPosition <= (45 * Conductor.timeScale) && strumTime - Conductor.songPosition >= (-45 * Conductor.timeScale));
+			return canBeHit = (strumTime - comparisonTime <= (45 * Conductor.timeScale) && strumTime - comparisonTime >= (-45 * Conductor.timeScale));
 		}
-		return canBeHit = ((isSustainNote && (strumTime > Conductor.songPosition - Conductor.safeZoneOffset && strumTime < Conductor.songPosition + ((Conductor.safeZoneOffset * 0.5) * Conductor.timeScale)) ) ||
-				strumTime > Conductor.songPosition - (Conductor.safeZoneOffset * Conductor.timeScale) && strumTime < Conductor.songPosition + Conductor.safeZoneOffset  );
+		return canBeHit = ((isSustainNote && (strumTime > comparisonTime - Conductor.safeZoneOffset && strumTime < comparisonTime + ((Conductor.safeZoneOffset * 0.5) * Conductor.timeScale)) ) ||
+				strumTime > comparisonTime - (Conductor.safeZoneOffset * Conductor.timeScale) && strumTime < comparisonTime + Conductor.safeZoneOffset  );
 	}
 	override function update(elapsed:Float) {
 		// super.update(elapsed);

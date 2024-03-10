@@ -612,8 +612,7 @@ class BoolOption extends Option{
 	var script:String;
 	var name:String;
 
-	public function new(desc:String,name:String,mod:String)
-	{
+	public function new(desc:String,name:String,mod:String) {
 		// acceptValues = true;
 		this.name = name;
 		// display = name;

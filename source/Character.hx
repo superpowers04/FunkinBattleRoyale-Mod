@@ -39,8 +39,7 @@ import hscriptfork.InterpSE;
 using StringTools;
 
 class CharAnimController extends FlxAnimationController{
-	override function findByPrefix(AnimFrames:Array<FlxFrame>, Prefix:String, logError = true):Void
-	{
+	override function findByPrefix(AnimFrames:Array<FlxFrame>, Prefix:String, logError = true):Void {
 		if(Prefix == "FORCEALLLMAOTHISISSHIT"){
 			fuckinAddAll(AnimFrames);
 		}
@@ -50,10 +49,23 @@ class CharAnimController extends FlxAnimationController{
 			if (regTP.match(index)) AnimFrames.push(frame);
 		}
 	}
-	function fuckinAddAll(AnimFrames:Array<FlxFrame>):Void
-	{
+	function fuckinAddAll(AnimFrames:Array<FlxFrame>):Void {
 		for (index => frame in _sprite.frames.framesHash){
 			AnimFrames.push(frame);
+		}
+	}
+	@:keep inline public function playAnimation(anim:FlxAnimation, force = false, reversed = false, frame = 0):Void {
+		var oldFlipX:Bool = false;
+		var oldFlipY:Bool = false;
+		if (_curAnim != null && _curAnim.name != anim.name) {
+			oldFlipX = _curAnim.flipX;
+			oldFlipY = _curAnim.flipY;
+			_curAnim.stop();
+		}
+		(_curAnim = anim).play(force, reversed, frame);
+
+		if (oldFlipX != _curAnim.flipX || oldFlipY != _curAnim.flipY) {
+			_sprite.dirty = true;
 		}
 	}
 }
@@ -234,6 +246,7 @@ class CharAnimController extends FlxAnimationController{
 	@privateAccess
 	public function callInterp(func_name:String, args:Array<Dynamic>,?important:Bool = false):Dynamic { // Modified from Modding Plus, I am too dumb to figure this out myself 
 		if ((!useHscript || amPreview) || (interp == null || !interp.variables.exists(func_name) ) && !important) {return null;}
+
 		try{
 			args.insert(0,this);
 			var method = interp.variables.get(func_name);
@@ -317,11 +330,9 @@ class CharAnimController extends FlxAnimationController{
 		if (charProperties.offset_flip != null ) needsInverted = charProperties.offset_flip;
 		var offsetCount = 0;
 		if (charProperties.animations_offsets != null && charProperties.animations_offsets.length > 0){
-
 			for (offset in charProperties.animations_offsets){ // Custom offsets
 				offsetCount++;
 				if (needsInverted == 1)
-
 					switch (charType) {
 						case 0:
 							if (offset.player1 != null && offset.player1.length > 1) addOffset(offset.anim,offset.player1[0],offset.player1[1]);
@@ -591,18 +602,7 @@ class CharAnimController extends FlxAnimationController{
 
 			if(charProperties == null && !SELoader.exists('${charLoc}/$curCharacter/config.json') || (amPreview && FlxG.keys.pressed.SHIFT)){
 				if(amPreview){
-					// if(FlxG.keys.pressed.SHIFT) MusicBeatState.instance.showTempmessage("Forcing new JSON due to shift being held");
 					var idleName:String = "";
-					// { // Load characters without an idle animation, hopefully
-					// 	var regTP:EReg = (~/<SubTexture name="([A-z 0-9]+[iI][dD][lL][eE][A-z 0-9]+)[0-9][0-9][0-9][0-9]"/gm);
-					// 	var input:String = charXml;
-					// 	while (regTP.match(input)) {
-					// 		input=regTP.matchedRight();
-					// 		// addAnimation("Idle", regTP.matched(1));
-					// 		idleName = regTP.matched(1);
-					// 		break;
-					// 	}
-					// }
 					charProperties = Json.parse('{
 						"flip_x":false,
 						"sing_duration":6.1,
@@ -615,7 +615,6 @@ class CharAnimController extends FlxAnimationController{
 					}');
 					animOffsets['all'] = [0.0,0.0];
 				}else{
-					// loadChar('bfHC');
 					if(curCharacter == "bf" || curCharacter == "gf"){
 						MainMenuState.handleError('Character ${curCharacter} has no character json and is a hardcoded character, Something went terribly wrong!');
 						return;
@@ -627,7 +626,6 @@ class CharAnimController extends FlxAnimationController{
 					return;
 				}
 			}else{
-
 				try{
 					if (charProperties == null) {
 						charProperties = Json.parse(CoolUtil.cleanJSON(charPropJson = SELoader.loadText('${charLoc}/$curCharacter/config.json')));
@@ -641,8 +639,6 @@ class CharAnimController extends FlxAnimationController{
 
 			loadedFrom = '${charLoc}/$curCharacter/config.json';
 			if(frames == null){
-
-
 				var pngName:String = "character.png";
 				var xmlName:String = "character.xml";
 				var forced:Int = 0;
@@ -724,7 +720,7 @@ class CharAnimController extends FlxAnimationController{
 		}
 		callInterp("initScript",[]);
 
-		trace('Finished loading $curCharacter, Lets get funky!');
+		trace('Loaded $curCharacter');
 	}
 
 
@@ -741,59 +737,31 @@ class CharAnimController extends FlxAnimationController{
 		
 		interp = null;
 		if (!amPreview && PlayState.instance != null){
-			PlayState.instance.handleError(error);
+			// PlayState.instance.handleError(error);
+			throw error;
 		}else{
 			MainMenuState.handleError(error);
 		}
 	}
 
-	function loadChar(?char:String = ""){
-			if(char != "")curCharacter = char;
-			// if(frames == null){
-
-			// 	switch (curCharacter) // Seperate statement for duplicated character paths
-			// 	{
-			// 		case 'gf':
-			// 			// GIRLFRIEND CODE
-			// 			frames = tex = Paths.getSparrowAtlas('characters/GF_assets');
-			// 		case 'bf' | 'bfHC':
-			// 			frames = tex = Paths.getSparrowAtlas('characters/BOYFRIEND');
-			// 	}
-			// }
-			// if(charProperties == null){
-			// 	switch (curCharacter)
-			// 	{
-			// 		case 'bf' | 'bfHC':// Hardcoded to atleast have a single character
-			// 			charProperties = Json.parse(BFJSON);
-			// 		case 'gf':// The game crashes if she doesn't exist, BF and GF must not be seperated
-			// 			charProperties = Json.parse(GFJSON);
-			// 	}
-			// }
-			loadCustomChar();
+	inline function loadChar(?char:String = ""){
+		if(char != "")curCharacter = char;
+		loadCustomChar();
 	}
 
 
-	public function new(?x:Float = 0, ?y:Float = 0, ?character:String = "", ?isPlayer:Bool = false,?charType:Int = 0,?preview:Bool = false,?exitex:FlxAtlasFrames = null,?charJson:CharacterJson = null,?useHscript:Bool = true,?charPath:String = "",?charInfo:Null<CharInfo> = null) // CharTypes: 0=BF 1=Dad 2=GF
-	{
+	public function new(?x:Float = 0, ?y:Float = 0, ?character:String = "", ?isPlayer:Bool = false,?charType:Int = 0,?preview:Bool = false,?exitex:FlxAtlasFrames = null,?charJson:CharacterJson = null,?useHscript:Bool = true,?charPath:String = "",?charInfo:Null<CharInfo> = null) { // CharTypes: 0=BF 1=Dad 2=GF 
 		#if !debug 
 		try{
 		#end
 		super(x, y);
 		if(lonely || character == "lonely") return;
-		if(charInfo != null){
-			this.charInfo = charInfo;
-			character = charInfo.folderName;
-		}
+		if(charInfo != null) character = (this.charInfo = charInfo).folderName;
 		trace('Loading ${character}');
 		animOffsets = ["all" => [0,0] ];
 		// animOffsets['all'] = [0.0, 0.0];
-		if (character == ""){
-			switch(charType){
-				case 0:character = "bf";
-				case 1:character = "bf";
-				case 2:character = "gf";
-			}
-		}
+		if (character == "") character = (charType == 2 ? "gf" : "bf");
+		
 		curCharacter = character;
 		this.charType = charType;
 		this.useHscript = useHscript;
@@ -809,26 +777,25 @@ class CharAnimController extends FlxAnimationController{
 		animation = new CharAnimController(this);
 
 		if(charJson != null) charProperties = charJson;
-		if(!amPreview) switch(charType){case 1:definingColor = FlxColor.RED;default:definingColor = FlxColor.GREEN;} else definingColor = FlxColor.WHITE;
+		if(exitex != null) frames = tex = exitex;
+		definingColor = (preview ? definingColor : (charType == 1 ? FlxColor.RED : FlxColor.GREEN));
 		
-		if (exitex != null) frames = tex = exitex;
 		antialiasing = true;
 		loadChar();
 		
-
 		dance();
 		// var alloffset = animOffsets.get("all");
 
 		for (i in ['RIGHT','UP','LEFT','DOWN']) { // Add main animations over miss if miss isn't present
-			if (animation.getByName('sing${i}miss') == null){
-				cloneAnimation('sing${i}miss', animation.getByName('sing$i'));
-				tintedAnims.push('sing${i}miss');
+			var miss = 'sing${i}miss';
+			if (animation.getByName(miss) == null){
+				cloneAnimation(miss, animation.getByName('sing$i'));
+				tintedAnims.push(miss);
 			}
 		}
 		this.y += charY;
 		this.x += charX;
-		if (isPlayer && animation.getByName('singRIGHT') != null && flip && flipNotes)
-		{
+		if (isPlayer && animation.getByName('singRIGHT') != null && flip && flipNotes) {
 			flipX = !flipX;
 
 				// var animArray
@@ -837,9 +804,9 @@ class CharAnimController extends FlxAnimationController{
 			animation.getByName('singLEFT').frames = oldRight;
 
 			// IF THEY HAVE MISS ANIMATIONS??
-			if (animation.getByName('singRIGHTmiss') != null)
-			{
-				var oldMiss = animation.getByName('singRIGHTmiss').frames;
+			var oldMissAnim = animation.getByName('singRIGHTmiss');
+			if (oldMissAnim != null) {
+				var oldMiss = oldMissAnim.frames;
 				animation.getByName('singRIGHTmiss').frames = animation.getByName('singLEFTmiss').frames;
 				animation.getByName('singLEFTmiss').frames = oldMiss;
 			}
@@ -880,11 +847,7 @@ class CharAnimController extends FlxAnimationController{
 				// playAnim('idle', true, false, 10);
 				dance();
 			}
-			if (currentAnimationPriority == 10) {
-				holdTimer += elapsed;
-			}
-			else
-				holdTimer = 0;
+			(currentAnimationPriority == 10 ? holdTimer += elapsed : holdTimer = 0);
 			if (!isPlayer && holdTimer >= Conductor.stepCrochet * dadVar * 0.001) {
 				holdTimer = 0;
 				dance();
@@ -988,14 +951,19 @@ class CharAnimController extends FlxAnimationController{
 			AnimName = nextAnimation;
 			nextAnimation = "";
 		}
-		if (animation.curAnim != null){
+		var curAnim = animation.curAnim;
+		if (curAnim != null){
 			lastAnim = animName;
-			if(!forceNextAnim){
+			if(!forceNextAnim && !isDonePlayingAnim()){
 				if(lastAnim == AnimName && replayAnims.contains(AnimName)){
-					if(!animLoops[AnimName] || !isDonePlayingAnim() )return false;
-				}else if(animation.curAnim.name != AnimName && !isDonePlayingAnim()){
-					if (animationPriorities[animation.curAnim.name] != null && currentAnimationPriority > animationPriorities[AnimName] ){return false;} // Skip if current animation has a higher priority
-					if (animationPriorities[animation.curAnim.name] == null && oneShotAnims.contains(animation.curAnim.name) && !oneShotAnims.contains(AnimName)){return false;} // Don't do anything if the current animation is oneShot
+					if(!animLoops[AnimName]) return false;
+				}else if(curAnim.name != AnimName){
+					if (animationPriorities[curAnim.name] == null ){
+						// Skip if current animation has a higher priority
+						if(currentAnimationPriority > animationPriorities[AnimName]) return false;
+					}else{
+						if(oneShotAnims.contains(curAnim.name) && !oneShotAnims.contains(AnimName)) return false;
+					}
 				}
 			} 
 		}
@@ -1010,17 +978,17 @@ class CharAnimController extends FlxAnimationController{
 		// 	}
 		// }
 		// setSprite(animGraphics[AnimName.toLowerCase()]);
-
-		if (animation.getByName(AnimName) == null) return false;
+		var anim = animation.getByName(AnimName);
+		if (anim == null) return false;
 		if(AnimName == lastAnim && loopAnimFrames[AnimName] != null){
-			if(animation.curAnim != null && animation.curAnim.curFrame < loopAnimFrames[AnimName]){
+			if(curAnim != null && curAnim.curFrame < loopAnimFrames[AnimName]){
 				return false; // Don't loop to frame position unless we've actually gotten past that frame
 			}
 			Frame = loopAnimFrames[AnimName];
 		}
 		animHasFinished = false;
 		if(Frame > 0 && Frame < 1 && Frame % 1 == Frame){
-			Frame = animation.getByName(AnimName).frames.length * Frame;
+			Frame = anim.frames.length * Frame;
 		}
 		callInterp("playAnimBefore",[AnimName]);
 		if (!forceNextAnim && skipNextAnim){
@@ -1028,9 +996,9 @@ class CharAnimController extends FlxAnimationController{
 			return false;
 		}
 		forceNextAnim = false;
-		animation.play(AnimName, Force, Reversed, Std.int(Frame));
+		cast(animation,CharAnimController).playAnimation(anim, Force, Reversed, Std.int(Frame));
 		AnimName = animName;
-		currentAnimationPriority = (if (animationPriorities[AnimName] != null) animationPriorities[AnimName] else 1);
+		currentAnimationPriority = animationPriorities[AnimName] ?? 1;
 		if ((debugMode || amPreview) || animation.curAnim != null && AnimName != lastAnim){
 			setOffsets(AnimName,offsetX,offsetY);
 		} // Skip if already playing, no need to calculate offsets and such

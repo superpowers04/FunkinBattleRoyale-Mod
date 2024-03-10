@@ -253,6 +253,7 @@ class PlayState extends ScriptMusicBeatState
 		var errorMsg:String = "";
 		var songPositionBar:Float = 0;
 		var updateTime:Bool = false;
+		var lastMusicUpdate:Float = 0;
 
 	/* Objects */
 
@@ -406,6 +407,7 @@ class PlayState extends ScriptMusicBeatState
 			return ((interps['${nameSpace}-${v}'] == null));
 		}
 		public override function callInterp(func_name:String, args:Array<Dynamic>,?id:String = "") { // Modified from Modding Plus, I am too dumb to figure this out myself
+				
 				try{
 					switch(func_name){
 						case ("noteHitDad"):{
@@ -426,6 +428,8 @@ class PlayState extends ScriptMusicBeatState
 						}
 
 					}
+				}catch(e){return MainMenuState.handleError('${func_name} for "${id}":\n $e');}
+				try{
 					args.insert(0,this);
 					if (id == "") {
 						for (name => interp in interps) {
@@ -447,11 +451,13 @@ class PlayState extends ScriptMusicBeatState
 		throw(new FakeException(''));
 	}
 	public override function errorHandle(?error:String = "",?forced:Bool = false) handleError(error,forced);
+	public override function toString(){
+		return 'PlayState';
+	}
 	public function handleError(?error:String = "",?forced:Bool = false){
 		generatedMusic = persistentUpdate = false;
 		canPause=true;
 		try{
-			if(currentInterp.args[0] == this) currentInterp.args.shift();
 
 			if(error == "") error = 'No error passed!';
 			// else if(error == "Null Object Reference") error = 'Null Object Reference;\nInterp info: ${currentInterp}';
@@ -2049,6 +2055,7 @@ class PlayState extends ScriptMusicBeatState
 
 
 		super.update(elapsed);
+		lastMusicUpdate = Sys.time() * 1000;
 		callInterp("update",[elapsed]);
 
 		
@@ -2087,6 +2094,7 @@ class PlayState extends ScriptMusicBeatState
 		testanimdebug();
 
 		if(handleTimes){
+
 			if (startingSong){
 				if (startedCountdown){
 					Conductor.songPosition += FlxG.elapsed * 1000;
@@ -2529,8 +2537,7 @@ class PlayState extends ScriptMusicBeatState
 
 				var comboSize = 1.20 - (seperatedScore.length * 0.1);
 				var lastStrum = playerStrums.members[playerStrums.members.length - 1];
-				for (i in 0...comboSplit.length)
-				{
+				for (i in 0...comboSplit.length) {
 					var num:Int = Std.parseInt(comboSplit[i]);
 					var numScore:FlxSprite = new FlxSprite().loadGraphic(Paths.image('num' + num));
 					// numScore.screenCenter();
@@ -2931,7 +2938,7 @@ class PlayState extends ScriptMusicBeatState
 			if (daNote == null || !daNote.alive || daNote.skipNote || !daNote.mustPress) continue;
 			
 			if (!onScreenNote) onScreenNote = true;
-			if (!pressArray[daNote.noteData] || !daNote.updateCanHit() || daNote.tooLate || daNote.wasGoodHit) continue;
+			if (!pressArray[daNote.noteData] || !daNote.updateCanHit(Conductor.songPosition + ((Sys.time() * 1000) - lastMusicUpdate)) || daNote.tooLate || daNote.wasGoodHit) continue;
 			var coolNote = possibleNotes[daNote.noteData];
 			if (coolNote != null){
 				if((Math.abs(daNote.strumTime - coolNote.strumTime) < 7 * Conductor.timeScale)){
@@ -3103,8 +3110,7 @@ class PlayState extends ScriptMusicBeatState
  
 		// PRESSES, check for note hits
 		
-		if (generatedMusic && pressArray.contains(true))
-		{
+		if (generatedMusic && pressArray.contains(true)) {
 			playerCharacter.holdTimer = 0;
  
 			var possibleNotes:Array<Note> = [null,null,null,null]; // notes that can be hit
@@ -3165,7 +3171,7 @@ class PlayState extends ScriptMusicBeatState
 	}
 
 	function kadeBRGoodNote(note:Note, ?resetMashViolation = true):Void {
-		var noteDiff:Float = Math.abs(note.strumTime - Conductor.songPosition);
+		var noteDiff:Float = Math.abs(note.strumTime - (Conductor.songPosition + ((Sys.time() * 1000) - lastMusicUpdate)));
 		note.hitDistance = Ratings.getDistanceFloat(noteDiff);
 		note.rating = Ratings.ratingFromDistance(note.hitDistance);
 

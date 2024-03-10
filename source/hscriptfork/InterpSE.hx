@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C)2008-2017 Haxe Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -30,17 +30,8 @@ import haxe.Constraints.IMap;
 
 class InterpSE extends Interp {
 	private override function resetVariables(){
-		variables = new Map<String,Dynamic>();
+		super.resetVariables();
 
-		variables.set("null",null);
-		variables.set("true",true);
-		variables.set("false",false);
-		variables.set("trace", Reflect.makeVarArgs(function(el) {
-			var inf = posInfos();
-			var v = el.shift();
-			if( el.length > 0 ) inf.customParams = el;
-			haxe.Log.trace(Std.string(v), inf);
-		}));
 		variables.set("Bool", Bool);
 		variables.set("Int", Int);
 		variables.set("Float", Float);
@@ -103,10 +94,8 @@ class InterpSE extends Interp {
 			} catch (err:Stop) {
 				switch (err) {
 					case SContinue:
-					case SBreak:
-						break;
-					case SReturn:
-						throw err;
+					case SBreak: break;
+					case SReturn: throw err;
 				}
 			}
 		}

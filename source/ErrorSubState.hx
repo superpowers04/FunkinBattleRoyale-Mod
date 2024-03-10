@@ -38,8 +38,7 @@ class ErrorSubState extends MusicBeatSubstate {
 	public var errorMsg:String = "";
 	public static var instance:ErrorSubState;
 	public static var fadeOut:Bool = true;
-	public function new(x:Float, y:Float,?error:String = "",force:Bool = false)
-	{
+	public function new(x:Float, y:Float,?error:String = "",force:Bool = false) {
 		instance = this;
 		endingMusic = null;
 		errorMsg = error;

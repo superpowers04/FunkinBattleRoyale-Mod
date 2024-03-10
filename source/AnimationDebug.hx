@@ -179,7 +179,7 @@ class AnimationDebug extends MusicBeatState
 			SELoader.importFile(validFile,'mods/packs/imported/characters/$name/character.$ending2');
 			LoadingScreen.loadAndSwitchState(new AnimationDebug("INVALID|" + name,false,1,false,true));
 
-		},[file,validFile,ending1,ending2],"Type a name for the character\n",name,function(name:String){return (if(TitleState.retChar(name) != "") "This character already exists! Please use a different name" else "");}));
+		},[file,validFile,ending1,ending2],"Type a name for the character\n",name,function(name:String){return (if(TitleState.retChar(name,false) != "") "This character already exists! Please use a different name" else "");}));
 	} 
 
 	override public function onFileDrop(file){
@@ -784,13 +784,14 @@ class AnimationDebug extends MusicBeatState
 	function editAnimation(Anim:String,charAnim:CharJsonAnimation,?unbind:Bool = false,?overide:Bool = true){
 		var existingAnim:Array<Dynamic> = findAnimation(Anim);
 		var anim = existingAnim[1];
-		if (unbind){
+		if (unbind || overide){
 			if (anim != null) charJson.animations[anim] = null;
-			return;
+			if (!overide)return;
+			anim = null;
 		}
 		if (anim != null){
 			charJson.animations[anim] = charAnim;
-			showTempmessage('Replaced existing animation!');
+			// showTempmessage('Replaced existing animation!');
 			return;
 		}
 		charJson.animations.push(charAnim);
@@ -965,8 +966,10 @@ class AnimationDebug extends MusicBeatState
 		uiMap["autoDetAnims"] = new FlxUIButton(160,160,"Autodetect Anims",function(){
 			try{
 				var count = 0;
+				var flipped = uiMap['flip_x_global'].checked || charJson.flip_x;
+				var overide = dad.isNew /*|| FlxG.keys.pressed.CONTROL*/;
 				for(index => animation in charAnims){
-					
+					if(animation == "**Unbind") continue;
 					var _animName = "";
 					var _type = "";
 					var checkAnim = animation.toLowerCase();
@@ -976,47 +979,56 @@ class AnimationDebug extends MusicBeatState
 							break;
 						}
 					}
+					// if(charJson.flip_x){ // 90% of the time, this is a bf clone. Worst case scenario, the animations can be re-bound
+					// 	if(checkAnim.contains('left')) checkAnim.replace('left','right');
+					// 	else if(checkAnim.contains('right')) checkAnim.replace('right','left');
+					// }
 					for(n in ['left','down','up','right']){
 						if(checkAnim.contains(n)){
 							if(_animName == "") _animName = "sing";
-							_animName += '${n}';
+							if(flipped){
+								_animName += (n=="left" ? "right" :(n=="right" ? "left" : n));
+							}else{
+								_animName += '${n}';
+							}
 							break;
 						}
 					}
-					if(charJson.flip_x){ // 90% of the time, this is a bf clone. Worst case scenario, the animations can be re-bound
-						if(checkAnim.contains('left')) checkAnim.replace('left','right');
-						else if(checkAnim.contains('right')) checkAnim.replace('right','left');
-					}
+					trace('$_animName $checkAnim $animation');
+
 					if(checkAnim.contains('miss'))_animName += 'miss';
 					if(checkAnim.contains('alt'))_animName += '-alt';
 
 
 
-					if(_animName != ""){
-						if(Character.animCaseInsensitive[_animName] != null) _animName = Character.animCaseInsensitive[_animName];
-						editAnimation(_animName,{
-							anim: _animName,
-							name: animation,
-							loop: uiMap["loop"].checked,
-							flipx:uiMap["flipanim"].checked,
-							noreplaywhencalled:!uiMap["restplay"].checked,
-							fps: Std.int(uiMap["animFPS"].value),
-							loopStart:Std.int(uiMap["loopStart"].value),
-							indices: [],
-							priority:-1
-						},false,dad.isNew);
-						count++;
-					}
+					if(_animName == "") continue;
+					if(Character.animCaseInsensitive[_animName] != null) _animName = Character.animCaseInsensitive[_animName];
+					
+					editAnimation(_animName,{
+						anim: _animName,
+						name: animation,
+						loop: uiMap["loop"].checked,
+						flipx:uiMap["flipanim"].checked,
+						noreplaywhencalled:!uiMap["restplay"].checked,
+						fps: Std.int(uiMap["animFPS"].value),
+						loopStart:Std.int(uiMap["loopStart"].value),
+						indices: [],
+						priority:-1
+					},false,overide);
+					count++;
+					
 				}
-				
-				spawnChar(true,false,charJson);
-				showTempmessage('Attempted to auto detect $count anims!');
+				// if(FlxG.keys.pressed.CONTROL) showTempmessage('Auto detected and forced $count anims!');
+				// else 
+					showTempmessage('Auto detected $count anims!');
 			}catch(e){
 				showTempmessage('Error while adding animation: ${e.message}',FlxColor.RED);
 			}
+			spawnChar(true,false,charJson);
+
+				
 		});
 		uiBox.add(uiMap["autoDetAnims"]);
-
 
 
 		// ----------------
@@ -1034,14 +1046,12 @@ class AnimationDebug extends MusicBeatState
 		add(uiBox2);
 		uiMap["uiBox2"] = uiBox2;
 
-		var looped = checkBox(10, 30,"No antialiasing","no_antialiasing");
-		uiBox2.add(looped);
-		var looped = checkBox(10, 50,"Flip X","flip_x");
-		uiBox2.add(looped);
+		uiBox2.add(uiMap['no_antialiasing']=checkBox(10, 30,"No antialiasing","no_antialiasing"));
+		uiBox2.add(uiMap['flip_x_global']=checkBox(10, 50,"Flip X","flip_x"));
 		// var looped = checkBox(30, 80,"Spirit Trail","spirit_trail");
 		// uiBox2.add(looped);
-		var looped = checkBox(10, 75,"Invert left/right singing for BF Clone","flip_notes");
-		uiBox2.add(looped);
+		// var looped = checkBox(10, 75,"Invert left/right singing for BF Clone","flip_notes");
+		// uiBox2.add(looped);
 		// var animTxt = new FlxText(30, 100,0,"Color, R/G/B");
 
 		uiBox2.add(uiMap["scaletxt"] = new FlxText(10, 100,0,"Scale"));
@@ -1166,11 +1176,11 @@ class AnimationDebug extends MusicBeatState
 		commitButton.resize(120,30);
 		uiBox2.add(commitButton);
 
-		var commitButton = new FlxUIButton(20,280,"Switch Modes",function(){
+		var modeButton = new FlxUIButton(20,280,"Switch Modes",function(){
 			openSubState(new AnimSwitchMode());
 		});
-		commitButton.resize(120,20);
-		uiBox2.add(uiMap["switchModes"] = commitButton);
+		modeButton.resize(120,20);
+		uiBox2.add(uiMap["switchModes"] = modeButton);
 
 
 		if(dad.charType == 0){
