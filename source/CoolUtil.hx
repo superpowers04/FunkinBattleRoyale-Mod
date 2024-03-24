@@ -11,7 +11,7 @@ using StringTools;
 
 class CoolUtil {
 	public static var fontName:String = "vcr.ttf";
-	public static var font:String = if(SELoader.exists('mods/font.ttf')) 'mods/font.ttf' else Paths.font(fontName);
+	public static var font:String = (SELoader.exists('mods/font.ttf') ? 'mods/font.ttf' : (SELoader.exists('mods/font.otf') ? 'mods/font.ttf' : Paths.font(fontName)));
 	public static var difficultyArray:Array<String> = ['EASY', "NORMAL", "HARD"];
 	public static var volKeys:Array<Array<Int>> = [];
 	public static var volKeysEnabled = true;
@@ -37,7 +37,9 @@ class CoolUtil {
 				Framerate = cast SESave.data.fpsCap;
 			}
 			if(Framerate < 30){
-				Framerate = SESave.data.fpsCap = if(Application.current.window.displayMode.refreshRate > 30 ) Application.current.window.displayMode.refreshRate else if(Application.current.window.frameRate > 30) Application.current.window.frameRate else 30;
+				var rf = Application.current.window.displayMode.refreshRate;
+				var fr = Application.current.window.frameRate;
+				Framerate = SESave.data.fpsCap = (rf > 30 ? rf : (fr > 30 ? fr : 30 ));
 			}
 			if(Framerate > 300){
 				Framerate = SESave.data.fpsCap = 300;
@@ -54,9 +56,7 @@ class CoolUtil {
 		}
 		return obj;
 	}
-	@:keep inline public static function difficultyString():String
-	{
-
+	@:keep inline public static function difficultyString():String {
 		return if (PlayState.stateType == 4) PlayState.actualSongName else difficultyArray[PlayState.storyDifficulty];
 	}
 	public static function toggleVolKeys(?toggle:Bool = true){
@@ -109,11 +109,8 @@ class CoolUtil {
 	}
 
 	@:keep inline public static function orderList(list:Array<String>):Array<String>{
-		haxe.ds.ArraySort.sort(list, function(a, b) {
-		   if(a < b) return -1;
-		   else if(b > a) return 1;
-		   else return 0;
-		});
+		haxe.ds.ArraySort.sort(list, (a, b) -> (a<b ? -1 : (a>b ? 1 : 0)) );
+
 		return list;
 	}
 	public static function coolStringFile(path:String):Array<String> {
@@ -124,18 +121,14 @@ class CoolUtil {
 		return daList;
 	}
 
-	@:keep inline public static function numberArray(max:Int, ?min = 0):Array<Int>
-	{
+	@:keep inline public static function numberArray(max:Int, ?min = 0):Array<Int> {
 		var dumbArray:Array<Int> = [];
 		for (i in min...max) dumbArray.push(i);
 		return dumbArray;
 	}
-	@:keep inline public static function multiInt(?int:Int = 0){
-		if (int == 1) return ''; else return 's';
-	}
+	@:keep inline public static function multiInt(?int:Int = 0) return (int==1?'':'s');
+
 	public static function cleanJSON(input:String):String{ // Haxe doesn't filter out comments?
-		input = input.trim();
-		input = (~/\/\*[\s\S]*?\*\/|\/\/.*/g).replace(input,'');
-		return input;
+		return (~/\/\*[\s\S]*?\*\/|\/\/.*/g).replace(input.trim(),'');
 	}
 }

@@ -5,8 +5,7 @@ import flixel.FlxSubState;
 
 class ControlsSubState extends FlxSubState
 {
-	public function new()
-	{
+	public function new(){
 		super();
 	}
 }

@@ -298,19 +298,19 @@ class PlayState extends ScriptMusicBeatState
 		public static var gf:Character;
 		public static var boyfriend:Character;
 		public static var girlfriend(get,set):Character;
+		public static var bf(get,set):Character;
+		public static var opponent(get,set):Character;
+		public static var playerCharacter(get,default):Character = null;
+		public static var opponentCharacter(get,default):Character = null;
 		@:keep inline public static function get_girlfriend(){return gf;};
 		@:keep inline public static function set_girlfriend(vari){return gf = vari;};
-		public static var bf(get,set):Character;
 		@:keep inline public static function get_bf(){return boyfriend;};
 		@:keep inline public static function set_bf(vari){return boyfriend = vari;};
-		public static var opponent(get,set):Character;
 		@:keep inline public static function get_opponent(){return dad;};
 		@:keep inline public static function set_opponent(vari){return dad = vari;};
-		public static var playerCharacter(get,default):Character = null;
 		@:keep inline public static function get_playerCharacter(){
 			return (playerCharacter ?? (instance != null && instance.swappedChars ? dad : boyfriend));
 		};
-		public static var opponentCharacter(get,default):Character = null;
 		@:keep inline public static function get_opponentCharacter(){
 			return (opponentCharacter ?? (instance != null && instance.swappedChars ? boyfriend : dad));
 		};
@@ -609,7 +609,6 @@ class PlayState extends ScriptMusicBeatState
 		FlxG.sound.music.play();
 		if(vocals != null) vocals.play();
 
-
 		callInterp('reloadDone',[]);
 		if(showWarning) showTempmessage('Soft reloaded state. This is unconventional, Hold shift and press F5 for a proper state reload');
 		Conductor.songPosition = time;
@@ -635,16 +634,15 @@ class PlayState extends ScriptMusicBeatState
 		super();
 		
 		checkInputFocus = false;
-		PlayState.player1 = "";
-		PlayState.player2 = "";
-		PlayState.player3 = "";
+		PlayState.player1 = PlayState.player2 = PlayState.player3 = "";
 	}
 	inline function loadBaseStage(?simple:Bool = false){
 		defaultCamZoom = 0.9;
 		curStage = 'stage';
 		stageTags = ["inside","stage"];
-		if(simple) stageTags.push('performance');stageTags.push('simple');
-		if(!simple){
+		if(simple) {
+			stageTags.push('performance');stageTags.push('simple');
+		}else {
 			var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('stageback'));
 			bg.antialiasing = true;
 			bg.scrollFactor.set(0.9, 0.9);
@@ -840,6 +838,8 @@ class PlayState extends ScriptMusicBeatState
 
 		if(loadChars && (SESave.data.gfShow || _dadShow || SESave.data.bfShow)){
 
+
+
 			LoadingScreen.loadingText = "Loading GF";
 			if(gf== null || !SESave.data.persistGF || (!SESave.data.gfShow && !Std.isOfType(gf,EmptyCharacter)) || gf.getNamespacedName() != player2){
 				if (SESave.data.gfShow && gfShow)
@@ -957,7 +957,8 @@ class PlayState extends ScriptMusicBeatState
 		var downscroll = downscroll || (SESave.data.flipScrollY && !downscroll); // Very dumb way of implementing it but fuck it
 
 		if (SONG.difficultyString != null && SONG.difficultyString != "") songDiff = SONG.difficultyString;
-		else songDiff = if(customDiff != "") customDiff else if(stateType == 4) "mods/charts" else if (stateType == 5) "osu! beatmap" else (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy");
+		else songDiff = (customDiff != "" ? customDiff : (stateType == 4 ? "mods/charts" : (stateType == 5 ? "osu! beatmap" : (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy"))));
+			// songDiff = if(customDiff != "") customDiff else if(stateType == 4) "mods/charts" else if (stateType == 5) "osu! beatmap" else (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy");
 		playerStrums = new FlxTypedGroup<StrumArrow>();
 		cpuStrums = new FlxTypedGroup<StrumArrow>();
 
@@ -1317,7 +1318,8 @@ class PlayState extends ScriptMusicBeatState
 		callInterp("startCountdown",[]);
 		
 
-
+		var introSpr = new FlxSprite();
+		add(introSpr);
 		startTimer = new FlxTimer().start(0.5, function(tmr:FlxTimer){
 			gf.dance();
 			opponentCharacter.dance();
@@ -1326,30 +1328,24 @@ class PlayState extends ScriptMusicBeatState
 			callInterp("startTimerStep",[swagCounter]);
 			if(playCountdown){
 
-				switch (swagCounter){
-					case 0:
-						if (errorMsg != ""){
-							handleError(errorMsg);
-							startTimer.cancel();
-							return;
-						}
+				if (swagCounter == 0 && errorMsg != ""){
+					handleError(errorMsg);
+					startTimer.cancel();
+					return;
 				}
+				
 				if(introGraphics[swagCounter] != null && introGraphics[swagCounter] != ""){
-					var go:FlxSprite = new FlxSprite().loadGraphic(introGraphics[swagCounter]);
+					var go:FlxSprite = introSpr.loadGraphic(introGraphics[swagCounter]);
 					go.scrollFactor.set();
-
-
 					go.updateHitbox();
-
 					go.screenCenter();
-					add(go);
+					go.alpha = 1;
 					FlxTween.tween(go, {y: go.y -= 50}, 0.1, {
 						ease: FlxEase.cubeOut,
 					});
 					FlxTween.tween(go, {y: go.y += 100, alpha: 0}, 0.25, {
 						ease: FlxEase.cubeIn,
-						startDelay:0.2,
-						onComplete: function(twn:FlxTween){go.destroy();}
+						startDelay:0.2
 					});
 				}
 				var sound:Dynamic = introAudio[swagCounter];
@@ -1372,6 +1368,7 @@ class PlayState extends ScriptMusicBeatState
 
 			if(swagCounter == introAudio.length + 1){
 				Conductor.songPosition = 0;
+				introSpr.destroy();
 			}
 			swagCounter += 1;
 			// generateSong('fresh');

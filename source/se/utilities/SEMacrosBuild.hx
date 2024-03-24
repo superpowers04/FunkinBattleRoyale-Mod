@@ -50,6 +50,9 @@ class SEMacrosBuild{
 			kind:FieldType.FVar(macro:String, macro $v{File.getContent('source/se/handlers/PsychLuaCompatScript.lua')}), 
 		});
 		#end
+		fields.push({name:"englishTranslation",access:[Access.AInline, Access.APublic, Access.AStatic, Access.AFinal],pos:Context.currentPos(),
+			kind:FieldType.FVar(macro:String, macro $v{File.getContent('assets/preload/data/lang/english.json')}), 
+		});
 
 		return fields;
 	}

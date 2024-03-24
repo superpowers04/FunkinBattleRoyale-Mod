@@ -26,6 +26,8 @@ class FuckState extends FlxUIState {
 	public static var FATAL:Bool = false;
 	public static var forced:Bool = false;
 	public static var showingError:Bool = false;
+	public static var useOpenFL:Bool = false;
+	public static var lastERROR = "";
 	// This function has a lot of try statements.
 	// The game just crashed, we need as many failsafes as possible to prevent the game from closing or crash looping
 	@:keep inline public static function FUCK(e:Dynamic,?info:String = "unknown",_forced:Bool = false,_FATAL:Bool = false,_rawError:Bool=false){
@@ -80,98 +82,102 @@ class FuckState extends FlxUIState {
 		var dateNow:String = "";
 		var err = "";
 		exception += _stack;
+
 		// Crash log 
+		if(lastERROR != exception){
+			lastERROR = exception;
 
-		try{
-			var funnyQuip = "insert funny line here";
-			var _date = Date.now();
 			try{
-				var jokes = [
-					"Hey look, mom! I'm on a crash report!",
-					"This wasn't supposed to go down like this...",
-					"Don't look at me that way.. I tried",
-					"Ow, that really hurt :(",
-					"missingno",
-					"Did I ask for your opinion?",
-					"Oh lawd he crashing",
-					"get stickbugged lmao",
-					"Mom? Come pick me up. I'm scared...",
-					"It's just standing there... Menacingly.",
-					"Are you having fun? I'm having fun.",
-					"That crash though",
-					"I'm out of ideas.",
-					"Where do we go from here?",
-					"Coded in Haxe.",
-					"Oh what the hell?",
-					"I just wanted to have fun.. :(",
-					"Oh no, not this again",
-					"null object reference is real and haunts us",
-					'What is a error exactly?',
-					"I just got ratioed :(",
-					"L + Ratio + Skill Issue",
-					"Now with more crashes",
-					"I'm out of ideas.",
-					"me when null object reference",
-					'you looked at me funny :(',
-					'Hey VSauce, Michael here. What is an error?',
-					'AAAHHHHHHHHHHHHHH! Don\'t mind me, I\'m practicing my screaming',
-					'crash% speedrun less goooo!',
-					'hey look, the consequences of my actions are coming to haunt me',
-					'time to go to stack overflow for a solution',
-					'you\'re mother',
-					'sex pt 2: electric boobaloo',
-					'sex pt 3: gone wrong'
+				var funnyQuip = "insert funny line here";
+				var _date = Date.now();
+				try{
+					var jokes = [
+						"Hey look, mom! I'm on a crash report!",
+						"This wasn't supposed to go down like this...",
+						"Don't look at me that way.. I tried",
+						"Ow, that really hurt :(",
+						"missingno",
+						"Did I ask for your opinion?",
+						"Oh lawd he crashing",
+						"get stickbugged lmao",
+						"Mom? Come pick me up. I'm scared...",
+						"It's just standing there... Menacingly.",
+						"Are you having fun? I'm having fun.",
+						"That crash though",
+						"I'm out of ideas.",
+						"Where do we go from here?",
+						"Coded in Haxe.",
+						"Oh what the hell?",
+						"I just wanted to have fun.. :(",
+						"Oh no, not this again",
+						"null object reference is real and haunts us",
+						'What is a error exactly?',
+						"I just got ratioed :(",
+						"L + Ratio + Skill Issue",
+						"Now with more crashes",
+						"I'm out of ideas.",
+						"me when null object reference",
+						'you looked at me funny :(',
+						'Hey VSauce, Michael here. What is an error?',
+						'AAAHHHHHHHHHHHHHH! Don\'t mind me, I\'m practicing my screaming',
+						'crash% speedrun less goooo!',
+						'hey look, the consequences of my actions are coming to haunt me',
+						'time to go to stack overflow for a solution',
+						'you\'re mother',
+						'sex pt 2: electric boobaloo',
+						'sex pt 3: gone wrong'
+						
+					];
+					funnyQuip = jokes[Std.int(Math.random() * jokes.length - 1) ]; // I know, this isn't FlxG.random but fuck you the game just crashed
+				}catch(e){}
+				err = '# Super Engine Crash Report: \n# $funnyQuip\n${exception}\nThis happened in ${info}';
+				if(!SELoader.exists('crashReports/')){
+					SELoader.createDirectory('crashReports/');
+				}
+
+				dateNow = _date.toString();
+
+				dateNow = StringTools.replace(dateNow, " ", "_");
+				dateNow = StringTools.replace(dateNow, ":", ".");
+				try{
+					currentStateName = haxe.rtti.Rtti.getRtti(cast FlxG.state).path;
+				}catch(e){}
+				try{
+					err +="\n\n # ---------- SYSTEM INFORMATION --------";
 					
-				];
-				funnyQuip = jokes[Std.int(Math.random() * jokes.length - 1) ]; // I know, this isn't FlxG.random but fuck you the game just crashed
-			}catch(e){}
-			err = '# Super Engine Crash Report: \n# $funnyQuip\n${exception}\nThis happened in ${info}';
-			if(!SELoader.exists('crashReports/')){
-				SELoader.createDirectory('crashReports/');
-			}
-
-			dateNow = _date.toString();
-
-			dateNow = StringTools.replace(dateNow, " ", "_");
-			dateNow = StringTools.replace(dateNow, ":", ".");
-			try{
-				currentStateName = haxe.rtti.Rtti.getRtti(cast FlxG.state).path;
-			}catch(e){}
-			try{
-				err +="\n\n # ---------- SYSTEM INFORMATION --------";
+					err +='\n Operating System: ${Sys.systemName()}';
+					err +='\n Working Path: ${SELoader.absolutePath('')}';
+					err +='\n Current Working Directory: ${Sys.getCwd()}';
+					err +='\n Executable path: ${Sys.programPath()}';
+					err +='\n Arguments: ${Sys.args()}';
+					err +="\n # ---------- GAME INFORMATION ----------";
+					err +='\n Version: ${MainMenuState.ver}';
+					err +='\n Buildtype: ${MainMenuState.compileType}';
+					err +='\n Debug: ${SESave.data.animDebug}';
+					err +='\n Registered character count: ${TitleState.characters.length}';
+					err +='\n Scripts: ${SESave.data.scripts}';
+					err +='\n State: ${currentStateName}';
+					err +='\n Save: ${SESave.data}';
+					err +='\n # --------------------------------------';
+					
+				}catch(e){
+					trace('Unable to get system information! ${e.message}');
+				}
+				sys.io.File.saveContent('crashReports/SUPERENGINE_CRASH-${dateNow}.log',err);
 				
-				err +='\n Operating System: ${Sys.systemName()}';
-				err +='\n Working Path: ${SELoader.absolutePath('')}';
-				err +='\n Current Working Directory: ${Sys.getCwd()}';
-				err +='\n Executable path: ${Sys.programPath()}';
-				err +='\n Arguments: ${Sys.args()}';
-				err +="\n # ---------- GAME INFORMATION ----------";
-				err +='\n Version: ${MainMenuState.ver}';
-				err +='\n Buildtype: ${MainMenuState.compileType}';
-				err +='\n Debug: ${SESave.data.animDebug}';
-				err +='\n Registered character count: ${TitleState.characters.length}';
-				err +='\n Scripts: ${SESave.data.scripts}';
-				err +='\n State: ${currentStateName}';
-				err +='\n Save: ${SESave.data}';
-				err +='\n # --------------------------------------';
-				
+				saved = true;
+				trace('Wrote a crash report to ./crashReports/SUPERENGINE_CRASH-${dateNow}.log!');
+				trace('Crash Report:\n$err');
 			}catch(e){
-				trace('Unable to get system information! ${e.message}');
-			}
-			sys.io.File.saveContent('crashReports/SUPERENGINE_CRASH-${dateNow}.log',err);
-			
-			saved = true;
-			trace('Wrote a crash report to ./crashReports/SUPERENGINE_CRASH-${dateNow}.log!');
-			trace('Crash Report:\n$err');
-		}catch(e){
-			trace('Unable to write a crash report!');
-			if(err != null && err.indexOf('SYSTEM INFORMATION') != -1){
-				trace('Here is generated crash report:\n$err');
+				trace('Unable to write a crash report!');
+				if(err != null && err.indexOf('SYSTEM INFORMATION') != -1){
+					trace('Here is generated crash report:\n$err');
 
+				}
 			}
 		}
 		Main.renderLock.release();
-		if(Main.game == null || _rawError || !TitleState.initialized){
+		if(Main.game == null || _rawError || !TitleState.initialized || useOpenFL){
 			try{Main.instance.removeChild(Main.funniSprite);}catch(e){};
 			try{Main.funniSprite.removeChild(Main.game);}catch(e){};
 			if(Main.game != null){
@@ -291,6 +297,7 @@ class FuckState extends FlxUIState {
 			dateNow = StringTools.replace(dateNow, ":", ".");
 			txt.text = 'Crash report saved to "crashReports/SUPERENGINE_CRASH-${dateNow}.log".\n Please send this file when reporting this crash.' + txt.text.substring(41);
 		}
+		useOpenFL = true;
 	}
 
 	override function update(elapsed:Float) { try{
@@ -303,11 +310,13 @@ class FuckState extends FlxUIState {
 				// TitleState.initialized = false;
 				MainMenuState.firstStart = true;
 				FlxG.switchState(new MainMenuState());
+				useOpenFL = false;
 				return;
 			}
 			if (FlxG.keys.justPressed.ESCAPE){
 				trace('Exit requested!');
 				Sys.exit(1);
+				useOpenFL = false;
 			}
 
 			if (LoadingScreen.isVisible){

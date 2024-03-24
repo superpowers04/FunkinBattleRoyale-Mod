@@ -56,7 +56,7 @@ class Alphabet extends FlxSpriteGroup
 		lastSprite = null;
 		lastWasSpace = false;
 		
-		_finalText = text = repl;
+		_finalText = text = se.translation.Lang.get(repl);
 		setup();
 		return text;
 	}

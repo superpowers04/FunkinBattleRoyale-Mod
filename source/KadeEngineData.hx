@@ -33,7 +33,7 @@ class KadeEngineData {
 				}
 			}
 		}
-
+		se.translation.Lang.loadTranslations(_data.lang);
 
 	 
 

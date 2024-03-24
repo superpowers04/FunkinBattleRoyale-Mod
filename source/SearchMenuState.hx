@@ -81,18 +81,17 @@ class SearchMenuState extends ScriptMusicBeatState {
 	}
 	function orderList(list:Array<String>):Array<String>{
 		haxe.ds.ArraySort.sort(list, function(a, b) {
-		   if(a < b) return -1;
-		   else if(b > a) return 1;
-		   else return 0;
+			a=a.toLowerCase();
+			b=b.toLowerCase();
+			return (a<b) ? -1 : ((a>b) ? 1 : 0);
 		});
 		return list;
 	}
 	function updateInfoText(str:String = ""){
-		if(infotext != null){
-
-			infotext.text = str;
-			infotext.scrollFactor.set();
-		}
+		if(infotext == null) return;
+		infotext.text = str;
+		infotext.scrollFactor.set();
+		
 	}
 	// var bgColor:FlxColor = 0xFFFF6E6E;
 	@:keep inline static public function resetVars(){

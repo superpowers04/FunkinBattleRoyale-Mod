@@ -42,7 +42,7 @@ class SELoader {
 		
 	}
 	// Basically clenses paths and returns the base path with the requested one. Used heavily for the Android port
-	@:keep inline public static function getPath(path:String):String{
+	@:keep inline public static function getPath(path:String,allowModded:Bool = true):String{
 		// Remove library from path
 		if(path.indexOf(":") > 3) path = path.substring(path.indexOf(":") + 1);
 		// Absolute paths should just return themselves without anything changed
@@ -54,7 +54,7 @@ class SELoader {
 			rawMode = false;
 			return path.replace('//','/');
 		}
-		if(path.startsWith("assets/") && FileSystem.exists('${PATH}mods${path}')) path = 'mods/' + path; // Return modded assets before vanilla assets
+		if(allowModded && path.startsWith("assets/") && FileSystem.exists('${PATH}mods${path}')) path = 'mods/' + path; // Return modded assets before vanilla assets
 
 		return (PATH + path).replace('//','/'); // Fixes paths having //'s in them
 	}
@@ -142,6 +142,7 @@ class SELoader {
 	@:keep inline public static function saveContent(textPath:String,content:String):String{return saveText(textPath,content,false);}
 	@:keep inline public static function getBytes(textPath:String):Bytes{return loadBytes(textPath,false);}
 	@:keep inline public static function gc(){
+		FlxG.bitmap.clearUnused();
 		openfl.system.System.gc();
 	}
 
@@ -212,6 +213,18 @@ class SELoader {
 	}
 	public static function readDirectory(path:String):Array<String>{
 		return FileSystem.readDirectory(getPath(path));
+	}
+	public static function readDirectories(paths:Array<String>):Array<String>{
+		var ret = [];
+		for(path in paths){
+			var _path = getPath(path,false);
+			if(exists(_path) && isDirectory(_path)){
+				for(item in readDirectory(_path)){
+					ret.push('$path/$item');
+				}
+			}
+		}
+		return ret;
 	}
 	public static function isDirectory(path:String):Bool{
 		return FileSystem.isDirectory(getPath(path));

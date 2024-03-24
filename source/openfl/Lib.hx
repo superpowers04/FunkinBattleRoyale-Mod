@@ -222,15 +222,15 @@ import js.Browser;
 	public static function getTimer():Int
 	{
 		#if lime
-		#if flash
-		return flash.Lib.getTimer();
-		#elseif sys
-		return Std.int(Date.now().getTime());
+			#if sys
+				return Std.int(Sys.time() * 1000);
+			#elseif flash
+				return flash.Lib.getTimer();
+			#else
+				return System.getTimer();
+			#end
 		#else
-		return System.getTimer();
-		#end
-		#else
-		return 0;
+			return 0;
 		#end
 	}
 

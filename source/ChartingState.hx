@@ -1729,12 +1729,10 @@ class ChartingState extends ScriptMusicBeatState
 	}
 	var requestMusicPlay = false;
 	inline function updateSection(){
-		if (curStep >= 16 * (curSection + 1))
-		{
+		if (curStep >= 16 * (curSection + 1)) {
 			while(curStep >= 16 * (curSection + 1)) increaseSection();
 		}
-		if (curStep <= (16 * curSection) - 1 && _song.notes[curSection - 1] != null)
-		{
+		if (curStep <= (16 * curSection) - 1 && _song.notes[curSection - 1] != null) {
 			while(curStep <= (16 * curSection) - 1 && _song.notes[curSection - 1] != null) changeSection(curSection - 1, false);
 		}
 	}

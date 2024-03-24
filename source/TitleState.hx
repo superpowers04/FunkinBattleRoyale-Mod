@@ -692,8 +692,7 @@ class TitleState extends MusicBeatState
 	var danceLeft:Bool = false;
 	var titleText:Alphabet;
 	override function tranOut(){return;}
-	function startIntro()
-	{
+	function startIntro() {
 		
 		AlphaCharacter.cacheAlphaChars();
 		LoadingScreen.loadingText = 'Loading TitleState';
@@ -833,7 +832,7 @@ class TitleState extends MusicBeatState
 			persistentUpdate = true;
 			FlxG.mouse.enabled = true;
 			FlxG.fixedTimestep = false; // Makes the game not be based on FPS for things, thank you Forever Engine for doing this
-			FlxG.mouse.useSystemCursor = true; // Uses system cursor, did not know this was a thing until Forever Engine
+			FlxG.mouse.useSystemCursor = SESave.data.useSystemCursor; // Uses system cursor, did not know this was a thing until Forever Engine
 			CoolUtil.volKeys = [FlxG.sound.muteKeys,FlxG.sound.volumeUpKeys,FlxG.sound.volumeDownKeys];
 			if(!SELoader.exists("mods/menuTimes.json")){ // Causes crashes if done while game is running, unknown why
 				try{
@@ -1359,16 +1358,25 @@ class TitleState extends MusicBeatState
 			FlxG.camera.scroll.y += 100;
 			logoBl.screenCenter();
 			logoBl.y -= 100;
-			if(Date.now().getHours() == 2){
+			if(Date.now().getHours() == 3){
 				logoBl.angle = FlxG.random.int(0,360);
-				logoBl.x = FlxG.random.int(-50,50);
-				logoBl.y = FlxG.random.int(-50,50);
+				logoBl.x = FlxG.random.int(-100,1280);
+				logoBl.y = FlxG.random.int(-50,720);
 			}
-			if(Date.now().getHours() == 2 || Date.now().getMonth() == 9){
+			if(Date.now().getHours() == 3){
+				titleText.color=0xffff0000;
+			}else if(Date.now().getMonth() == 9){
 				titleText.color=0xffff8b0f;
 			}
 
 			FlxTween.tween(FlxG.camera.scroll,{x: 0,y:0},1,{ease:FlxEase.cubeOut});
+		}
+	}
+	override function stepHit(){
+		super.stepHit();
+		if(Date.now().getHours() == 3 && FlxG.random.int(0,100) > 80){
+			titleText.members[FlxG.random.int(0,titleText.length)].x = FlxG.random.int(-40,1280);
+			titleText.members[FlxG.random.int(0,titleText.length)].y = FlxG.random.int(-40,770);
 		}
 	}
 

@@ -1,4 +1,5 @@
-24.03.10.0150;
+24.03.23.2155;
+* Crash screen now properly reverts to openfl if a crash is detected on the crash screen(irony)
 * Fix a bunch of bugs
 24.01.31.2157 ---
 * Change how bg bouncing works in MultiMenuState

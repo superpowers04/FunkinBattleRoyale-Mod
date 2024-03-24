@@ -477,8 +477,7 @@ class Controls extends FlxActionSet
 	static function removeKeys(action:FlxActionDigital, keys:Array<FlxKey>)
 	{
 		var i = action.inputs.length;
-		while (i-- > 0)
-		{
+		while (i-- > 0) {
 			var input = action.inputs[i];
 			if (input.device == KEYBOARD && keys.indexOf(cast input.inputID) != -1)
 				action.remove(input);

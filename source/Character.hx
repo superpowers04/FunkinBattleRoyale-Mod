@@ -195,7 +195,10 @@ class CharAnimController extends FlxAnimationController{
 		public var camY:Float = 0;
 		public var useMisses:Bool = false;
 		public var useVoices:Bool = false;
-		public var dadVar:Float = 4; // Singduration?
+		public var singDuration:Float = 4; // Singduration?
+		public var dadVar(get,set):Float; // Singduration?
+		public function get_dadVar() return singDuration;
+		public function set_dadVar(x) return singDuration = x;
 		public var missSounds:Array<Sound> = [];
 		public var voiceSounds:Array<FlxSound> = [];
 		public var flip:Bool = true;
@@ -386,7 +389,7 @@ class CharAnimController extends FlxAnimationController{
 
 
 		// healthIcon = charProperties.healthicon;
-		dadVar = charProperties.sing_duration; // As the varname implies
+		singDuration = charProperties.sing_duration; // As the varname implies
 		flipX=charProperties.flip_x; // Flip for BF clones
 		antialiasing = !charProperties.no_antialiasing; 
 
@@ -397,47 +400,61 @@ class CharAnimController extends FlxAnimationController{
 		var animCount = 0;
 		var hasIdle = false;
 		if(charProperties.animations.length > 0){
-			for (anima in charProperties.animations){
-				try{if (anima.anim.substr(-4) == "-alt"){hasAlts=true;} // Alt Checking
-				if (anima.stage != "" && anima.stage != null){if(PlayState.curStage.toLowerCase() != anima.stage.toLowerCase()){continue;}} // Check if animation specifies stage, skip if it doesn't match PlayState's stage
-				if (anima.song != "" && anima.song != null){if(PlayState.SONG.song.toLowerCase() != anima.song.toLowerCase()){continue;}} // Check if animation specifies song, skip if it doesn't match PlayState's song
-				if (animCaseInsensitive[anima.anim] != null) anima.anim = animCaseInsensitive[anima.anim];
-				if (animation.getByName(anima.anim) != null){continue;} // Skip if animation has already been defined
-				if (anima.char_side != null && anima.char_side != 3 && anima.char_side == charType){continue;} // This if statement hurts my brain
-				if (anima.ifstate != null && PlayState.instance != null){
-					anima.ifstate.isFunc = false; //Force because funni
-					// PlayState.
-					if (anima.ifstate.check == 1 ){ // Do on step or beat
-						if (PlayState.stepAnimEvents[charType] == null) PlayState.stepAnimEvents[charType] = [anima.anim => anima.ifstate];
-					} else {
-						if (PlayState.beatAnimEvents[charType] == null) PlayState.beatAnimEvents[charType] = [anima.anim => anima.ifstate]; else PlayState.beatAnimEvents[charType][anima.anim] = anima.ifstate;
+			for (index => anima in charProperties.animations){
+				var property = 0;
+				try{
+					if (anima == null){
+						trace('Animation at $index is null! Ignoring!');
+						continue;
 					}
+					if (anima.anim == null) throw('HOW THE FUCK IS THE ANIM NULL');
+					if (anima.name == null) throw('HOW THE FUCK IS THE ANIM NAME NULL');
+					if (anima.anim.substr(-4) == "-alt") hasAlts=true; // Alt Checking
+					if (anima.stage != "" && anima.stage != null){if(PlayState.curStage.toLowerCase() != anima.stage.toLowerCase()){continue;}} // Check if animation specifies stage, skip if it doesn't match PlayState's stage
+					if (anima.song != "" && anima.song != null){if(PlayState.SONG.song.toLowerCase() != anima.song.toLowerCase()){continue;}} // Check if animation specifies song, skip if it doesn't match PlayState's song
+					if (animCaseInsensitive[anima.anim] != null) anima.anim = animCaseInsensitive[anima.anim];
+					if (animation.getByName(anima.anim) != null) continue; // Skip if animation has already been defined
+					if (anima.char_side != null && anima.char_side != 3 && anima.char_side != charType){continue;} // This if statement hurts my brain
 					
-					// PlayState.regAnimEvent(charType,anima.ifstate,anima.anim);
-				}
-				if (anima.oneshot == true && !amPreview){ // "On static platforms, null can't be used as basic type Bool" bruh
-					oneShotAnims.push(anima.anim);
-					anima.loop = false; // Looping when oneshot is a terrible idea
-				}
-				if (anima.noreplaywhencalled == true && !amPreview){ //
-					replayAnims.push(anima.anim);
-				}
-				if(anima.loopStart != null && anima.loopStart != 0 )loopAnimFrames[anima.anim] = anima.loopStart;
-				if(anima.playAfter != null && anima.playAfter != '' )loopAnimTo[anima.anim] = anima.playAfter;
-				if(anima.anim == "idle" || anima.anim == "danceLeft")hasIdle = true;
-				if (anima.indices.length > 0) { // Add using indices if specified
-					addAnimation(anima.anim, anima.name,anima.indices,"", anima.fps, anima.loop,anima.flipx);
-				}else if (anima.frameNames != null && anima.frameNames.length > 0) { // Add using frameNames if specified
-					addAnimation(anima.anim, anima.name,anima.frameNames,"", anima.fps, anima.loop,anima.flipx);
-				}else{addAnimation(anima.anim, anima.name, anima.fps, anima.loop,anima.flipx);}
 
-				if(anima.priority != null && -1 < anima.priority ){
-					animationPriorities[anima.name] = anima.priority;
-				}
-				if(animationPriorities[anima.name] == null){
-					animationPriorities[anima.name] = 1;
-				}
-				}catch(e){handleError('${curCharacter} had an animation error ${e.message}');break;}
+					if (anima.ifstate != null && PlayState.instance != null){
+						anima.ifstate.isFunc = false; //Force because funni
+						// PlayState.
+						if (anima.ifstate.check == 1 ){ // Do on step or beat
+							if (PlayState.stepAnimEvents[charType] == null) PlayState.stepAnimEvents[charType] = [anima.anim => anima.ifstate];
+						} else {
+							if (PlayState.beatAnimEvents[charType] == null) PlayState.beatAnimEvents[charType] = [anima.anim => anima.ifstate]; else PlayState.beatAnimEvents[charType][anima.anim] = anima.ifstate;
+						}
+						
+						// PlayState.regAnimEvent(charType,anima.ifstate,anima.anim);
+					}
+					if (anima.oneshot == true && !amPreview){ // "On static platforms, null can't be used as basic type Bool" bruh
+						oneShotAnims.push(anima.anim);
+						anima.loop = false; // Looping when oneshot is a terrible idea
+					}
+					if (anima.noreplaywhencalled == true && !amPreview){ //
+						replayAnims.push(anima.anim);
+					}
+					if(anima.loopStart != null && anima.loopStart != 0 ) loopAnimFrames[anima.anim] = anima.loopStart;
+					
+					if(anima.playAfter != null && anima.playAfter != '' ) loopAnimTo[anima.anim] = anima.playAfter;
+					
+					if(anima.anim == "idle" || anima.anim == "danceLeft") hasIdle = true;
+					
+					if (anima.indices.length > 0) { // Add using indices if specified
+						addAnimation(anima.anim, anima.name,anima.indices,"", anima.fps, anima.loop,anima.flipx);
+					}else if (anima.frameNames != null && anima.frameNames.length > 0) { // Add using frameNames if specified
+						addAnimation(anima.anim, anima.name,anima.frameNames,"", anima.fps, anima.loop,anima.flipx);
+					}else{addAnimation(anima.anim, anima.name, anima.fps, anima.loop,anima.flipx);}
+					
+
+					if(anima.priority != null && -1 < anima.priority ){
+						animationPriorities[anima.name] = anima.priority;
+					}
+					if(animationPriorities[anima.name] == null){
+						animationPriorities[anima.name] = 1;
+					}
+				}catch(e){handleError('${curCharacter} had an animation error ${e.details()}'); return;}
 				animCount++;
 			}
 		}
@@ -456,7 +473,7 @@ class CharAnimController extends FlxAnimationController{
 								obj = Reflect.getProperty(obj,e);
 								if(obj == null) throw('Unable to access $e');
 							}catch(e){
-								handleError('Error accessing ${curCharacter}.${prop.path}: ${e.message}');
+								handleError('Error accessing ${curCharacter}.${prop.path}: ${e.details()}');
 								obj = null;
 								break;
 							}
@@ -469,7 +486,7 @@ class CharAnimController extends FlxAnimationController{
 						try{
 							Reflect.setProperty(obj,prop.path,prop.value);
 						}catch(e){
-							handleError('Error setting ${curCharacter}.${prop.path} to ${prop.value}: ${e.message}');
+							handleError('Error setting ${curCharacter}.${prop.path} to ${prop.value}: ${e.details()}');
 							break;
 
 						}
@@ -630,11 +647,14 @@ class CharAnimController extends FlxAnimationController{
 					if (charProperties == null) {
 						charProperties = Json.parse(CoolUtil.cleanJSON(charPropJson = SELoader.loadText('${charLoc}/$curCharacter/config.json')));
 					}
-				}catch(e){MainMenuState.handleError(e,'Character ${curCharacter} has a broken config.json! ${e.message}');
+				}catch(e){
+					handleError('Character ${curCharacter} has a broken config.json! ${e.message}');
 					return;
 				}
 			}
-			if ((charProperties == null || charProperties.animations == null || charProperties.animations[0] == null) && !amPreview){handleError('$curCharacter\'s JSON is invalid!');} // Boot to main menu if character's JSON can't be loaded
+			if ((charProperties == null || charProperties.animations == null || charProperties.animations[0] == null) && !amPreview){
+				return handleError('$curCharacter\'s JSON is invalid!');
+			} // Boot to main menu if character's JSON can't be loaded
 			// if ((charProperties == null || charProperties.animations == null || charProperties.animations[0] == null) && amPreview){
 
 			loadedFrom = '${charLoc}/$curCharacter/config.json';
@@ -732,16 +752,28 @@ class CharAnimController extends FlxAnimationController{
 		e.hscriptGen = true;
 		return e;
 	}
-
+	var thrownError:Bool = false;
+	var loaded:Bool=false;
 	public function handleError(error:String){
-		
+		if(thrownError) return;
+		trace('$curCharacter:$error');
 		interp = null;
-		if (!amPreview && PlayState.instance != null){
-			// PlayState.instance.handleError(error);
-			throw error;
-		}else{
+		thrownError = true;
+		// if(!loaded){
+		// 	try{
+		// 		loaded=true;
+		// 		// loadChar("bf");
+
+		// 	}catch(e){}
+		// }
+		lonely = true;
+		color = 0xaa000000;
+		// if (!amPreview && PlayState.instance != null){
+		// 	PlayState.instance.errorHandle(error);
+		// 	// throw error;
+		// }else{
 			MainMenuState.handleError(error);
-		}
+		// }
 	}
 
 	inline function loadChar(?char:String = ""){
@@ -822,17 +854,20 @@ class CharAnimController extends FlxAnimationController{
 		animation.callback = function(name:String,frameNumber:Int,frameIndex:Int){
 			callInterp("animFrame",[animation.curAnim,frameNumber,frameIndex]);
 		};
-		if(animation.curAnim == null && !lonely && !amPreview){MainMenuState.handleError('$curCharacter is missing an idle/dance animation!');}
+		if(animation.curAnim == null && !lonely && !amPreview){return handleError('$curCharacter is missing an idle/dance animation!');}
 		if(animation.getByName('songStart') != null && !lonely && !amPreview) playAnim('songStart',true);
 		if(!charProperties.editableSprite){
 			// graphic.canBeDumped = true;
 			graphic.dump();
 		}
 		#if !debug
-		}catch(e){MainMenuState.handleError(e,'Error with $curCharacter: ${e}');
-			return;
+		}catch(e){
+			return handleError('Error with $curCharacter: ${e}');
+			
 		}
 		#end
+		loaded=true;
+
 	}
 
 	override function update(elapsed:Float)
@@ -848,7 +883,7 @@ class CharAnimController extends FlxAnimationController{
 				dance();
 			}
 			(currentAnimationPriority == 10 ? holdTimer += elapsed : holdTimer = 0);
-			if (!isPlayer && holdTimer >= Conductor.stepCrochet * dadVar * 0.001) {
+			if (!isPlayer && holdTimer >= Conductor.stepCrochet * singDuration * 0.001) {
 				holdTimer = 0;
 				dance();
 			}
@@ -856,7 +891,7 @@ class CharAnimController extends FlxAnimationController{
 		}
 
 		super.update(elapsed);
-	}catch(e:Dynamic){MainMenuState.handleError(e,'Caught character "update" crash: ${e}');}}
+	}catch(e:Dynamic){handleError('Caught character "update" crash: ${e}');}}
 
 	
 	/**
@@ -1034,7 +1069,7 @@ class CharAnimController extends FlxAnimationController{
 					addOffset(name,animOffsets[anim.name][0],animOffsets[anim.name][1],true);
 				}
 			}
-		}catch(e)MainMenuState.handleError('Caught character "cloneAnimation" crash: ${e.message}');
+		}catch(e) handleError('Caught character "cloneAnimation" crash: ${e.message}');
 	}
 	public function addOffset(name:String, x:Float = 0, y:Float = 0,?custom:Bool = false,?replace:Bool = false)
 	{

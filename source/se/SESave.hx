@@ -148,5 +148,8 @@ typedef YourMother = Dynamic;
 	var flipScrollY:Bool = false;
 	var resyncVoices:Bool = true;
 
+	var useSystemCursor:Bool = false;
+	var lang:String = "english";
+
 	public function new(){}
 }

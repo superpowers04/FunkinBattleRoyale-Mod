@@ -8,15 +8,13 @@ import flixel.FlxG;
  * @author
  */
 
-typedef BPMChangeEvent =
-{ 
+typedef BPMChangeEvent = { 
 	var stepTime:Int;
 	var songTime:Float;
 	var bpm:Float;
 }
 
-class Conductor
-{
+class Conductor {
 	public static var bpm:Float = 100;
 	public static var crochet:Float = ((60 / bpm) * 1000); // beats in milliseconds
 	public static var stepCrochet:Float = crochet / 4; // steps in milliseconds
@@ -72,17 +70,9 @@ class Conductor
 			totalSteps += deltaSteps;
 			totalPos += ((60 / curBPM) * 1000 / 4) * deltaSteps;
 		}
-		// trace("Created new BPM map - " + bpmChangeMap);
 	}
 
-	public static function changeBPM(newBpm:Float)
-	{
-		if(Math.isNaN(newBpm) || newBpm == 0){
-			newBpm = 120;
-		}
-		bpm = Math.abs(newBpm);
-
-		crochet = ((60 / bpm) * 1000);
-		stepCrochet = crochet / 4;
+	@:keep inline public static function changeBPM(newBpm:Float) {
+		stepCrochet = (crochet = ((60 / (bpm = Math.abs(Math.isNaN(newBpm) || newBpm == 0 ? 120 : newBpm))) * 1000)) / 4;
 	}
 }

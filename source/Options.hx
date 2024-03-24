@@ -640,14 +640,16 @@ class HCIntOption extends Option{
 	var max:Int = 0;
 	var min:Int = 0;
 	var inc:Int = 0;
+	var callback:()->Void;
 
-	public function new(name:String,desc:String,id:String,?min:Int = 0,?max:Int = 100,?inc:Int = 1){
+	public function new(name:String,desc:String,id:String,?min:Int = 0,?max:Int = 100,?inc:Int = 1,?callback:()->Void){
 		this.max = max;
 		this.min = min;
 		this.inc = inc;
 		acceptValues = true;
 		this.name = name;
 		this.id = id;
+		this.callback = callback;
 		super();
 		acceptValues = true;
 		description = desc;
@@ -681,14 +683,16 @@ class HCFloatOption extends Option{
 	var max:Float = 0;
 	var min:Float = 0;
 	var inc:Float = 0.1;
+	var callback:()->Void;
 
-	public function new(name:String,desc:String,id:String,?min:Float = 0,?max:Float = 1,?inc:Float = 0.1){
+	public function new(name:String,desc:String,id:String,?min:Float = 0,?max:Float = 1,?inc:Float = 0.1,?callback:()->Void){
 		this.max = max;
 		this.min = min;
 		this.inc = inc;
 		acceptValues = true;
 		this.name = name;
 		this.id = id;
+		this.callback = callback;
 		super();
 		acceptValues = true;
 		description = desc;
@@ -704,6 +708,7 @@ class HCFloatOption extends Option{
 		else if(FlxG.keys.pressed.CONTROL) ince *= 0.1;
 		Reflect.setProperty(SESave.data,id,Math.max(cast (Reflect.getProperty(SESave.data,id),Float) - ince,min));
 		display = updateDisplay();
+		if(callback!=null)callback();
 		return true;
 	}
 	public override function right():Bool{
@@ -713,6 +718,7 @@ class HCFloatOption extends Option{
 		else if(FlxG.keys.pressed.CONTROL) ince *= 0.1;
 		Reflect.setProperty(SESave.data,id,Math.min(cast (Reflect.getProperty(SESave.data,id),Float) + ince,max));
 		display = updateDisplay();
+		if(callback!=null)callback();
 		return true;
 	}
 	override function updateDisplay():String return name + ": " + getValue();
@@ -722,14 +728,16 @@ class HCBoolOption extends Option{
 	var name:String;
 	var trueText:String = "";
 	var falseText:String = "";
+	var callback:()->Void;
 
-	public function new(name:String,desc:String,id:String,?trueText:String = "",falseText:String = "")
+	public function new(name:String,desc:String,id:String,?trueText:String = "",falseText:String = "",?callback:()->Void)
 	{
 		// acceptValues = true;
 		this.name = name;
 		this.id = id;
 		this.trueText = trueText;
 		this.falseText = falseText;
+		this.callback = callback;
 		super();
 		description = desc;
 
@@ -738,6 +746,7 @@ class HCBoolOption extends Option{
 	public override function press():Bool{
 		Reflect.setProperty(SESave.data,id,!Reflect.getProperty(SESave.data,id));
 		display = updateDisplay();
+		if(callback!=null)callback();
 		return true;
 	}
 
@@ -907,6 +916,27 @@ class ResetKeybindsOption extends Option
 	}
 }
 
+class LanguageOption extends Option{
+	var name:String;
+
+	public function new(name:String) {
+		this.name = name;
+
+		super();
+		description = name;
+
+	}
+	override function getValue():String return "";
+			
+	override function right():Bool return false;
+	override function left():Bool return false;
+	
+	override function press():Bool {
+		se.translation.Lang.loadTranslations(SESave.data.lang = name);
+		return true;
+	}
+	override function updateDisplay():String return name;
+}
 class QuickOption extends Option{
 	var name:String;
 	var setting:QOSetting;

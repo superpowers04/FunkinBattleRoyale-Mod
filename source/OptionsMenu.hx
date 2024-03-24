@@ -175,7 +175,8 @@ class OptionsMenu extends MusicBeatState
 		],"Disable some features for better performance"),
 		new OptionCategory("Visibility", [
 			new HCBoolOption('Force generic Font', "Force menus to use the built-in font or mods/font.ttf for easier reading(Note, some menus will break)",'useFontEverywhere'),
-			new HCBoolOption('FPS Counter', "Show the FPS Counter",'fps'),
+			new HCBoolOption('Use System Cursor', "Toggles the use of Flixel's cursor, might be useful if the system cursor fails to work.",'useSystemCursor',()->{FlxG.mouse.useSystemCursor = SESave.data.useSystemCursor;}),
+			new HCBoolOption('FPS Counter', "Show the FPS Counter",'fps',()->{Main.instance.toggleFPS(SESave.data.fps);}),
             new BackTransOption("Change underlay opacity"),new BackgroundSizeOption("Change underlay size"),
 			new HCBoolOption('NPS Display', "Keeps track of and shows your current notes per second",'npsDisplay'),
 			new HCBoolOption('Show Note Ratings', "Shows note ratings next to the strumline",'noterating'),
@@ -194,17 +195,22 @@ class OptionsMenu extends MusicBeatState
 			#if hxCodec
 			new HCBoolOption("VLC Audio Handling","Whether to use Flixel or VLC for audio. VLC supports more formats but may cause issues","vlcSound"),
 			#end
-			new VolumeOption("Adjust the volume of the entire game","master"),
-			new VolumeOption("Adjust the volume of the background music","inst"),
-			new VolumeOption("Adjust the volume of the vocals","voices"),
-			new VolumeOption("Adjust the volume of the hit sounds","hit"),    
-			new VolumeOption("Adjust the volume of miss sounds","miss"),       
-			new VolumeOption("Adjust the volume of other sounds and the default script sound volume","other"),  
+			new VolumeOption("se.options.volume.master","master"),
+			new VolumeOption("se.options.volume.inst","inst"),
+			new VolumeOption("se.options.volume.voices","voices"),
+			new VolumeOption("se.options.volume.hit","hit"),    
+			new VolumeOption("se.options.volume.miss","miss"),       
+			new VolumeOption("se.options.volume.other","other"),  
 			new HCBoolOption("Miss Sounds","Play a sound when you miss",'playMisses'),
 			new HCBoolOption("Hit Sounds","Play a click when you hit a note. Uses osu!'s sounds or your mods/hitsound.ogg",'hitSound'),
 			new HCBoolOption("Play Character Voices","Plays the voices a character has when you press a note.","playVoices"),
 			new HCBoolOption("Resync Music","Automatically resync voices if they fall out of sync. Might cause lag",'resyncVoices'),
-		],"Toggle some sounds and change the volume of things"),
+		],Lang.get('se.options.audio.desc')),
+		new OptionCategory('se.options.lang', [
+			for (name in SELoader.readDirectories(['assets/data/lang','mods/lang'])){
+				new LanguageOption(name.substring(name.lastIndexOf('/')+1,name.lastIndexOf('.')));
+			}
+		],Lang.get('se.options.lang.desc')),
 	];
 
 	public var acceptInput:Bool = true;
@@ -217,7 +223,7 @@ class OptionsMenu extends MusicBeatState
 	var currentSelectedCat:OptionCategory;
 	var blackBorder:FlxSprite;
 	var titleText:FlxText;
-	function addTitleText(str:String = "< Options - Tap here to go back"){
+	function addTitleText(str:String = "se.options.title"){
 		if (titleText != null) titleText.destroy();
 		titleText = new FlxText(FlxG.width * 0.5 - (str.length * 10), 20, 0, str, 12);
 		titleText.scrollFactor.set();
@@ -265,7 +271,7 @@ class OptionsMenu extends MusicBeatState
 
 		currentDescription = "none";
 
-		versionShit = new FlxText(5, FlxG.height + 40, 0, "Offset (Left, Right, Shift for slow): " + HelperFunctions.truncateFloat(SESave.data.offset,2) + " - Description - " + currentDescription, 12);
+		versionShit = new FlxText(5, FlxG.height + 40, 0, "Offset (Left, Right, Shift for slow): " + HelperFunctions.truncateFloat(SESave.data.offset,2) + " - Description - " + se.translation.Lang.get(currentDescription), 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat(CoolUtil.font, 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		
@@ -401,7 +407,7 @@ class OptionsMenu extends MusicBeatState
 				}
 				
 				curSelected = 0;
-				addTitleText('Options > ' + options[selCat].name);
+				addTitleText(se.translation.Lang.get('Options') + ' > ' + se.translation.Lang.get(options[selCat].name));
 				changeSelection();
 				// updateOffsetText();
 			}

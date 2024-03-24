@@ -24,8 +24,7 @@ import flixel.util.FlxStringUtil;
 
 using StringTools;
 
-class PauseSubState extends MusicBeatSubstate
-{
+class PauseSubState extends MusicBeatSubstate {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 
 	var menuItems:Array<String> = [];
@@ -415,7 +414,8 @@ class PauseSubState extends MusicBeatSubstate
 		FlxTween.tween(bg,{alpha:0},2.5,{ease:FlxEase.quartOut});
 
 
-
+		var spr = new FlxSprite();
+		var tween:FlxTween;
 		startTimer = new FlxTimer().start(0.5, function(tmr:FlxTimer) {
 
 			var introAssets:Map<String, Array<String>> = new Map<String, Array<String>>();
@@ -425,40 +425,44 @@ class PauseSubState extends MusicBeatSubstate
 			var altSuffix:String = "";
 			switch (swagCounter) {
 				case 1:
-					var ready:FlxSprite = new FlxSprite().loadGraphic(Paths.image(introAlts[0]));
+					var ready:FlxSprite = spr.loadGraphic(Paths.image(introAlts[0]));
 					ready.scrollFactor.set();
 					ready.updateHitbox();
 					ready.screenCenter();
+					ready.alpha = 1;
+
 
 					add(ready);
-					FlxTween.tween(ready, {y: ready.y + 100, alpha: 0}, Conductor.crochet / 1000, {
+					tween = FlxTween.tween(ready, {y: ready.y + 100, alpha: 0}, 0.4, {
 						ease: FlxEase.cubeInOut,
-						onComplete: function(twn:FlxTween) {ready.destroy();}
+						// onComplete: function(twn:FlxTween) {ready.destroy();}
 					});
 					FlxG.sound.play(Paths.sound('intro2' + altSuffix), 0.6);
 				case 2:
-					var set:FlxSprite = new FlxSprite().loadGraphic(Paths.image(introAlts[1]));
-					set.scrollFactor.set();
+					var set:FlxSprite = spr.loadGraphic(Paths.image(introAlts[1]));
+					tween.cancel();
+					set.updateHitbox();
+					set.alpha = 1;
 
 
 
 					set.screenCenter();
 					add(set);
-					FlxTween.tween(set, {y: set.y + 100, alpha: 0}, Conductor.crochet / 1000, {
+					tween = FlxTween.tween(set, {y: set.y + 100, alpha: 0}, 0.4, {
 						ease: FlxEase.cubeInOut,
-						onComplete: function(twn:FlxTween) {set.destroy();}
+						// onComplete: function(twn:FlxTween) {set.destroy();}
 					});
 					FlxG.sound.play(Paths.sound('intro1' + altSuffix), 0.6);
 				case 3:
-					var go:FlxSprite = new FlxSprite().loadGraphic(Paths.image(introAlts[2]));
+					var go:FlxSprite = spr.loadGraphic(Paths.image(introAlts[2]));
+					tween.cancel();
 					go.scrollFactor.set();
-
-
 					go.updateHitbox();
+					go.alpha = 1;
 
 					go.screenCenter();
 					add(go);
-					FlxTween.tween(go, {y: go.y + 100, alpha: 0}, Conductor.crochet / 1000, {
+					tween = FlxTween.tween(go, {y: go.y + 100, alpha: 0}, 0.4, {
 						ease: FlxEase.cubeInOut,
 						onComplete: function(twn:FlxTween) {go.destroy();}
 					});
