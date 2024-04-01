@@ -230,7 +230,12 @@ class FinishSubState extends MusicBeatSubstate
 			FlxG.sound.pause();
 
 			// if(!win)FlxG.sound.play(Paths.sound('fnf_loss_sfx'));
-			music = new FlxSound().loadEmbedded(endingMusic ?? Paths.music( win ? 'StartItchBuild' : 'gameOver' ), true, true);
+			if(endingMusic == null){
+				music = new FlxSound().loadEmbedded(Paths.music( win ? 'StartItchBuild' : 'gameOver' ), true, true);
+			}else{
+				music = new FlxSound().loadEmbedded(endingMusic , true, true);
+
+			}
 			music.play(false);
 
 			if(win && endingMusic == null){
