@@ -1,6 +1,9 @@
 24.04.01.1820;
+* Add support for translations from mods/lang(Currently almost nothing is translated)
+* Embed hscript library into super engine
+* Some animation debug fixes
 * Crash screen now properly reverts to openfl if a crash is detected on the crash screen(irony)
-* Fix a bunch of bugs
+* Fix a bunch of random bugs
 24.01.31.2157 ---
 * Change how bg bouncing works in MultiMenuState
 * BPM change maps now work in all states
