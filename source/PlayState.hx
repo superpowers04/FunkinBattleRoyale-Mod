@@ -1012,7 +1012,7 @@ class PlayState extends ScriptMusicBeatState
 		if(actualSongName == ""){
 			actualSongName = (if(ChartingState.charting) "Charting" else curSong + " " + songDiff);
 		}
-		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50 - SESave.data.guiGap,0,actualSongName + " - " + inputEngineName, 16);
+		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50 - SESave.data.guiGap,0,'$actualSongName - $inputEngineName', 16);
 		kadeEngineWatermark.setFormat(CoolUtil.font, 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
 		kadeEngineWatermark.scrollFactor.set();
 		if(QuickOptionsSubState.getSetting("Flippy mode")){
@@ -1561,7 +1561,7 @@ class PlayState extends ScriptMusicBeatState
 		songPosBar_.numDivisions = 1000;
 		songPosBar_.setRange(0,songLength - 1000);
 		songPosBar_.scrollFactor.set();
-		songPosBar_.createFilledBar(FlxColor.GRAY, FlxColor.LIME);
+		songPosBar_.createFilledBar(FlxColor.GRAY, 0xFFaa33aa);
 
 		if(songName == null) songName = new FlxText(0,0,SONG.song, 14);
 		songName.text = SONG.song;
@@ -1569,10 +1569,10 @@ class PlayState extends ScriptMusicBeatState
 		songName.y = songPosBG_.y + 1;
 		songName.setFormat(CoolUtil.font, 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
 		songName.scrollFactor.set();
-		if (songTimeTxt == null) songTimeTxt = new FlxText(0,0,0,"00:00/0:00", 16);
+		if (songTimeTxt == null) songTimeTxt = new FlxText(0,0,0,"00:000/00:000", 16);
 		songTimeTxt.x = songPosBG_.x + songPosBG_.width - (20 + songTimeTxt.width);
 		songTimeTxt.y = songPosBG_.y + 1;
-		if (downscroll) songName.y -= 3;
+		// if (downscroll) songName.y -= 3;
 		songTimeTxt.text = "00:00/" + songLengthTxt;
 		songTimeTxt.x -= songTimeTxt.width;
 		songTimeTxt.setFormat(CoolUtil.font, 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);

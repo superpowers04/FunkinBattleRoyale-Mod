@@ -742,7 +742,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 
 							#if discord_rpc
 								if(listeningTime == 0)listeningTime = Date.now().getTime();
-								DiscordClient.changePresence('Listening to a song in menus',songInfo.name,listeningTime);
+								DiscordClient.changePresence('Listening to a song in menus',CoolUtil.formatChartName(songInfo.name),listeningTime);
 							#end
 						}else{
 							curPlaying = "";

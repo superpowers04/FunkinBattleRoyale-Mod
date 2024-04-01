@@ -99,7 +99,8 @@ class CoolUtil {
 		return daList;
 	}
 	public static function formatChartName(str:String):String{
-		str = (~/[-_ ]/g).replace(str,' ');
+
+		if(!str.contains(' ')) str = (~/[-_ ]/g).replace(str,' '); // If the string contains spaces, probably already formatted to remove _ and -
 		var e = str.split(' ');
 		str = "";
 		for (item in e){

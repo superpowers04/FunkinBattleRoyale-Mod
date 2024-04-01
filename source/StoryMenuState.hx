@@ -183,7 +183,7 @@ class StoryMenuState extends ScriptMusicBeatState
 				}else if(SELoader.exists('mods/charts/' + PlayState.storyPlaylist[0].toLowerCase() )){
 					selSong = 'mods/charts/' + PlayState.storyPlaylist[0].toLowerCase();
 				}else{
-					songJSON = multi.MultiMenuState.findSongByName(PlayState.storyPlaylist[0].toLowerCase() + "-" + diffic,weekName);
+					songJSON = multi.MultiMenuState.findSongByName(PlayState.storyPlaylist[0] + "-" + diffic,weekName);
 					if(songJSON == "") songJSON = multi.MultiMenuState.findSongByName(PlayState.storyPlaylist[0].toLowerCase() + "-" + diffic,weekName);
 					if(songJSON == ""){
 						MainMenuState.handleError("Unable to find song '" + PlayState.storyPlaylist[0] + "'!");

@@ -746,7 +746,7 @@ class CharAnimController extends FlxAnimationController{
 
 	public static function newChar(x:Float, y:Float, ?character:String = "", ?isPlayer:Bool = false,?charType:Int = 0,?exitex:FlxAtlasFrames = null,?charJson:CharacterJson = null,?useHscript:Bool = true):Character{
 		var e = new Character(x,y,character,isPlayer,charType,exitex,charJson);
-		if(PlayState.instance.songStarted){
+		if(PlayState.instance != null && PlayState.instance.songStarted){
 			PlayState.instance.showTempmessage("Please load characters before song start to prevent lag during song!",FlxColor.RED);
 		}
 		e.hscriptGen = true;
