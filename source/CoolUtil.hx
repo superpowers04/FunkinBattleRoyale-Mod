@@ -11,7 +11,7 @@ using StringTools;
 
 class CoolUtil {
 	public static var fontName:String = "vcr.ttf";
-	public static var font:String = (SELoader.exists('mods/font.ttf') ? 'mods/font.ttf' : (SELoader.exists('mods/font.otf') ? 'mods/font.ttf' : Paths.font(fontName)));
+	public static var font:String = (SELoader.anyExists(['mods/font.ttf','mods/font.otf']) ?? Paths.font(fontName));
 	public static var difficultyArray:Array<String> = ['EASY', "NORMAL", "HARD"];
 	public static var volKeys:Array<Array<Int>> = [];
 	public static var volKeysEnabled = true;

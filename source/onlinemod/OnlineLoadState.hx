@@ -183,10 +183,10 @@ class OnlineLoadState extends MusicBeatState
 					{
 						customSong = true;
 
-						if (!FileSystem.exists('assets/onlinedata/data/${folder.toLowerCase()}')) FileSystem.createDirectory('assets/onlinedata/data/${folder.toLowerCase()}');
-						File.saveBytes('assets/onlinedata/data/${folder.toLowerCase()}/${jsonInput.toLowerCase()}.json', file);
+						if (!SELoader.exists('assets/onlinedata/data/${folder.toLowerCase()}')) SELoader.createDirectory('assets/onlinedata/data/${folder.toLowerCase()}');
+						SELoader.saveBytes('assets/onlinedata/data/${folder.toLowerCase()}/${jsonInput.toLowerCase()}.json', file);
 						
-						if (FileSystem.exists('assets/onlinedata/songs/${folder.toLowerCase()}/Voices.ogg')) // If Voices.ogg has already been downladed
+						if (SELoader.exists('assets/onlinedata/songs/${folder.toLowerCase()}/Voices.ogg')) // If Voices.ogg has already been downladed
 							loadVoices('assets/onlinedata/songs/${folder.toLowerCase()}/Voices.ogg');
 						else
 							requestVoices();
@@ -200,8 +200,8 @@ class OnlineLoadState extends MusicBeatState
 				case Packets.SEND_VOICES:
 					var file:Bytes = cast(data[0], Bytes);
 
-					if (!FileSystem.exists('assets/onlinedata/songs/${folder.toLowerCase()}')) FileSystem.createDirectory('assets/onlinedata/songs/${folder.toLowerCase()}');
-					File.saveBytes('assets/onlinedata/songs/${folder.toLowerCase()}/Voices.ogg', file);
+					if (!SELoader.exists('assets/onlinedata/songs/${folder.toLowerCase()}')) SELoader.createDirectory('assets/onlinedata/songs/${folder.toLowerCase()}');
+					SELoader.saveBytes('assets/onlinedata/songs/${folder.toLowerCase()}/Voices.ogg', file);
 
 					voices = new FlxSound().loadEmbedded(Sound.fromAudioBuffer(AudioBuffer.fromBytes(file)));
 
@@ -212,8 +212,8 @@ class OnlineLoadState extends MusicBeatState
 				case Packets.SEND_INST:
 					var file:Bytes = cast(data[0], Bytes);
 
-					FileSystem.createDirectory('assets/onlinedata/songs/${folder.toLowerCase()}');
-					File.saveBytes('assets/onlinedata/songs/${folder.toLowerCase()}/Inst.ogg', file);
+					SELoader.createDirectory('assets/onlinedata/songs/${folder.toLowerCase()}');
+					SELoader.saveBytes('assets/onlinedata/songs/${folder.toLowerCase()}/Inst.ogg', file);
 
 					inst = Sound.fromAudioBuffer(AudioBuffer.fromBytes(file));
 

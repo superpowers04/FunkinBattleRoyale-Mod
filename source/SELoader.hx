@@ -204,9 +204,12 @@ class SELoader {
 	public static function fullPath(path:String):String{
 		return FileSystem.fullPath(getPath(path));
 	}
-	public static function anyExists(paths:Array<String>):String{
-		for(i in paths) if(exists(i)) return i;
-		return null;
+	public static function anyExists(paths:Array<String>,?returnOriginal:Bool = false,?defaultValue:String = null):String{
+		for(i in paths) {
+			var path = getPath(i);
+			if(exists(path)) return returnOriginal ? i : path;
+		}
+		return defaultValue;
 	}
 	public static function exists(path:String):Bool{
 		return FileSystem.exists(getPath(path));

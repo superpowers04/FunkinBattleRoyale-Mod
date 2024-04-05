@@ -257,7 +257,24 @@ class OnlinePlayState extends PlayState
 
 		super.resyncVocals();
 	}
+	public override function handleError(?error:String = "",?forced:Bool = false){
+		// generatedMusic = persistentUpdate = false;
+		canPause=true;
+		try{
 
+			if(error == "") error = 'No error passed!';
+			// else if(error == "Null Object Reference") error = 'Null Object Reference;\nInterp info: ${currentInterp}';
+			if(currentInterp.isActive) error += '\nInterp info: ${currentInterp}';
+			trace('Error!\n ${error}');
+			resetInterps();
+			parseMoreInterps = false;
+			errorMsg = "";
+			Chat.OutputChatMessage(error);
+			FlxG.switchState(new OnlineLobbyState());
+		}catch(e){
+			trace('${e.message}\n${e.stack}');MainMenuState.handleError(error);
+		}
+	}
 	override function beatHit(){
 		super.beatHit();
 		CoolLeaderBoard.sort((a,b) -> Std.int(b[3].text.split(' ')[0]) - Std.int(a[3].text.split(' ')[0]));

@@ -50,7 +50,7 @@ class MainMenuState extends SickMenuState {
 	public static var errorMessage:String = "";
 	public static var bgcolor:Int = 0;
 	// public static var char:Character = null;
-	static var hasWarnedInvalid:Bool = false;
+	// static var hasWarnedInvalid:Bool = false;
 	static var hasWarnedNightly:Bool = (nightly == "");
 	public static var triedChar:Bool = false;
 	public static var lastError = "";
@@ -66,11 +66,12 @@ class MainMenuState extends SickMenuState {
 		if(SESave.data.doCoolLoading && error.indexOf('display.CairoRenderer') >= 0){
 			_error = "Flixel tried to render an FlxText while the game was rendering the loading screen, causing an error.\nYou can probably just re-do what you did. If this is annoying, disable threaded loading in the options";
 		}
-		if(MainMenuState.errorMessage != '${_error}\n${MainMenuState.errorMessage}')
+		if(MainMenuState.errorMessage.indexOf('${_error}\n${MainMenuState.errorMessage}') == -1)
 			MainMenuState.errorMessage = '${_error}\n${MainMenuState.errorMessage}';
 		trace('${error}:${details}');
 		if(exception != null)
-			try{trace('${exception.message}\n${exception.stack}');}catch(e){}
+			try{trace('${exception.message}\n${exception.stack}');
+		}catch(e){}
 		
 		if (onlinemod.OnlinePlayMenuState.socket != null){
 			try{
@@ -177,10 +178,10 @@ class MainMenuState extends SickMenuState {
 			}
 
 
-			if (MainMenuState.errorMessage == "" && TitleState.invalidCharacters.length > 0 && !hasWarnedInvalid) {
-				errorMessage += "You have some characters missing config.json files.";
-				hasWarnedInvalid = true;
-			} 
+			// if (MainMenuState.errorMessage == "" && TitleState.invalidCharacters.length > 0 && !hasWarnedInvalid) {
+			// 	errorMessage += "You have some characters missing config.json files.";
+			// 	hasWarnedInvalid = true;
+			// } 
 			if (!hasWarnedNightly) {
 				errorMessage += "This is a nightly build for " + ver.substring(0,ver.length - (1 + nightly.length) ) +", expect bugs and things changing without warning!\nBasing a fork off of this is not advised!";
 				// ver+=nightly;

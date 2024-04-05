@@ -63,19 +63,24 @@ class OfflinePlayState extends PlayState {
 		var voicesThread = new ThreadedAction(() -> { // Offload to another thread for faster loading
 		#end
 			if(loadedVoices == null || lastVoicesFile != voicesFile){
-				if(voicesFile == ""){
-					for (i in ['assets/onlinedata/songs/${PlayState.actualSongName.toLowerCase()}/Voices.ogg','assets/onlinedata/songs/${PlayState.songDir.toLowerCase()}/Voices.ogg','assets/onlinedata/songs/${PlayState.SONG.song.toLowerCase()}/Voices.ogg']) {
-						if (FileSystem.exists('${Sys.getCwd()}/$i')){
-							voicesFile = i;
-						}
-					}
+				if(voicesFile == null || voicesFile == ""){
+					voicesFile = SELoader.anyExists([
+							'assets/onlinedata/songs/${chartFile.substring(chartFile.lastIndexOf('/')+1,chartFile.lastIndexOf('.'))}/Voices.ogg',
+							'assets/onlinedata/songs/${PlayState.songDir}/Voices.ogg',
+							'assets/onlinedata/songs/${PlayState.actualSongName.toLowerCase()}/Voices.ogg',
+							'assets/onlinedata/songs/${PlayState.SONG.song.toLowerCase()}/Voices.ogg'
+						],"");
 				}
 				if(voicesFile != ""){
-					SELoader.rawMode = true;
-					loadedVoices = SELoader.loadFlxSound(voicesFile);
-				}
-				if(voicesFile == "" && PlayState.SONG != null){
-					loadedVoices =  new FlxSound();
+					try{
+						loadedVoices = SELoader.loadFlxSound(voicesFile);
+					}catch(e){
+						trace('Unable to load voices ${e.details()}');
+						loadedVoices = new FlxSound();
+						PlayState.SONG.needsVoices = false;
+					}
+				}else if(voicesFile == "" && PlayState.SONG != null){
+					loadedVoices = new FlxSound();
 					PlayState.SONG.needsVoices = false;
 				}
 				if(loadedVoices.length < 1){
@@ -86,20 +91,27 @@ class OfflinePlayState extends PlayState {
 		#if(target.threaded)
 		});
 		#end
-			if(loadedInst == null || lastInstFile != instFile){ // This doesn't need to be threaded
-				if(instFile == ""){
 
-					for (i in ['assets/onlinedata/songs/${PlayState.actualSongName.toLowerCase()}/Inst.ogg','assets/onlinedata/songs/${PlayState.songDir.toLowerCase()}/Inst.ogg','assets/onlinedata/songs/${PlayState.SONG.song.toLowerCase()}/Inst.ogg']) {
-						if (FileSystem.exists('${Sys.getCwd()}/$i')){
-							instFile = i;
-						}
-					}
-					if (instFile == ""){MainMenuState.handleError('${PlayState.actualSongName} is missing a inst file!');}
+		if(loadedInst == null || lastInstFile != instFile){ // This doesn't need to be threaded
+			try{
 
+				if(instFile == null || instFile == ""){
+					var list = [
+							'assets/onlinedata/songs/${chartFile.substring(chartFile.lastIndexOf('/')+1,chartFile.lastIndexOf('.'))}/Inst.ogg',
+							'assets/onlinedata/songs/${PlayState.actualSongName.toLowerCase()}/Inst.ogg',
+							'assets/onlinedata/songs/${PlayState.songDir.toLowerCase()}/Inst.ogg',
+							'assets/onlinedata/songs/${PlayState.SONG.song.toLowerCase()}/Inst.ogg'
+						];
+					instFile = SELoader.anyExists(list,"");
 				}
-				SELoader.rawMode = true;
+				if (instFile == null || instFile == ""){ // why the fuck is instFile null? :sob:
+					throw('${PlayState.actualSongName} is missing a inst file!');
+				}
 				loadedInst = SELoader.loadSound(instFile);
+			}catch(e){
+				return MainMenuState.handleError('Error occurred while trying to load inst:${e.details()}');
 			}
+		}
 		#if(target.threaded)
 		voicesThread.wait();
 		#end
@@ -120,12 +132,12 @@ class OfflinePlayState extends PlayState {
 
 		LoadingScreen.loadingText = "Loading chart JSON";
 		if (!ChartingState.charting) {
-				if(chartFile.endsWith(".sm")){
-					PlayState.SONG = smTools.SMFile.loadFile(chartFile).convertToFNF();
-				}else{
-					PlayState.SONG = Song.parseJSONshit(SELoader.getContent(chartFile));
+			if(chartFile.endsWith(".sm")){
+				PlayState.SONG = smTools.SMFile.loadFile(chartFile).convertToFNF();
+			}else{
+				PlayState.SONG = Song.parseJSONshit(SELoader.getContent(chartFile));
 
-				}
+			}
 				// if(nameSpace != ""){
 				// 	if(TitleState.retChar(nameSpace + "|" + PlayState.player2) != null){
 				// 		PlayState.player2 = nameSpace + "|" + PlayState.player2;

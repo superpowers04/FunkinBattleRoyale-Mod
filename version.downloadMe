@@ -1,4 +1,4 @@
-24.04.01.1820;
+24.04.03.1653;
 * Add support for translations from mods/lang(Currently almost nothing is translated)
 * Embed hscript library into super engine
 * Some animation debug fixes

@@ -156,6 +156,8 @@ class OfflineMenuState extends SearchMenuState
 		PlayState.storyDifficulty = 0;
 	}
 	PlayState.actualSongName = songName;
+	OfflinePlayState.instFile = "";
+	OfflinePlayState.voicesFile = "";
 
 	LoadingScreen.loadAndSwitchState(new OfflinePlayState());
   }
