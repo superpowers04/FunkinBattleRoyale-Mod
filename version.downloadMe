@@ -1,12 +1,3 @@
-24.04.03.1653;
-* Add support for translations from mods/lang(Currently almost nothing is translated)
-* Embed hscript library into super engine
-* Some animation debug fixes
-* Crash screen now properly reverts to openfl if a crash is detected on the crash screen(irony)
-* Fix a bunch of random bugs
-24.01.31.2157 ---
-* Change how bg bouncing works in MultiMenuState
-* BPM change maps now work in all states
-* Work on hosting and stuff(Not released yet due to lack of motivation :sob:)
-* Implement several changes from Naytoon for multiplayer
-* Add pasting to text boxes and block input until you exit out of text box(Currently this breaks using enter to search)
+24.04.05.2338;
+* Some minor fixes
+* Psych Engine mods folder mods can now be kinda loaded by putting them into the packs folder

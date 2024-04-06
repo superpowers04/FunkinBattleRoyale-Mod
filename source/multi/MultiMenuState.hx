@@ -32,11 +32,21 @@ using StringTools;
 	var isCategory:Bool = false;
 	var name:String = "";
 	var charts:Array<String>;
-	@:optional var voices:Null<String>;
-	@:optional var inst:Null<String>;
+	// By default, these are literally just path + "FILE.ogg", there's no reason to store path 3 seperate fucking times :skul:
+	@:optional var voices(get,default):Null<String>;
+	public function get_voices() return voices ?? '${path}Voices.ogg';
+	@:optional var inst(get,default):Null<String>;
+	public function get_inst() return inst ?? '${path}Inst.ogg';
 	var path:String = "";
 	var namespace:String = null;
 	var categoryID:Int = 0;
+	function chartExists(){
+		return charts[0] != null && SELoader.exists(path +'/'+charts[0]);
+	}
+	function instExists(){
+		return SELoader.exists(inst);
+	}
+	function toString() {return 'Song <$name>';}
 }
 
 class MultiMenuState extends onlinemod.OfflineMenuState
@@ -184,7 +194,10 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 	}
 	@:keep inline static public function isValidFile(file) {return ((StringTools.endsWith(file, '.json') || StringTools.endsWith(file, '.sm')) && !blockedFiles.contains(file.toLowerCase()));}
 	@:keep inline function addSong(path:String,name:String,catID:Int = 0):SongInfo{
-		if (!SELoader.exists('${path}/Inst.ogg') ) return null;
+		if(!SELoader.exists(path) || !SELoader.isDirectory(path)){
+			trace('$path doesnt exist!');
+			return null;
+		}
 		var songInfo:SongInfo = {
 			name:name,
 			charts:[],
@@ -267,7 +280,6 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 			#end
 			return;
 		}
-		var _goToSong = 0;
 		var i:Int = 0;
 		categories = [];
 		songInfoArray=[];
@@ -280,7 +292,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 				var containsSong = false;
 				LoadingScreen.loadingText = 'Scanning mods/charts';
 				for (directory in dirs){
-					if (search != "" && !query.match(directory.toLowerCase())) continue; // Handles searching
+					if (!SELoader.isDirectory('${dataDir}${directory}') || (search != "" && !query.match(directory.toLowerCase()))) continue; // Handles searching
 					var song = addSong('${dataDir}${directory}',directory,catID);
 					if(song == null) continue;
 					if(!containsSong){
@@ -290,7 +302,6 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 					}
 					addListing(directory,i,song);
 					songInfoArray.push(song);
-					if(_goToSong == 0)_goToSong = i;
 					i++;
 				}
 				if(!containsSong){
@@ -311,7 +322,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 					var containsSong = false;
 					LoadingScreen.loadingText = 'Scanning mods/weeks/$name';
 					for (directory in dirs){
-						if (SELoader.isDirectory('${dataDir}${directory}') && (search != "" && !catMatch && !query.match(directory.toLowerCase()))) continue; // Handles searching
+						if (!SELoader.isDirectory('${dataDir}${directory}') && (!catMatch && search != "" && !query.match(directory.toLowerCase()))) continue; // Handles searching
 						if (SELoader.exists('${dataDir}${directory}/Inst.ogg')){
 							var song = addSong('${dataDir}${directory}',directory,catID);
 							if(song == null) continue;
@@ -323,7 +334,6 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 							}
 							addListing(directory,i,song);
 							songInfoArray.push(song);
-							if(_goToSong == 0)_goToSong = i;
 							
 							i++;
 						}
@@ -338,58 +348,60 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 					var catID = categories.length;
 					// dataDir = "mods/packs/" + dataDir + "/charts/";
 					var catMatch = query.match(name.toLowerCase());
-					var dataDir = "mods/packs/" + name + "/charts/";
-					if(!SELoader.exists(dataDir) && !SELoader.exists(dataDir = "mods/packs/" + name + "/data/")){continue;}
+					var baseDir = 'mods/packs/$name/';
+					var dataDir = SELoader.anyExists(['${baseDir}charts/','${baseDir}data/']);
+					// !SELoader.exists(dataDir) && !SELoader.exists(dataDir = "mods/packs/" + name + "/data/")
+					if(dataDir == null) continue;
 					_packCount++;
 					var containsSong = false;
 					var dirs = orderList(SELoader.readDirectory(dataDir));
-					if(dataDir == 'mods/packs/$name/data/'){ // Vanilla style
-						var songDir = 'mods/packs/$name/songs/';
-						LoadingScreen.loadingText = 'Scanning mods/packs/$name/data/';
+					
+					if(dataDir.substring(dataDir.length-5) == 'data/'){ // Vanilla style
+						var songDir = '${baseDir}songs/';
 						for (directory in dirs){
-							if (SELoader.isDirectory('${dataDir}${directory}') && (search != "" && !catMatch && !query.match(directory.toLowerCase()))) continue; // Handles searching
-							if (SELoader.exists('${songDir}${directory}/Inst.ogg')){
-								var song = addSong('${dataDir}${directory}',directory,catID);
-								if(song == null) continue;
-								song.inst = '${songDir}${directory}/Inst.ogg';
-								song.voices = '${songDir}${directory}/Voices.ogg';
-								song.namespace = name;
-								if(!containsSong){
-									containsSong = true;
-									addCategory(name,i);
-									i++;
-								}
-								addListing(directory,i,song);
-								songInfoArray.push(song);
-								if(_goToSong == 0)_goToSong = i;
+							if (!SELoader.isDirectory('${dataDir}${directory}') || (search != "" && !catMatch && !query.match(directory.toLowerCase()))) continue; // Handles searching
+							var songDir = '${songDir}${directory}/';
+							var instPath = '${songDir}Inst.ogg';
+							if (!SELoader.exists(instPath)) continue;
+							var song = addSong('${dataDir}${directory}',directory,catID);
+							
+							if(song == null) continue;
+							song.inst = instPath;
+							song.voices = '${songDir}Voices.ogg';
+							song.namespace = name;
+							if(!containsSong){
+								containsSong = true;
+								addCategory(name,i);
 								i++;
 							}
+							addListing(directory,i,song);
+							songInfoArray.push(song);
+							i++;
+							
 						}
-					}else{ // SE Style
-
-						LoadingScreen.loadingText = 'Scanning mods/packs/$name/charts/';
-						for (directory in dirs) {
-							if (SELoader.isDirectory('${dataDir}${directory}') && (search != "" && !catMatch && !query.match(directory.toLowerCase()))) continue; // Handles searching
-							if (SELoader.exists('${dataDir}${directory}/Inst.ogg') || SELoader.exists('${dataDir}${directory}/ignoreMissingInst') ){
-								var song = addSong('${dataDir}${directory}',directory,catID);
-								if(song == null) continue;
-								song.namespace = name;
-								if(!containsSong) {
-									containsSong = true;
-									addCategory(name,i);
-									i++;
-								}
-								addListing(directory,i,song);
-								songInfoArray.push(song);
-								if(_goToSong == 0) _goToSong = i;
+						continue;
+					} 
+					// SE Style
+					LoadingScreen.loadingText = 'Scanning mods/packs/$name/charts/';
+					for (directory in dirs) {
+						var path = '${dataDir}${directory}';
+						if (!SELoader.isDirectory(path) || (!catMatch && search != "" && !query.match(directory.toLowerCase()))) continue; // Handles searching
+						if (SELoader.exists('${path}/Inst.ogg') || SELoader.exists('${path}/ignoreMissingInst') ){
+							var song = addSong(path,directory,catID);
+							if(song == null) continue;
+							song.namespace = name;
+							if(!containsSong) {
+								containsSong = true;
+								addCategory(name,i);
 								i++;
 							}
+							addListing(directory,i,song);
+							songInfoArray.push(song);
+							i++;
 						}
 					}
-					if(!containsSong){
-						// grpSongs.members[i - 1].color = FlxColor.RED;
-						emptyCats.push(name);
-					}
+					if(!containsSong) emptyCats.push(name);
+					
 				}
 			}
 			while(emptyCats.length > 0){
@@ -398,11 +410,19 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 				i++;
 			}
 		}
+		if(reload && lastSel == 1){
+			for(index => value in grpSongs){
+				if(value.menuValue is SongInfo){
+					changeSelection(i);
+					break;
+				}
+			}
+		}
 		// if(_packCount == 0){
 		// 	addCategory("No packs or weeks to show",i);
 		// 	grpSongs.members[i - 1].color = FlxColor.RED;
 		// }
-		if(reload && lastSel == 1) changeSelection(_goToSong);
+		// if(reload && lastSel == 1) changeSelection(_goToSong);
 		SELoader.gc();
 		updateInfoText('Use shift to scroll faster; Shift+F7 to erase the score of the current chart. Press CTRL/Control to listen to instrumental/voices of song. Press again to toggle the voices. *Disables autopause while listening to a song in this menu. Found ${songInfoArray.length} songs');
 
@@ -570,7 +590,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 				diffList.push(songInfo.path + "/" + v);
 			}
 		}
-		gotoSong(SELoader.getPath(songInfo.path),songInfo.charts[selMode],songInfo.name,songInfo.inst,songInfo.voices);
+		gotoSong(SELoader.getPath(songInfo.path),songInfo.charts[selMode],songInfo.name,songInfo.voices,songInfo.inst);
 	}
 
 	override function select(sel:Int = 0){
@@ -700,7 +720,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 						voices = null;
 
 						try{
-							FlxG.sound.playMusic(SELoader.loadSound('${songInfo.path}Inst.ogg'),SESave.data.instVol,true);
+							FlxG.sound.playMusic(SELoader.loadSound(songInfo.inst),SESave.data.instVol,true);
 						}catch(e){
 							showTempmessage('Unable to play instrumental! ${e.message}',FlxColor.RED);
 						}
@@ -753,9 +773,9 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 					if(curPlaying == songInfo.name){
 						try{
 							if(voices == null){
-								if(SELoader.exists('${songInfo.path}/Voices.ogg')){
+								if(SELoader.exists(songInfo.voices)){
 									voices = new FlxSound();
-									voices.loadEmbedded(SELoader.loadSound('${songInfo.path}/Voices.ogg'),true);
+									voices.loadEmbedded(SELoader.loadSound(songInfo.voices),true);
 									voices.volume = SESave.data.voicesVol;
 									voices.looped = true;
 									voices.play(FlxG.sound.music.time);

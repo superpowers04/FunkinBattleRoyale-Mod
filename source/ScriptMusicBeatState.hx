@@ -222,6 +222,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 			}
 		}
 		#if linc_luajit
+		var showedIgnoreMessage = false
 		public function parseLua(?songScript:String = "",?brTools:HSBrTools = null,?id:String = "song",?file:String = "hscript"):SELua{
 			// Scripts are forced with weeks, otherwise, don't load any scripts if scripts are disabled
 			if(!parseMoreInterps || !SESave.data.luaScripts) return null;
@@ -231,8 +232,9 @@ class ScriptMusicBeatState extends MusicBeatState{
 					if(songScript.startsWith('ignoreScript')){
 						trace('$file ignored as it starts with ignoreScript');
 					}else{
-						if(SESave.data.animDebug && !songScript.contains('isSE = true')){
-							showTempmessage('$file ignored as it is missing "isSE = true"!\nThis is required to prevent loading broken lua scripts',FlxColor.RED);
+						if(SESave.data.animDebug && !showedIgnoreMessage && !songScript.contains('isSE = true')){
+							showedIgnoreMessage = true;
+							showTempmessage('Some lua files were ignored as they\'re missing "isSE = true"!\nThis is required to prevent loading broken lua scripts',FlxColor.RED);
 						}
 
 						trace('$file ignored as it is either blank or missing "isSE = true"! This is required to prevent loading broken lua scripts');

@@ -22,6 +22,21 @@ import haxe.io.Bytes;
 // import vlc.VLCSound;
 using StringTools;
 
+// @:publicFields class SEDirectory {
+// 	public var path = "";
+// 	function new(_path:String = ""){
+// 		path=SELoader.getPath(_path);
+// 		if(path.substring(-1) != "/") path+="/";
+// 	}
+// 	@:keep inline function appendPath(part:String){
+// 		return _path + part;
+// 	}
+// 	function exists(path:String){
+// 		return SELoader.exists(appendPath())
+// 	}
+
+// }
+
 class SELoader {
 
 	static public var cache:InternalCache = new InternalCache();

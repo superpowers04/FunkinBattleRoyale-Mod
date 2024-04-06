@@ -200,34 +200,40 @@ class ImportModFromFolder extends MusicBeatState
 	function scanSongs(?folder:String = "",assets:String=""){
 		try{
 			if(FileSystem.exists('${assets}songs/')){ // Chad github style
-				var inCharts = (FileSystem.isDirectory('${assets}data/songs/') ? '${assets}data/songs/' : 
-				(FileSystem.isDirectory('${assets}data/song data/') ? '${assets}data/song data/'
-				:'${assets}data/')); // Fuckin later versions of kade engine
+				var inCharts = 
+					(FileSystem.isDirectory('${assets}data/songs/') ? '${assets}data/songs/' : 
+					(FileSystem.isDirectory('${assets}data/song data/') ? '${assets}data/song data/'
+					:'${assets}data/')); // Fuckin later versions of kade engine
 				for (directory in FileSystem.readDirectory('${assets}songs/')) {
 					changedText = 'Checking ${directory}...'; // Just display this text
 					
-					if(!FileSystem.isDirectory('${assets}songs/${directory}') || (!importExisting && existingSongs.contains(directory.toLowerCase()))) continue; // Skip if it's a file or if it's on the existing songs list
+					if(!FileSystem.isDirectory('${assets}songs/${directory}') || (!importExisting && existingSongs.contains(directory.toLowerCase()))) 
+						continue; // Skip if it's a file or if it's on the existing songs list
 					var dir:String = '${assets}songs/${directory}/';
-					if(!FileSystem.exists('${dir}Inst.ogg') || !FileSystem.isDirectory('${inCharts}${directory}/') ) {trace('"${inCharts}${directory}/" or "${dir}Inst.ogg" doesnt exist');continue;}
+					if(!FileSystem.exists('${dir}Inst.ogg') || !FileSystem.isDirectory('${inCharts}${directory}/') ) {
+						trace('"${inCharts}${directory}/" or "${dir}Inst.ogg" doesnt exist');
+						continue;
+					}
 
 					var outDir:String = 'mods/packs/${chartPrefix}/charts/${directory}/';
 					try{FileSystem.createDirectory(outDir);}catch(e) MainMenuState.handleError('Error while creating folder, ${e.message}');
-					
-					for (i => v in ['${dir}Inst.ogg' => '${outDir}Inst.ogg','${dir}Voices.ogg' => '${outDir}Voices.ogg']) {
-						try{
-							changedText = 'Copying ${i}...';// Just display this text
-					
-							SELoader.importFile(i,v);
-						}catch(e) trace('$i caused ${e.message}');
-					}
+					try{
+						changedText = 'Copying Inst...';
+						SELoader.importFile('${dir}Inst.ogg','${outDir}Inst.ogg');
+					}catch(e) trace('Importing inst caused ${e.message}');
+					try{
+						changedText = 'Copying Voices...';
+						SELoader.importFile('${dir}Voices.ogg','${outDir}Voices.ogg');
+					}catch(e) trace('Importing voices caused ${e.message}');
 					for (file in FileSystem.readDirectory('${inCharts}${directory}/')) {
 						try{
 							changedText = 'Copying ${file}...';// Just display this text
 					
 							SELoader.importFile('${inCharts}${directory}/${file}','${outDir}${file}');
 						}catch(e) trace('$file caused ${e.message}');
-
-				}songsImported++;}
+					}
+					songsImported++;
+				}
 			}
 		if(FileSystem.exists('${assets}music/')){ // Older itch.io style
 			for (directory in FileSystem.readDirectory('${assets}music/')) {
