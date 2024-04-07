@@ -107,6 +107,7 @@ class SearchMenuState extends ScriptMusicBeatState {
 		PlayState.storyDifficulty = 1;
 		PlayState.actualSongName = "";
 		PlayState.hsBrToolsPath = "";
+		PlayState.PSignoreScripts=false;
 		onlinemod.OfflinePlayState.nameSpace = 
 			onlinemod.OfflinePlayState.chartFile = 
 			onlinemod.OfflinePlayState.instFile = 

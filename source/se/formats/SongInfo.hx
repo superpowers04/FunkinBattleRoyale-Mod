@@ -1,34 +1,19 @@
 package se.formats;
 
-@:keep @:publicFields @:structInit class SongInfo {
+@:publicFields @:structInit class SongInfo {
 	var isCategory:Bool = false;
 	var name:String = "";
 	var charts:Array<String>;
 	// By default, these are literally just path + "FILE.ogg", there's no reason to store path 3 seperate fucking times :skul:
-	@:optional var internalVoices:String = "";
-	@:optional var internalInst:String = "";
-	@:optional var voices(get,set):String;
-	@:optional var inst(get,set):String;
-	function get_voices(){
-		return internalVoices == "" ? path+'Voices.ogg' : internalVoices;
-	}
-	function set_voices(vari:String){
-		return internalVoices = vari;
-	}
-	function get_inst(){
-		return internalInst == "" ? path+'Inst.ogg' : internalInst;
-	}
-	function set_inst(vari:String){
-		return internalInst = vari;
-	}
-	// var voices(get,set):String;
-	// function get_voices() return internal_voices == "" ? path+'Voices.ogg' : internal_voices;
-	// function set_voices(val:String) return internal_voices = val;
-	// var inst(get,set):String;
-	// function get_inst() return internal_inst == "" ? path+'Inst.ogg' : internal_inst;
-	// function set_inst(val:String) return internal_inst = val;
+	@:optional var internal_voices:String = "";
+	@:optional var internal_inst:String = "";
+	var voices(get,default):String = "";
+	function get_voices() return voices == "" ? path+'Voices.ogg' : voices;
+	var inst(get,default):String = "";
+	function get_inst() return inst == "" ? path+'Inst.ogg' : inst;
+
 	var path:String = "";
-	var namespace:String;
+	var namespace:String = null;
 	@:optional var categoryID:Int = 0;
 	function chartExists(){
 		return charts[0] != null && SELoader.exists(path +'/'+charts[0]);
@@ -37,5 +22,12 @@ package se.formats;
 		return SELoader.exists(inst);
 	}
 	function toString() {return 'Song <$name>';}
-	function new(){}
+	function new(name:String="",charts:Array<String>,path:String="",?namespace:String=null,?isCategory:Bool=false,?categoryID:Int=0){
+		this.name = name;
+		this.charts = charts;
+		this.path = path;
+		this.namespace = namespace;
+		this.isCategory = isCategory;
+		this.categoryID=categoryID;
+	}
 }

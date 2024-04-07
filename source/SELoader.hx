@@ -307,6 +307,52 @@ class SELoader {
 				returnArray.push(song);
 			}
 		}
+		if(path.isDirectory('data/')){ // Normal FNF
+			var songsFolder = path.newDirectory('songs/');
+			for (folder in path.readDirectory('data/')){
+				var path = path.newDirectory('data/$folder');
+				if(!path.isDirectory() || !songsFolder.exists('$folder/Inst.ogg')) continue;
+				var song:SongInfo = {
+					name:folder,
+					charts:[],
+					namespace:null,
+
+					path:path.toString()
+				};
+				song.inst = songsFolder.appendPath('$folder/Inst.ogg');
+				song.voices = songsFolder.appendPath('$folder/Voices.ogg');
+				for (file in orderList(path.readDirectory())){
+					if(file.substring(file.length-5) != ".json" || blockedFiles.contains(file.toLowerCase())) 
+						continue;
+					song.charts.push(file);
+				}
+				returnArray.push(song);
+			}
+		}
+		if(path.isDirectory('songs/')){ // Codename :sob:
+			var path = path.newDirectory('songs/');
+			for (folder in path.readDirectory()){
+				if(!path.isDirectory('$folder/charts')) continue;
+				var path = path.newDirectory('$folder');
+				var song:SongInfo = {
+					name:folder,
+					charts:[],
+					namespace:null,
+
+					path:path.toString()
+				};
+				song.inst = path.appendPath('song/Inst.ogg');
+				song.voices = path.appendPath('song/Voices.ogg');
+				for (file in orderList(path.readDirectory('charts'))){
+					if(file.substring(file.length-5) != ".json" || blockedFiles.contains(file.toLowerCase())) 
+						continue;
+					song.charts.push('charts/$file');
+				}
+				returnArray.push(song);
+			}
+
+
+		}
 		return returnArray;
 
 	}

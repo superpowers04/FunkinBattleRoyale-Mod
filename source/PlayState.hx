@@ -97,6 +97,7 @@ class PlayState extends ScriptMusicBeatState
 		public static var playlistMode:Bool = false;
 		public static var songDiff:String = "";
 		public static var invertedChart:Bool = false;
+		public static var PSignoreScripts:Bool = false;
 		public var chartIsInverted:Bool = false;
 		var songLength:Float = 0;
 		public var curSection:Int = -1;
@@ -617,6 +618,8 @@ class PlayState extends ScriptMusicBeatState
 		if((!enableScripts && !parseMoreInterps && !force)) return;
 		parseMoreInterps = true;
 		super.loadScripts(enableScripts,enableCallbacks,force);
+
+
 		for (i in 0 ... scripts.length) {
 			var v = scripts[i];
 			LoadingScreen.loadingText = 'Loading scripts: $v';
@@ -718,7 +721,10 @@ class PlayState extends ScriptMusicBeatState
 		if(hsBrToolsPath == "" || !SELoader.exists(hsBrToolsPath)) hsBrToolsPath = 'assets/';
 		
 		hsBrTools = getBRTools(hsBrToolsPath,'SONG');
-		if(QuickOptionsSubState.getSetting("Song hscripts") && SELoader.exists(hsBrTools.path)){
+		if(PSignoreScripts){
+			showTempmessage('Song scripts are currently disabled',FlxColor.RED);
+		}else if(QuickOptionsSubState.getSetting("Song hscripts") && SELoader.exists(hsBrTools.path)){
+			
 			LoadingScreen.loadingText = 'Loading song scripts';
 			loadScript(hsBrTools.path,'','SONG',hsBrTools);
 		}

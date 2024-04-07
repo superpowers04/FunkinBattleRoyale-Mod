@@ -25,8 +25,7 @@ import se.formats.SongInfo;
 using StringTools;
 
 
-class MultiMenuState extends onlinemod.OfflineMenuState
-{
+class MultiMenuState extends onlinemod.OfflineMenuState {
 	// static var modes:Map<Int,Array<String>> = [];
 	// static var nameSpaces:Array<String> = [];
 	// static var songNames:Array<String> = [];
@@ -481,7 +480,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 			showTempmessage("Invalid song!",FlxColor.RED);
 			return;
 		}
-		var songInfo = grpSongs.members[sel].menuValue;
+		var songInfo:SongInfo = cast grpSongs.members[sel].menuValue;
 		onlinemod.OfflinePlayState.nameSpace = "";
 		if(songInfo.namespace != null){
 			onlinemod.OfflinePlayState.nameSpace = songInfo.namespace;
@@ -636,7 +635,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 			playCount++;
 			allowInput = false;
 			curVol = 2; // Resync audio volume
-			var songInfo = grpSongs.members[curSelected]?.menuValue;
+			var songInfo:SongInfo = grpSongs.members[curSelected]?.menuValue;
 			if(songInfo == null) {
 				curPlaying = "";
 				SickMenuState.musicHandle();

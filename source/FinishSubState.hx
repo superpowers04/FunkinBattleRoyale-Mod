@@ -280,9 +280,10 @@ class FinishSubState extends MusicBeatSubstate
 				#if android
 					'Tap the left of the screen to exit or the right of the screen to restart'
 				#else
-					'Press ENTER to exit, R to reload or O to open options.'
+					'Press ENTER to exit, R to reload, I to reload w/o song scripts\n or O to open options.'
 				#end );
 				contText.size = 24;
+				contText.alignment=CENTER;
 				// contText.x -= contText.width * 0.5;
 				contText.screenCenter(X);
 				contText.alpha = 0.3;
@@ -350,7 +351,10 @@ class FinishSubState extends MusicBeatSubstate
 				// +'\n Downscroll: ${SESave.data.downscroll}'
 				+'\n Ghost Tapping: ${SESave.data.ghost}'
 				+'\n Practice: ${SESave.data.practiceMode}${if(PlayState.instance.hasDied)' - Score not saved' else ''}'
-				+'\n HScripts: ${QuickOptionsSubState.getSetting("Song hscripts")}' + (QuickOptionsSubState.getSetting("Song hscripts") ? '\n  Script Count:${PlayState.instance.interpCount}' : "")
+				+'\n HScripts: ${QuickOptionsSubState.getSetting("Song hscripts")}' + 
+					(QuickOptionsSubState.getSetting("Song hscripts") ? 
+						(PlayState.PSignoreScripts ? "\n  Script Count:${PlayState.instance.interpCount}(Song Scripts disabled)" : '\n  Script Count:${PlayState.instance.interpCount}')
+						: "")
 				+'\n Safe Frames: ${SESave.data.frames}' 
 				+'\n HitWindows: ${Ratings.ratingMS("sick")},${Ratings.ratingMS("good")},${Ratings.ratingMS("bad")},${Ratings.ratingMS("shit")} MS'
 				+'\n Input Engine: ${PlayState.inputEngineName}, V${MainMenuState.ver}'
@@ -534,6 +538,11 @@ class FinishSubState extends MusicBeatSubstate
 
 			if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.S){saveScore(true);}
 			if (FlxG.keys.justPressed.R){if(win){FlxG.resetState();}else{restart();}}
+			if (isError && FlxG.keys.justPressed.I){
+				PlayState.PSignoreScripts = true;
+				PlayState.scripts = [];
+				restart();
+			}
 			if (FlxG.keys.justPressed.O && optionsisyes){
 				SearchMenuState.doReset = false;
 				OptionsMenu.lastState = PlayState.stateType + 10;
