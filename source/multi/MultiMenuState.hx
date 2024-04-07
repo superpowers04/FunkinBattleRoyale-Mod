@@ -374,42 +374,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		updateInfoText('Use shift to scroll faster; Shift+F7 to erase the score of the current chart. Press CTRL/Control to listen to instrumental/voices of song. Press again to toggle the voices. *Disables autopause while listening to a song in this menu. Found ${songInfoArray.length} songs');
 
 	}
-	// function checkSong(dataDir:String,directory:String){
 
-	// }
-
-	// public static function grabSongInfo(songName:String):Array<String>{ // Returns empty array if song is not found or invalid
-	// 	var ret:Array<Dynamic> = [];
-	// 	var query = new EReg((~/[-_ ]/g).replace(songName.toLowerCase(),'[-_ ]'),'i');
-	// 	var modes = [];
-	// 	var dataDir = "mods/charts/";
-	// 	// This is pretty messy, but I don't believe regex's are possible without a for loop
-	// 	if (FileSystem.exists(dataDir))
-	// 	{
-	// 		var dirs = orderList(FileSystem.readDirectory(dataDir));
-	// 		for (directory in dirs)
-	// 			{
-	// 				if (query.match(directory.toLowerCase())) // Handles searching
-	// 				{
-	// 					if (FileSystem.exists('${dataDir}${directory}/Inst.ogg') ){
-	// 						modes = [];
-	// 						for (file in FileSystem.readDirectory(dataDir + directory))
-	// 						{
-	// 								if (!blockedFiles.contains(file.toLowerCase()) && StringTools.endsWith(file, '.json')){
-	// 									modes.push(file);
-	// 								}
-	// 						}
-	// 						if (modes[0] == null){return [];}
-	// 						ret[0] = dataDir + directory;
-	// 						ret[1] = directory;
-	// 						ret[2] = modes;
-	// 						break; // Who the hell in their right mind would continue to loop
-	// 					}
-	// 				}
-	// 			}
-	// 	}
-	// 	return ret;
-	// }
 	public static function loadScriptsFromSongPath(selSong:String){
 		LoadingScreen.loadingText = "Finding scripts";
 		if(selSong.contains("mods/packs") || selSong.contains("mods/weeks")){

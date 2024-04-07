@@ -270,7 +270,9 @@ class SELoader {
 		return File.copy(getPath(from),getPath(to));
 	}
 	public static function importFile(from:String,to:String){
-		return File.copy(from,getPath(to));
+		var path = getPath(to);
+		FileSystem.createDirectory(path.substring(0,path.lastIndexOf('/')));
+		return File.copy(from,path);
 	}
 	public static function exportFile(from:String,to:String){
 		return File.copy(getPath(from),to);
@@ -289,6 +291,18 @@ class SELoader {
 		var returnArray:Array<SongInfo> = [];
 		if(!path.isDirectory()) return returnArray;
 		var blockedFiles = multi.MultiMenuState.blockedFiles;
+		if(path.isDirectory('assets/')){ // subfolder
+			var stuff:Array<SongInfo> = getSongsFromFolder(path.appendPath('assets/'));
+			if(stuff.length > 0){
+				for(i in stuff) returnArray.push(i);
+			}
+		}
+		if(path.isDirectory('mods/')){ // subfolder
+			var stuff:Array<SongInfo> = getSongsFromFolder(path.appendPath('mods/'));
+			if(stuff.length > 0){
+				for(i in stuff) returnArray.push(i);
+			}
+		}
 		if(path.isDirectory('charts/')){ // SE
 			for (folder in path.readDirectory('charts/')){
 				var path = path.newDirectory('charts/$folder');
@@ -350,8 +364,15 @@ class SELoader {
 				}
 				returnArray.push(song);
 			}
-
-
+		}
+		if(returnArray.length < 0){
+			for (file in orderList(path.readDirectory())){
+				if(!path.isDirectory(file)) continue;
+				var songs = getSongsFromFolder(path.appendPath());
+				if(songs.length > 0){
+					for (song in songs) returnArray.push(song);
+				}
+			}
 		}
 		return returnArray;
 
