@@ -20,34 +20,10 @@ import flixel.ui.FlxBar;
 
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
+import se.formats.SongInfo;
 
 using StringTools;
 
-
-/* MultiMenu rework:
-
-*/
-
-@:publicFields @:structInit class SongInfo {
-	var isCategory:Bool = false;
-	var name:String = "";
-	var charts:Array<String>;
-	// By default, these are literally just path + "FILE.ogg", there's no reason to store path 3 seperate fucking times :skul:
-	@:optional var voices(get,default):Null<String>;
-	public function get_voices() return voices ?? '${path}Voices.ogg';
-	@:optional var inst(get,default):Null<String>;
-	public function get_inst() return inst ?? '${path}Inst.ogg';
-	var path:String = "";
-	var namespace:String = null;
-	var categoryID:Int = 0;
-	function chartExists(){
-		return charts[0] != null && SELoader.exists(path +'/'+charts[0]);
-	}
-	function instExists(){
-		return SELoader.exists(inst);
-	}
-	function toString() {return 'Song <$name>';}
-}
 
 class MultiMenuState extends onlinemod.OfflineMenuState
 {
@@ -58,7 +34,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 	static var categories:Array<String> = [];
 	static inline var CATEGORYNAME:String = "-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-CATEGORY";
 	var selMode:Int = -1;
-	static var blockedFiles:Array<String> = ['events.json','picospeaker.json','dialogue-end.json','dialogue.json','_meta.json','meta.json','se-overrides.json','config.json'];
+	public static var blockedFiles:Array<String> = ['events.json','picospeaker.json','dialogue-end.json','dialogue.json','_meta.json','meta.json','se-overrides.json','config.json'];
 	static var lastSel:Int = 1;
 	static var lastSearch:String = "";
 	public static var lastSong:String = ""; 
@@ -349,58 +325,30 @@ class MultiMenuState extends onlinemod.OfflineMenuState
 					// dataDir = "mods/packs/" + dataDir + "/charts/";
 					var catMatch = query.match(name.toLowerCase());
 					var baseDir = 'mods/packs/$name/';
-					var dataDir = SELoader.anyExists(['${baseDir}charts/','${baseDir}data/']);
+					// var dataDir = SELoader.anyExists(['${baseDir}charts/','${baseDir}data/']);
 					// !SELoader.exists(dataDir) && !SELoader.exists(dataDir = "mods/packs/" + name + "/data/")
-					if(dataDir == null) continue;
+					// if(dataDir == null) continue;
 					_packCount++;
-					var containsSong = false;
+					// var containsSong = false;
 					var dirs = orderList(SELoader.readDirectory(dataDir));
 					
-					if(dataDir.substring(dataDir.length-5) == 'data/'){ // Vanilla style
-						var songDir = '${baseDir}songs/';
-						for (directory in dirs){
-							if (!SELoader.isDirectory('${dataDir}${directory}') || (search != "" && !catMatch && !query.match(directory.toLowerCase()))) continue; // Handles searching
-							var songDir = '${songDir}${directory}/';
-							var instPath = '${songDir}Inst.ogg';
-							if (!SELoader.exists(instPath)) continue;
-							var song = addSong('${dataDir}${directory}',directory,catID);
-							
-							if(song == null) continue;
-							song.inst = instPath;
-							song.voices = '${songDir}Voices.ogg';
-							song.namespace = name;
-							if(!containsSong){
-								containsSong = true;
-								addCategory(name,i);
-								i++;
-							}
-							addListing(directory,i,song);
-							songInfoArray.push(song);
-							i++;
-							
-						}
+					var folderSongs:Array<SongInfo> = SELoader.getSongsFromFolder(baseDir);
+					if(folderSongs.length == 0){
+						emptyCats.push(name);
 						continue;
-					} 
-					// SE Style
-					LoadingScreen.loadingText = 'Scanning mods/packs/$name/charts/';
-					for (directory in dirs) {
-						var path = '${dataDir}${directory}';
-						if (!SELoader.isDirectory(path) || (!catMatch && search != "" && !query.match(directory.toLowerCase()))) continue; // Handles searching
-						if (SELoader.exists('${path}/Inst.ogg') || SELoader.exists('${path}/ignoreMissingInst') ){
-							var song = addSong(path,directory,catID);
-							if(song == null) continue;
-							song.namespace = name;
-							if(!containsSong) {
-								containsSong = true;
-								addCategory(name,i);
-								i++;
-							}
-							addListing(directory,i,song);
-							songInfoArray.push(song);
-							i++;
-						}
 					}
-					if(!containsSong) emptyCats.push(name);
+					addCategory(name,i);
+					i++;
+					for (song in folderSongs){
+						song.categoryID=catID;
+						song.namespace=name;
+						addListing(song.name,i,song);
+						songInfoArray.push(song);
+					}
+					
+					i++;
+
+					// if(!containsSong) emptyCats.push(name);
 					
 				}
 			}

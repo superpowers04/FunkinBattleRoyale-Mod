@@ -242,8 +242,8 @@ class SelectScriptableState extends SearchMenuState{
 	}
 	public static function selectState(scriptName){
 			var stateType = "musicbeatstate";
-			if(FileSystem.exists("mods/scripts/" + scriptName + "/statetype.txt")){
-				stateType = File.getContent("mods/scripts/" + scriptName + "/statetype.txt");
+			if(SELoader.exists("mods/scripts/" + scriptName + "/statetype.txt")){
+				stateType = SELoader.getContent("mods/scripts/" + scriptName + "/statetype.txt");
 			}
 			var state:Class<FlxState> = null;
 			switch(stateType.toLowerCase()){

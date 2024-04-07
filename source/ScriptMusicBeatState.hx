@@ -222,7 +222,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 			}
 		}
 		#if linc_luajit
-		var showedIgnoreMessage = false
+		var showedIgnoreMessage = false;
 		public function parseLua(?songScript:String = "",?brTools:HSBrTools = null,?id:String = "song",?file:String = "hscript"):SELua{
 			// Scripts are forced with weeks, otherwise, don't load any scripts if scripts are disabled
 			if(!parseMoreInterps || !SESave.data.luaScripts) return null;

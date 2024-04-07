@@ -286,6 +286,7 @@ class MusicBeatState extends FlxUIState {
 		}
 
 		super.update(elapsed);
+		// SELoader.gc();
 	}
 	@:keep inline public function updateSteps(){
 		updateCurStep();

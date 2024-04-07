@@ -1121,15 +1121,20 @@ class SEMath
 	 */
 	public static function pointInCoordinates(pointX:Float, pointY:Float, rectX:Float, rectY:Float, rectWidth:Float, rectHeight:Float):Bool
 	{
-		if (pointX >= rectX && pointX <= (rectX + rectWidth))
-		{
-			if (pointY >= rectY && pointY <= (rectY + rectHeight))
-			{
-				return true;
-			}
-		}
-		return false;
+		return (pointX >= rectX && pointX <= (rectX + rectWidth)) && (pointY >= rectY && pointY <= (rectY + rectHeight));
 	}
+	// what the hell flixel
+	// 	public static function pointInCoordinates(pointX:Float, pointY:Float, rectX:Float, rectY:Float, rectWidth:Float, rectHeight:Float):Bool
+	// {
+	// 	if (pointX >= rectX && pointX <= (rectX + rectWidth))
+	// 	{
+	// 		if (pointY >= rectY && pointY <= (rectY + rectHeight))
+	// 		{
+	// 			return true;
+	// 		}
+	// 	}
+	// 	return false;
+	// }
 
 	/**
 	 * Returns true if the given x/y coordinate is within the given rectangular block
@@ -1197,17 +1202,7 @@ class SEMath
 	public static function maxAdd(value:Int, amount:Int, max:Int, min:Int = 0):Int
 	{
 		value += amount;
-
-		if (value > max)
-		{
-			value = max;
-		}
-		else if (value <= min)
-		{
-			value = min;
-		}
-
-		return value;
+		return (value > max ? max : (value <= min ? min : value));
 	}
 
 	/**
@@ -1562,7 +1557,7 @@ class SEMath
 	unspecified.
 **/
 
-// I hate inlines
+// I hate improperly used inlines
 
 class SEStringTools {
 	/**

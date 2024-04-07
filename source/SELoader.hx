@@ -19,23 +19,39 @@ import flixel.sound.FlxSound;
 import flixel.util.typeLimit.OneOfTwo;
 import lime.media.AudioBuffer;
 import haxe.io.Bytes;
+import se.formats.SongInfo;
 // import vlc.VLCSound;
 using StringTools;
 
-// @:publicFields class SEDirectory {
-// 	public var path = "";
-// 	function new(_path:String = ""){
-// 		path=SELoader.getPath(_path);
-// 		if(path.substring(-1) != "/") path+="/";
-// 	}
-// 	@:keep inline function appendPath(part:String){
-// 		return _path + part;
-// 	}
-// 	function exists(path:String){
-// 		return SELoader.exists(appendPath())
-// 	}
+@:publicFields class SEDirectory {
+	public var path = "";
+	function new(_path:String = ""){
+		path=SELoader.getPath(_path);
+		if(path.substring(-1) != "/") path+="/";
+	}
+	@:keep inline function appendPath(?part:String){
+		return part == null ? path : path + part;
+	}
+	function exists(?path:String){
+		SELoader.rawMode=true;
+		return SELoader.exists(appendPath(path));
+	}
+	function newDirectory(?path:String){
+		return new SEDirectory(appendPath(path));
+	}
+	function isDirectory(?path:String){
+		SELoader.rawMode=true;
+		return SELoader.isDirectory(appendPath(path));
+	}
+	function readDirectory(?path:String){
+		SELoader.rawMode=true;
+		return SELoader.readDirectory(appendPath(path));
+	}
+	function toString(){
+		return path;
+	}
 
-// }
+}
 
 class SELoader {
 
@@ -58,8 +74,6 @@ class SELoader {
 	}
 	// Basically clenses paths and returns the base path with the requested one. Used heavily for the Android port
 	@:keep inline public static function getPath(path:String,allowModded:Bool = true):String{
-		// Remove library from path
-		if(path.indexOf(":") > 3) path = path.substring(path.indexOf(":") + 1);
 		// Absolute paths should just return themselves without anything changed
 		if(
 			#if windows
@@ -69,6 +83,8 @@ class SELoader {
 			rawMode = false;
 			return path.replace('//','/');
 		}
+		// Remove library from path
+		if(path.indexOf(":") > 3) path = path.substring(path.indexOf(":") + 1);
 		if(allowModded && path.startsWith("assets/") && FileSystem.exists('${PATH}mods${path}')) path = 'mods/' + path; // Return modded assets before vanilla assets
 
 		return (PATH + path).replace('//','/'); // Fixes paths having //'s in them
@@ -258,6 +274,41 @@ class SELoader {
 	}
 	public static function exportFile(from:String,to:String){
 		return File.copy(getPath(from),to);
+	}
+
+	static function orderList(list:Array<String>):Array<String>{
+		haxe.ds.ArraySort.sort(list, function(a, b) {
+			a=a.toLowerCase();
+			b=b.toLowerCase();
+			return (a<b) ? -1 : ((a>b) ? 1 : 0);
+		});
+		return list;
+	}
+	public static function getSongsFromFolder(path:String):Array<SongInfo>{
+		var path=new SEDirectory(path);
+		var returnArray:Array<SongInfo> = [];
+		if(!path.isDirectory()) return returnArray;
+		var blockedFiles = multi.MultiMenuState.blockedFiles;
+		if(path.isDirectory('charts/')){ // SE
+			for (folder in path.readDirectory('charts/')){
+				var path = path.newDirectory('charts/$folder');
+				if(!path.exists('Inst.ogg') && !path.exists('ignoreMissingInst')) continue;
+				var song:SongInfo = {
+					name:folder,
+					charts:[],
+					namespace:null,
+					path:path.toString()
+				};
+				for (file in orderList(path.readDirectory())){
+					if(file.substring(file.length-5) != ".json" || blockedFiles.contains(file.toLowerCase())) 
+						continue;
+					song.charts.push(file);
+				}
+				returnArray.push(song);
+			}
+		}
+		return returnArray;
+
 	}
 
 }

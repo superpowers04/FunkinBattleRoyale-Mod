@@ -294,6 +294,11 @@ class MainMenuState extends SickMenuState {
 			//Damn, talk about a huge difference from 9 options down to 3
 			options = ['modded songs',"scripted states","credits",'options'];
 			descriptions = ["Play songs from your mods/charts folder, packs or weeks","Join and play online with other people on a Battle Royale compatible server.","Run a script in a completely scriptable blank state",'Customise your experience to fit you'];
+			if(!MainMenuState.ver.contains(TitleState.updatedVer.trim())){
+				options.insert(2,"Update");
+				descriptions.insert(2,"An update has been detected for Super Engine, Press this to view the changelog and download the update!");
+			}
+
 		#if !mobile
 		}else{
 			options = ['modded songs','join FNF\'br server', 'host br server',

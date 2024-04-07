@@ -12,6 +12,7 @@ import lime.app.Application;
 
 class OutdatedSubState extends MusicBeatState
 {
+	// TODO: INGAME DOWNLOADING
 
 	public static var needVer:String = "Unknown";
 	public static var currChanges:String = "Check for Updates needs to be enabled in Options > Misc!";
@@ -38,6 +39,7 @@ class OutdatedSubState extends MusicBeatState
 		kadeLogo.x -= kadeLogo.frameHeight;
 		kadeLogo.y -= 180;
 		kadeLogo.alpha = 0.8;
+		kadeLogo.angle = 10;
 		add(kadeLogo);
 		var outdatedLMAO:FlxText = new FlxText(0, FlxG.height * 0.05, 0,if(TitleState.outdated) 'Super Engine is outdated, Your version: ${MainMenuState.ver} latest: ${needVer}' else 'Up to date: ${MainMenuState.ver}' , 32);
 		outdatedLMAO.setFormat(CoolUtil.font, 32, if(TitleState.outdated) FlxColor.RED else FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -48,7 +50,7 @@ class OutdatedSubState extends MusicBeatState
 		var txt:FlxText = new FlxText(0, 0, FlxG.width,
 			"\n\nChangelog:\n\n"
 			+ currChanges.substring(0,1000)
-			+ "\n\n\nPress Space to get latest update's zip, D to open a invite to the Discord server or Escape to close.\n\nYou can install it by downloading the zip and dragging the files\n into your game folder",
+			+ "\n\n\nPress Space to download latest update's zip, D to open a invite to the Discord server or Escape to close.\n\nYou can install it by downloading the zip and dragging the files\n into your game folder",
 			32);
 		
 		txt.setFormat(CoolUtil.font, 32, FlxColor.fromRGB(200, 200, 200), CENTER);
@@ -68,32 +70,32 @@ class OutdatedSubState extends MusicBeatState
 			else colorRotation = 0;
 		}, 0);
 		
-		new FlxTimer().start(2, function(tmr:FlxTimer)
+		new FlxTimer().start(Conductor.crochet * 0.001, function(tmr:FlxTimer)
 		{
-			if(kadeLogo.angle == -10) FlxTween.angle(kadeLogo, kadeLogo.angle, 10, 2, {ease: FlxEase.quartInOut});
-			else FlxTween.angle(kadeLogo, kadeLogo.angle, -10, 2, {ease: FlxEase.quartInOut});
+			FlxTween.angle(kadeLogo, kadeLogo.angle, -kadeLogo.angle, Conductor.crochet * 0.001, {ease: FlxEase.quartInOut});
 		}, 0);
 		
-		new FlxTimer().start(0.8, function(tmr:FlxTimer)
+		new FlxTimer().start(Conductor.crochet * 0.001, function(tmr:FlxTimer)
 		{
-			if(kadeLogo.alpha == 0.8) FlxTween.tween(kadeLogo, {alpha: 1}, 0.8, {ease: FlxEase.quartInOut});
-			else FlxTween.tween(kadeLogo, {alpha: 0.8}, 0.8, {ease: FlxEase.quartInOut});
+			if(kadeLogo.alpha == 0.8) FlxTween.tween(kadeLogo, {alpha: 1}, Conductor.crochet * 0.001, {ease: FlxEase.quartInOut});
+			else FlxTween.tween(kadeLogo, {alpha: 0.8}, Conductor.crochet * 0.001, {ease: FlxEase.quartInOut});
 		}, 0);
 	}
-
+	var allowInput = true;
 	override function update(elapsed:Float)
 	{
-		if (controls.ACCEPT || FlxG.keys.justPressed.SPACE)
-		{
-			fancyOpenURL(if(MainMenuState.nightly == "")"https://nightly.link/superpowers04/Super-Engine/workflows/main/master/windowsBuild-Minimal.zip" else "https://nightly.link/superpowers04/Super-Engine/workflows/main/nightly/windowsBuild-Minimal.zip");
-		}
-		if (FlxG.keys.justPressed.D)
-		{
-			fancyOpenURL("https://discord.gg/28GPGTRuuR");
-		}
-		if (controls.BACK)
-		{
-			FlxG.switchState(new MainMenuState());
+		if(allowInput){
+
+			if (controls.ACCEPT || FlxG.keys.justPressed.SPACE) {
+
+				fancyOpenURL(if(MainMenuState.nightly == "")"https://nightly.link/superpowers04/Super-Engine/workflows/main/master/windowsBuild-Minimal.zip" else "https://nightly.link/superpowers04/Super-Engine/workflows/main/nightly/windowsBuild-Minimal.zip");
+			}
+			if (FlxG.keys.justPressed.D) {
+				fancyOpenURL("https://discord.gg/28GPGTRuuR");
+			}
+			if (controls.BACK) {
+				FlxG.switchState(new MainMenuState());
+			}
 		}
 		super.update(elapsed);
 	}
