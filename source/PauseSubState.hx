@@ -300,7 +300,6 @@ class PauseSubState extends MusicBeatSubstate {
 		switch (PlayState.stateType) {
 			case 2:MusicBeatState.returningFromClass=true;FlxG.switchState(new onlinemod.OfflineMenuState());
 			case 4:MusicBeatState.returningFromClass=true;FlxG.switchState(new multi.MultiMenuState());
-			case 5:MusicBeatState.returningFromClass=true;FlxG.switchState(new osu.OsuMenuState());
 			default:MusicBeatState.instance.goToLastClass(PlayState);
 		}
 		shouldveLeft = true;

@@ -807,9 +807,9 @@ class PlayState extends ScriptMusicBeatState
 			}
 		}
 		var bfShow = SESave.data.bfShow;
-		if(PlayState.player1 == "")PlayState.player1 = SONG.player1;
-		if(PlayState.player2 == "")PlayState.player2 = SONG.player2;
-		if(PlayState.player3 == "")PlayState.player3 = SONG.gfVersion;
+		if(PlayState.player1 == "") PlayState.player1 = SONG.player1;
+		if(PlayState.player2 == "") PlayState.player2 = SONG.player2;
+		if(PlayState.player3 == "") PlayState.player3 = SONG.gfVersion;
 		if(PlayState.player1 == "" || PlayState.player1.toLowerCase() == "lonely" || PlayState.player1.toLowerCase() == "hidden" || PlayState.player1.toLowerCase() == "nothing") bfShow = false;
 		if(PlayState.player2 == "" || PlayState.player2.toLowerCase() == "lonely" || PlayState.player2.toLowerCase() == "hidden" || PlayState.player2.toLowerCase() == "nothing") _dadShow = false;
 		if(PlayState.player3 == "" || PlayState.player3.toLowerCase() == "lonely" || PlayState.player3.toLowerCase() == "hidden" || PlayState.player3.toLowerCase() == "nothing") gfShow = false;
@@ -1745,8 +1745,7 @@ class PlayState extends ScriptMusicBeatState
 			// var camList = FlxG.cameras.list;
 			if(player == 1){
 				if(playerNoteCamera != null)playerNoteCamera.destroy();
-				playerNoteCamera = new FlxCamera(0,0,
-												1280,720);
+				playerNoteCamera = new FlxCamera(0,0,  1280,720);
 				
 				
 				FlxG.cameras.add(playerNoteCamera,false);
@@ -1811,8 +1810,8 @@ class PlayState extends ScriptMusicBeatState
 			if(useNoteCameras){
 
 				babyArrow.screenCenter(X);
-				babyArrow.x += ((strumWidth  * if(SESave.data.useStrumsAsButtons) 1.5 else 1 ) * i) + i - 
-				(strumWidth + (strumWidth * (  if(SESave.data.useStrumsAsButtons) 1 else  0.5) ));
+				babyArrow.x += ((strumWidth  * (SESave.data.useStrumsAsButtons ? 1.5 : 1) ) * i) + i - 
+				(strumWidth + (strumWidth *    (SESave.data.useStrumsAsButtons ? 1 : 0.5) ));
 				
 				if(SESave.data.useStrumsAsButtons){
 					// babyArrow.setGraphicSize(1);
@@ -2881,16 +2880,17 @@ class PlayState extends ScriptMusicBeatState
 		// SEIKeyMap[FlxKey.fromStringMap[SESave.data.AltrightBind]] =	3;
 		callInterp('registerKeysAfter',[SEIKeyMap]);
 	}
+	var possibleNotes:Array<Note> = [];
 	function SEIKeyPress(event:KeyboardEvent){
 		if(this != FlxG.state){
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, SEIKeyPress);
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, SEIKeyRelease);
 			return;
 		}
-
+		if(playerStrums == null || !generatedMusic || !generatedArrows) return;
 		SEIBlockInput = false;
-		pressArray = [for(i in 0 ... pressArray.length) false];
-		releaseArray = [for(i in 0 ... releaseArray.length) false];
+		for(i in 0 ... pressArray.length) pressArray[i] = false;
+		for(i in 0 ... releaseArray.length) releaseArray[i] = false;
 		callInterp('keyPress',[event.keyCode]);
 		if (SEIBlockInput || cancelCurrentFunction || !acceptInput || playerCharacter.isStunned || subState != null || paused ) return;
 		
@@ -2961,6 +2961,7 @@ class PlayState extends ScriptMusicBeatState
 		while(i > 0) {
 			i--;
 			daNote = possibleNotes[i];
+			possibleNotes[i]=null;
 			if(daNote == null && pressArray[i] && timeSinceOnscreenNote > 0){
 				ghostTaps += 1;
 				if(!ghostTapping) noteMiss(i, null);
@@ -2980,8 +2981,8 @@ class PlayState extends ScriptMusicBeatState
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, SEIKeyRelease);
 			return;
 		}
-		holdArray = [for(i in 0 ... holdArray.length) false];
-
+		if(playerStrums == null) return;
+		for(i in 0 ... holdArray.length) holdArray[i]=false;
 		callInterp('keyRelease',[event.keyCode]);
 		if (cancelCurrentFunction || subState != null || paused ) return;
 
@@ -3002,7 +3003,7 @@ class PlayState extends ScriptMusicBeatState
 	}
 
 	function BotplayKeyShit(){
-		if(!botPlay)return kadeBRKeyShit();
+		if(!botPlay) return kadeBRKeyShit();
 		// pressArray = [for(i in 0 ... pressArray.length) false];
 		for(i in 0 ... pressArray.length) 
 			pressArray[i] = holdArray[i] = releaseArray[i] = false;
@@ -3493,6 +3494,8 @@ class PlayState extends ScriptMusicBeatState
 		callInterp("destroy",[]);
 		try{
 			hsBrTools.reset();
+			if(boyfriend != null && !SESave.data.persistBF) boyfriend.destroy();
+			if(gf != null && !SESave.data.persistGF) gf.destroy();
 			instance = null;
 		}catch(e){}
 		super.destroy();

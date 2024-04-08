@@ -1,4 +1,4 @@
-24.04.07.1528;
+24.04.07.2240;
 * Some minor fixes
 * Charts can now be loaded from Psych Engine mods put into the packs folder (The data and songs folder have to be in the root of the pack)
 * Charts can now be loaded from Codename Engine mods put into the packs folder (The songs folder has to be in the root of the pack)

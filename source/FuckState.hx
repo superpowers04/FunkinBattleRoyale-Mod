@@ -135,10 +135,7 @@ class FuckState extends FlxUIState {
 					SELoader.createDirectory('crashReports/');
 				}
 
-				dateNow = _date.toString();
-
-				dateNow = StringTools.replace(dateNow, " ", "_");
-				dateNow = StringTools.replace(dateNow, ":", ".");
+				dateNow = StringTools.replace(StringTools.replace(_date.toString(), " ", "_"), ":", ".");
 				try{
 					currentStateName = haxe.rtti.Rtti.getRtti(cast FlxG.state).path;
 				}catch(e){}

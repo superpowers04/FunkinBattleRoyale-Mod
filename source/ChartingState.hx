@@ -2377,7 +2377,6 @@ class ChartingState extends ScriptMusicBeatState
 		switch(PlayState.stateType){
 			case 2: LoadingScreen.loadAndSwitchState(new onlinemod.OfflinePlayState()); 
 			case 4,6: LoadingScreen.loadAndSwitchState(new multi.MultiPlayState());
-			case 5: LoadingScreen.loadAndSwitchState(new osu.OsuPlayState());
 			default: LoadingScreen.loadAndSwitchState(new PlayState());
 		}
 	}

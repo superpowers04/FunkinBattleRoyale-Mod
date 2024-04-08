@@ -263,7 +263,7 @@ class MainMenuState extends SickMenuState {
 	// }
 	override function changeSelection(change:Int = 0){
 		// if(char != null && change != 0) char.playAnim(Note.noteAnims[if(change > 0)1 else 2],true);
-		if(MainMenuState.errorMessage != "")MainMenuState.errorMessage = "";
+		MainMenuState.errorMessage = "";
 		super.changeSelection(change);
 	}
 	#if(android) inline static #end var otherMenu:Bool = false;
@@ -272,7 +272,7 @@ class MainMenuState extends SickMenuState {
 		options = ["deprecated freeplay","download charts","download characters","import charts from mods","changelog", 'credits'];
 		descriptions = ['Play any song from the main game or your assets folder',"Download charts made for or ported to Super Engine","Download characters made for or ported to Super Engine",'Convert charts from other mods to work here. Will put them in Modded Songs',"Read the latest changes for the engine","Check out the awesome people who helped with this engine in some way"];
 		
-				if (TitleState.osuBeatmapLoc != '') {options.push("osu beatmaps"); descriptions.push("Play osu beatmaps converted over to FNF");}
+				// if (TitleState.osuBeatmapLoc != '') {options.push("osu beatmaps"); descriptions.push("Play osu beatmaps converted over to FNF");}
 		options.push("back"); descriptions.push("Go back to the main menu");
 		curSelected = 0;
 
@@ -295,7 +295,7 @@ class MainMenuState extends SickMenuState {
 			options = ['modded songs',"scripted states","credits",'options'];
 			descriptions = ["Play songs from your mods/charts folder, packs or weeks","Join and play online with other people on a Battle Royale compatible server.","Run a script in a completely scriptable blank state",'Customise your experience to fit you'];
 			if(!MainMenuState.ver.contains(TitleState.updatedVer.trim())){
-				options.insert(2,"Update");
+				options.insert(2,"update");
 				descriptions.insert(2,"An update has been detected for Super Engine, Press this to view the changelog and download the update!");
 			}
 
@@ -305,7 +305,7 @@ class MainMenuState extends SickMenuState {
 				'online songs',"story mode",'other',"scripted states", 'open mods folder','options'];
 			descriptions = ["Play songs from your mods/charts folder, packs or weeks","Join and play online with other people on a Battle Royale compatible server.",
 			'Host a server so people can join locally, via ngrok or from your IP using portforwarding',
-			"Play songs that have been downloaded during online games.","Play a vanilla or custom week",'Freeplay, Osu beatmaps, and download characters or songs',"Run a script in a completely scriptable blank state",'Open your mods folder in your File Manager','Customise your experience to fit you'];
+			"Play songs that have been downloaded during online games.","Play a vanilla or custom week",'Freeplay, credits, and download characters or songs',"Run a script in a completely scriptable blank state",'Open your mods folder in your File Manager','Customise your experience to fit you'];
 
 		}
 			otherMenu = false;
@@ -376,7 +376,7 @@ class MainMenuState extends SickMenuState {
 				case 'online songs':
 					loading = true;
 					FlxG.switchState(new onlinemod.OfflineMenuState());
-				case 'changelog':
+				case 'changelog' | 'update':
 					FlxG.switchState(new OutdatedSubState());
 				// case "Setup characters":
 				// 	FlxG.switchState(new SetupCharactersList());
@@ -404,9 +404,9 @@ class MainMenuState extends SickMenuState {
 				case 'deprecated freeplay':
 					loading = true;
 					FlxG.switchState(new FreeplayState());
-				case 'osu beatmaps':
-					loading = true;
-					FlxG.switchState(new osu.OsuMenuState());
+				// case 'osu beatmaps':
+				// 	loading = true;
+				// 	FlxG.switchState(new osu.OsuMenuState());
 				case "import charts from mods":
 					FlxG.switchState(new ImportMod());
 				case 'download characters':

@@ -152,7 +152,8 @@ class AnimationDebug extends MusicBeatState
 			return multi.MultiMenuState.fileDrop(file);
 		}
 		if(file.endsWith(".osu") || file.endsWith(".osz") ){
-			return osu.OsuMenuState.fileDrop(file);
+			MainMenuState.handleError('osu! beatmap support has been removed\nosu! lazer changed the file structure and-\n it\'s not worth it to maintain support when osu! stable and lazer are far better');
+			return;
 		}
 		if(FlxG.state is PlayState) return;
 		var validFile:String = "";
