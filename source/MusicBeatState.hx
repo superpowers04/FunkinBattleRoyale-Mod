@@ -127,6 +127,7 @@ class MusicBeatState extends FlxUIState {
 	{
 		CoolUtil.setFramerate(true);
 
+		CoolUtil.updateActiveObject(null);
 		instance = this;
 		super.create();
 
@@ -134,6 +135,7 @@ class MusicBeatState extends FlxUIState {
 	}
 	override function destroy(){
 		instance = null;
+		CoolUtil.updateActiveObject(null);
 		super.destroy();
 	}
 	

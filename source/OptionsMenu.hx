@@ -83,7 +83,7 @@ class OptionsMenu extends MusicBeatState
 		new OptionCategory("Online", [
 			// new HCBoolOption("Saves charts to disk whenever you recieve one","Save charts from servers","onlineSaveChart"),
 			new HCBoolOption('Allow Server Scripts',"Allow servers to run scripts. THIS IS DANGEROUS, ONLY ENABLE IF YOU TRUST THE SERVERS",'allowServerScripts'),
-		],"Settings relating to Characters, scripts, etc"),
+		],"Settings relating to online play"),
 		new OptionCategory("Gameplay", [
 			new DFJKOption(controls),
 			new HCBoolOption("Native Touch Buttons","Toggle the built-in taps for hitting notes(Legacy input only!)","useTouch"),
@@ -107,7 +107,7 @@ class OptionsMenu extends MusicBeatState
 			new SEJudgement("Good"),
 			new SEJudgement("Bad"),
 			new SEJudgement("Shit")
-		],"Edit things like Keybinds, scroll direction, etc"),
+		],"Edit your judgement timings"),
 		new OptionCategory("Modifiers", [
 			new HCBoolOption("Practice Mode","Disables the ability to get a gameover, You can still get a score unless you die","practiceMode"),
 			new HCBoolOption("Ghost Tapping","Allow tapping a direction without receiving a miss","ghost"),

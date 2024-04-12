@@ -542,4 +542,5 @@ class OnlineLobbyState extends ScriptMusicBeatState {
 	}
 	super.update(elapsed);
   }
+
 }

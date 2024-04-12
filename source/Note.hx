@@ -301,7 +301,12 @@ class Note extends FlxSprite
 
 
 		this.noteData = _noteData % getKeyCount(); 
-		shouldntBeHit = (isSustainNote && prevNote.shouldntBeHit || (_type == 1 || _type == "hurtnote" || _type == "hurt note" || _type == "hurt" || _type == true));
+
+		shouldntBeHit = (isSustainNote && prevNote.shouldntBeHit);
+		if(_type == 1 || _type == "hurtnote" || _type == "hurt note" || _type == "hurt" || _type == true){
+			shouldntBeHit=true;
+			if(!mustPress) noteAnimation=null;
+		}
 		if(inCharter){
 			this.strumTime = strumTime;
 			showNote = true;

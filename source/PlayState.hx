@@ -1041,6 +1041,8 @@ class PlayState extends ScriptMusicBeatState
 			scoreTxt.autoSize = false;
 			scoreTxt.wordWrap = false;
 			scoreTxt.alignment = "center";
+			scoreTxt.width = 350;
+			scoreTxt.height = 350;
 		}else {
 			scoreTxt = new FlxText(10 + SESave.data.guiGap, FlxG.height * 0.46 , 600, "NPS: 000000\nScore:00000000\nCombo:00000 (Max 00000)\nCombo Breaks:00000\nAccuracy:0000 %\n Unknown", 20); // Long ass text to make sure it's sized correctly
 			// scoreTxt.autoSize = true;
@@ -1952,7 +1954,9 @@ class PlayState extends ScriptMusicBeatState
 
 		return super.openSubState(SubState);
 	}
-
+	public function closeInterp(id){
+		unloadInterp(id);
+	}
 	override function closeSubState() {
 		if (!paused) return super.closeSubState();
 		
