@@ -6,6 +6,7 @@ import lime.utils.Assets;
 import sys.FileSystem;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
+import flixel.input.keyboard.FlxKey;
 
 using StringTools;
 
@@ -13,7 +14,6 @@ class CoolUtil {
 	public static var fontName:String = "vcr.ttf";
 	public static var font:String = (SELoader.anyExists(['mods/font.ttf','mods/font.otf']) ?? Paths.font(fontName));
 	public static var difficultyArray:Array<String> = ['EASY', "NORMAL", "HARD"];
-	public static var volKeys:Array<Array<Int>> = [];
 	public static var volKeysEnabled = true;
 	public static var Framerate:Float = 0;
 	public static var updateRate:Float = 120;
@@ -46,7 +46,7 @@ class CoolUtil {
 			}
 		}
 		Main.instance.setFPSCap(Framerate);
-		FlxG.updateFramerate = (FlxG.drawFramerate = Std.int(Framerate)) * 2;
+		FlxG.updateFramerate = (FlxG.drawFramerate = Std.int(Framerate));
 	}
 
 	@:keep inline public static function clearFlxGroup(obj:FlxTypedGroup<Dynamic>):FlxTypedGroup<Dynamic>{ // Destroys all objects inside of a FlxGroup
@@ -61,9 +61,10 @@ class CoolUtil {
 	}
 	public static function toggleVolKeys(?toggle:Bool = true){
 		if (toggle){
-			FlxG.sound.muteKeys = volKeys[0];
-			FlxG.sound.volumeUpKeys = volKeys[1];
-			FlxG.sound.volumeDownKeys = volKeys[2];
+			FlxG.sound.muteKeys = [FlxKey.fromStringMap[SESave.data.keys[0][9]]];
+			FlxG.sound.volumeDownKeys = [FlxKey.fromStringMap[SESave.data.keys[0][10]]];
+			FlxG.sound.volumeUpKeys = [FlxKey.fromStringMap[SESave.data.keys[0][11]]];
+
 			return;
 		}
 		FlxG.sound.muteKeys = null;
@@ -71,7 +72,7 @@ class CoolUtil {
 		FlxG.sound.volumeDownKeys = null;
 	}
 	@:keep inline public static function coolTextFile(path:String):Array<String> {
-		var daList:Array<String> = Assets.getText(path).trim().split('\n');
+		var daList:Array<String> = SELoader.getContent(path).trim().split('\n');
 
 		for (i in 0...daList.length) {
 			daList[i] = daList[i].trim().replace("\\n","\n");

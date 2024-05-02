@@ -154,6 +154,7 @@ class ScriptableSearchMenuState extends SearchMenuState{
 		
 		return super.switchTo(state);
 	}
+	#if(flixel > "5.3.0")
 	override function startOutro(func){
 		try{
 			ScriptableStateManager.callInterp('startOutro',[func]);
@@ -164,6 +165,7 @@ class ScriptableSearchMenuState extends SearchMenuState{
 		
 		return super.startOutro(func);
 	}
+	#end
 	override function select(sel:Int = 0){
 		try{
 
@@ -533,6 +535,7 @@ class ScriptableMusicBeatState extends MusicBeatState{
 		
 		return super.switchTo(state);
 	}
+	#if (flixel > "5.6")
 	override function startOutro(func){
 		try{
 			ScriptableStateManager.callInterp('startOutro',[func]);
@@ -543,6 +546,7 @@ class ScriptableMusicBeatState extends MusicBeatState{
 		
 		return super.startOutro(func);
 	}
+	#end
 	override function new(){
 		ScriptableStateManager.callInterp('new',[this,]);
 		ScriptableStateManager.interp.variables.set("state",this);

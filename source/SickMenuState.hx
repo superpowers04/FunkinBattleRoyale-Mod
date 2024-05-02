@@ -71,6 +71,7 @@ class SickMenuState extends ScriptMusicBeatState
 	function generateList(?reload:Bool = false){
 		if(reload){
 			grpControls = new FlxTypedGroup<Alphabet>();
+
 			add(grpControls);
 		}
 		grpControls.clear();
@@ -279,7 +280,9 @@ class SickMenuState extends ScriptMusicBeatState
 		if(grpControls.members[curSelected] != null && !isEpicTween){
 			
 			grpControls.members[curSelected].scale.set(1.1,1.1);
-			if(curTween != null)curTween.cancel();
+			if(curTween != null){
+				curTween.cancel();
+			}
 			curTween = FlxTween.tween(grpControls.members[curSelected].scale,{x:1,y:1},Conductor.stepCrochet * 0.003,{ease:FlxEase.circOut});
 		}
 		if(SESave.data.beatBouncing){
@@ -305,7 +308,7 @@ class SickMenuState extends ScriptMusicBeatState
 		if (curSelected < 0) curSelected = grpControls.length - 1;
 		if (curSelected >= grpControls.length) curSelected = 0;
 
-		if(bg.height > 720) FlxG.camera.scroll.y = (curSelected / grpControls.length) * (bg.height - 720);
+		if(bg.height > 720) bg.y = (curSelected / grpControls.length) * -(bg.height - 720);
 
 
 		descriptionText.text = descriptions[curSelected];
@@ -319,8 +322,7 @@ class SickMenuState extends ScriptMusicBeatState
 
 			item.alpha = 0.6;
 			item.color = 0xdddddd;
-			if (item.targetY == 0)
-			{
+			if (item.targetY == 0) {
 				item.alpha = 1;
 				item.color = 0xffffff;
 			}

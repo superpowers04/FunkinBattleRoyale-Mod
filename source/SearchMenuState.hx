@@ -243,7 +243,7 @@ class SearchMenuState extends ScriptMusicBeatState {
 		songs = [];
 
 		var i:Int = 0;
-		var query = new EReg((~/[-_ ]/g).replace(search.toLowerCase(),'[-_ ]'),'i'); // Regex that allows _ and - for songs to still pop up if user puts space, game ignores - and _ when showing
+		var query = new EReg((~/[-_ ]/g).replace(search.toLowerCase().replace('\\','\\\\'),'[-_ ]'),'i'); // Regex that allows _ and - for songs to still pop up if user puts space, game ignores - and _ when showing
 		for (char in searchList){
 			if(search == "" || query.match(char.toLowerCase()) ){
 				addToList(char,i);
@@ -276,7 +276,7 @@ class SearchMenuState extends ScriptMusicBeatState {
 	function handleScroll(){
 		var sbBGYOffset = scrollBarBG.y;
 		var sbBGHeight = sbBGYOffset + scrollBarBG.height - 20;
-		var LENGTH = grpSongs.length - 1;
+		var LENGTH = grpSongs.members.length - 1;
 		if(scrollPressed || FlxG.mouse.x > scrollBar.x && FlxG.mouse.x < scrollBar.x + scrollBar.width){
 			scrollBar.alpha = 1;
 			scrollHover = true;

@@ -7,7 +7,7 @@ import Song;
 
 using StringTools;
 
-
+import flixel.FlxG;
 
 // A rewrite of how FNF songs are read, intended to prevent changing bpm and such to break the current song's time
 // While you can convert into this format, converting out will be a bit finnicky
@@ -38,10 +38,10 @@ class SESONG{
 		public var forceCharacters(get,default):Bool = false; // Whether characters from the chart should be forced. Always enabled when charting
 			public function get_forceCharacters() return ChartingState.charting || PlayState.isStoryMode || forceCharacters;
 		/* Helper variables */
-			public var player3(set,get):String; // Redirect to GF
+			public var player3(get,set):String; // Redirect to GF
 				public function get_player3() return gf;
 				public function set_player3(val) return gf = val;
-			public var gfVersion(set,get):String; // Redirect to GF
+			public var gfVersion(get,set):String; // Redirect to GF
 				public function get_gfVersion() return gf;
 				public function set_gfVersion(val) return gf = val;
 
@@ -53,17 +53,23 @@ class SESONG{
 		public var rawJSON:Dynamic; // The raw JSON of the chart
 		public var focusPlayer:Bool = false; // MusthitSection but without changing the note ids
 		public var name:String = "Unspecified"; // Song name
+		public var song(get,set):String;
+		public var needsVoices:Bool = false;
+		public function get_song() return name;
+		public function set_song(v) return name = v;
 
 	/**/
+	public function new(){
 
+	}
 	public function importLegacy(song:SwagSong):SESONG{ // Returns itself because funni
 		var curBPM:Float = Math.abs(song.bpm);
 		var totalSteps:Int = 0;
 		var totalPos:Float = 0;
 		var mustHit:Bool = false;
-		for (i in 0...song.songNotes.length)
+		for (i in 0...song.notes.length)
 		{
-			var section = song.song[i];
+			var section = song.notes[i];
 			if(section.changeBPM && section.bpm != curBPM)
 			{
 				curBPM = Math.abs(section.bpm);
@@ -76,8 +82,8 @@ class SESONG{
 				mustHitSwitches.push([totalPos,mustHit]);
 			}
 			var nid:Int = 0; // Note ID
-			while (nid < section.songNotes.length){
-				var note = section.songNotes[nid];
+			while (nid < section.sectionNotes.length){
+				var note = section.sectionNotes[nid];
 
 				nid++;
 				if(note[1] < 0){
@@ -99,6 +105,7 @@ class SESONG{
 		scrollSpeed = song.speed;
 		stage = song.stage;
 		name = song.song;
+		needsVoices = song.needsVoices;
 		forceCharacters = song.forceCharacters;
 		return this;
 	}
@@ -113,7 +120,7 @@ class SESONG{
 	public function update(el:Float){
 		var bpm:Float = cast getCurrentPast(BPMChanges,Conductor.songPosition);
 		focusPlayer = cast getCurrentPast(mustHitSwitches,Conductor.songPosition);
-		if(Conductor.BPM != bpm) Conductor.changeBPM(bpm);
+		if(Conductor.bpm != bpm) Conductor.changeBPM(bpm);
 	}
 	// public function stepHit(step:Int){
 	// 	if(step / 16 == 0 ){
@@ -128,7 +135,7 @@ class SESONG{
 	public function generateNotes(song:SESONG,?jumpTo:Float = 0):Array<Note>{
 		var unspawnNotes:Array<Note> = [];
 		for (songNotes in eventNotes){
-			daStrumTime = songNotes[0] + SESave.data.offset;
+			var daStrumTime = songNotes[0] + SESave.data.offset;
 
 			var daNoteData:Int = songNotes[1];
 
@@ -141,7 +148,7 @@ class SESONG{
 			unspawnNotes.push(swagNote);
 		}
 		for (songNotes in songNotes){
-				daStrumTime = songNotes[0] + SESave.data.offset;
+				var daStrumTime = songNotes[0] + SESave.data.offset;
 				if (daStrumTime < 0)
 					daStrumTime = 0;
 

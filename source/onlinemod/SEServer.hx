@@ -1,11 +1,65 @@
 package onlinemod;
+import openfl.events.Event;
+import openfl.events.ProgressEvent;
+import openfl.events.IOErrorEvent;
 
+import openfl.net.Socket;
+import openfl.net.ServerSocket;
+import openfl.utils.ByteArray;
+import openfl.events.ServerSocketConnectEvent;
+import openfl.utils.Endian;
+import onlinemod.Player;
+import flixel.FlxG;
+
+@:publicFields @:structInit class Command {
+	// var name:String;
+	var description:String;
+	var execute:(ConnectedPlayer,String,Array<String>)->Void;
+	@:optional var admin = false;
+
+}
 
 class SEServer{
+	public static var instance:SEServer;
 	public static var socket:ServerSocket;
 	public static var connectedPlayers:Array<ConnectedPlayer> = [];
 	public static var clientsFromNames:Map<String,Null<Int>> = [];
 	public static var serverVariables:Map<Dynamic,Dynamic>;
+	public static var prefix:String = "!";
+
+
+	public static function createServer(port){
+		var socket = new ServerSocket();
+		socket.bind(port);
+		if(!socket.bound){
+			throw('Unable to bind to port ${port}. Is it already in use or too low?');
+			return;
+		}
+		instance = new SEServer();
+		connectedPlayers = [];
+		clientsFromNames = [];
+		socket.addEventListener(Event.CONNECT, (e:ServerSocketConnectEvent) -> {
+			var ID = connectedPlayers.length;
+			connectedPlayers[ID] = {
+				socket:e.socket,
+				receiver:new Receiver(SEServer.HandleData.bind(ID,_,_)),
+				nick:"OUTDATED",
+				admin:(ID == 0)
+			}
+			trace('New connection! ${e.socket}');
+			var socket = e.socket;
+			socket.endian = LITTLE_ENDIAN;
+			socket.addEventListener(IOErrorEvent.IO_ERROR, SEServer.OnErrorSocket.bind(ID,_));
+			socket.addEventListener(Event.CLOSE, SEServer.OnCloseSock.bind(ID,_));
+			socket.addEventListener(ProgressEvent.SOCKET_DATA, SEServer.OnData.bind(ID,_));
+		});
+		socket.addEventListener(IOErrorEvent.IO_ERROR, SEServer.OnError);
+		socket.addEventListener(Event.CLOSE, SEServer.OnClose);
+		// socket.addEventListener(ProgressEvent.SOCKET_DATA, OnData);
+		socket.listen(12);
+		SEServer.socket = socket;
+	}
+
 	/* Packets, this should probably be handled elsewhere but whatever ig*/
 	/* TODO: ADD SCRIPT SUPPORT */
 	public static function HandleData(socketID:Int,packetId:Int, data:Array<Dynamic>) {	
@@ -33,15 +87,30 @@ class SEServer{
 						return true;
 					}
 					clientsFromNames[data[0]] = socketID;
+					if(socketID==0){
+						player.self=player.admin=true;
+					}
 					player.nick = data[0];
 					trace('${socketID}: registered as ${player.nick}');
 					Sender.SendPacket(Packets.NICKNAME_CONFIRM, [0], socket);
 				case Packets.JOINED_LOBBY:
 					Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['Hosting is not currently finished, nothing besides chatting is implemented at the moment..'],socket);
 				case Packets.SEND_CHAT_MESSAGE:{
+					if(player != null && data[1] is String && data[1].substring(0,prefix.length) == prefix){
+						try{
+							handleCommand(player,socket,data[1]);
+						}catch(e){
+							Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['An error occured while processing this command!'],socket);
+							if(player.admin){
+								Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['${e.details()}'],socket);
+							}
+							trace(e);
+						}
+						return true;
+					}
 					for (playerObject in connectedPlayers){
-						if(playerObject.socket != null && playerObject != player) 
-							Sender.SendPacket(Packets.BROADCAST_CHAT_MESSAGE,data,playerObject.socket);
+						if(playerObject.socket == null || playerObject == player) continue;
+						Sender.SendPacket(Packets.BROADCAST_CHAT_MESSAGE,data,playerObject.socket);
 					}
 				}
 			}
@@ -49,6 +118,19 @@ class SEServer{
 			trace('Error handling packet($pktName) from $socketID:${e.message}');
 		}
 		return true;
+	}
+	public static function handleCommand(player:ConnectedPlayer,socket:Socket,str:String){
+		var split = str.substring(prefix.length).split(' ');
+		var cmd = instance.commands[split[0]];
+		if(cmd == null){
+			Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['Invalid command, do !help for a list of commands'],socket);
+			return;
+		}
+		if(cmd.admin && !player.admin){
+			Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['You do not have permission to run this command!'],socket);
+			return;
+		}
+		cmd.execute(player,str,split);
 	}
 	public static function OnData(ID:Int,e:ProgressEvent) {
 		var data:ByteArray = new ByteArray();
@@ -75,7 +157,7 @@ class SEServer{
 		shutdownServer();
 		FlxG.switchState(new OnlinePlayMenuState('Closed server: ${e}'));
 	}
-	static function OnError(e:IOErrorEvent) {
+	public static function OnError(e:IOErrorEvent) {
 		shutdownServer();
 		FlxG.switchState(new OnlinePlayMenuState('Socket error: ${e.text}'));
 	}
@@ -106,5 +188,56 @@ class SEServer{
 		// shutdownServer();
 		trace('Error with socket $sockID: ${e.text}');
 		// FlxG.switchState(new OnlinePlayMenuState('Socket error: ${e.text}'));
+	}
+	public static function sendMessageToAllClients(str:String,?player:ConnectedPlayer){
+		if(player == null){
+			for (playerObject in connectedPlayers){
+				if(playerObject.socket == null) continue;
+				Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,[str],playerObject.socket);
+			}
+			return;
+		}
+		for (playerObject in connectedPlayers){
+			if(playerObject.socket == null || playerObject == player) continue;
+			Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,[str],playerObject.socket);
+		}
+
+	}
+	/*Instance shit
+		Currently only using this so commands don't waste memory for no fuckin reason
+	*/
+	public var scripts:Array<String> = [];
+	public var songName:String = "";
+	public var chartPath:String = "";
+	public var instPath:String = "";
+	public var voicePath:String = "";
+	public var chart:String="";
+	public var commands:Map<String,Command> = [
+		'help' => {
+			description:"Returns all commands available",
+			execute:function(player:ConnectedPlayer,cmd:String,split:Array<String>){
+				for(name=>cmd in SEServer.instance.commands){
+					if(cmd.admin && !player.admin) continue;
+					Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['$name - ${cmd.description}'],player.socket);
+				}
+			}
+		},
+		// TODO ADD PROPER CLIENT SONG SETTING
+		'setsong' => {
+			description:"Sets the song",
+			execute:function(player:ConnectedPlayer,cmd:String,split:Array<String>){
+				if(split[2] == null){
+					if(player.self) return FlxG.switchState(new OnlineSongMenuState());
+					Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['No song specified!'],player.socket);
+					return;
+				}
+				Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['This command is not implemented!'],player.socket);
+			}
+		}
+	];
+	public function new(){}
+
+	public function updateSong(){
+		sendMessageToAllClients('Song updated to $songName');
 	}
 }

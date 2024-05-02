@@ -1043,7 +1043,7 @@ class ChartingState extends ScriptMusicBeatState
 	inline function loadAudioBuffer() {
 
 		audioBuffers[0] = AudioBuffer.fromFile(SELoader.getPath(if(onlinemod.OfflinePlayState.instFile != "") onlinemod.OfflinePlayState.instFile else ('assets/songs/' + _song.song.toLowerCase() + "/Inst.ogg")));
-		audioBuffers[1] = AudioBuffer.fromFile(SELoader.getPath(if(onlinemod.OfflinePlayState.voicesFile != "") onlinemod.OfflinePlayState.voicesFile else ('assets/songs/' + _song.song.toLowerCase() + "/Voices.ogg")));
+		if(_song.needsVoices || (onlinemod.OfflinePlayState.voicesFile != "" && FileSystem.exists(onlinemod.OfflinePlayState.voicesFile))) audioBuffers[1] = AudioBuffer.fromFile(SELoader.getPath(if(onlinemod.OfflinePlayState.voicesFile != "") onlinemod.OfflinePlayState.voicesFile else ('assets/songs/' + _song.song.toLowerCase() + "/Voices.ogg")));
 		// audioBytes[0] = audioBuffers[0].data.toBytes();
 		// audioBytes[1] = audioBuffers[1].data.toBytes();
 	}
@@ -1065,11 +1065,14 @@ class ChartingState extends ScriptMusicBeatState
 		lastChart = onlinemod.OfflinePlayState.chartFile;
 
 		// WONT WORK FOR TUTORIAL OR TEST SONG!!! REDO LATER
-		if(_song.needsVoices || (onlinemod.OfflinePlayState.voicesFile != "" && FileSystem.exists(onlinemod.OfflinePlayState.voicesFile))){
-			vocals = new FlxSound().loadEmbedded(Sound.fromFile(onlinemod.OfflinePlayState.voicesFile));
+		if((onlinemod.OfflinePlayState.voicesFile != "" && FileSystem.exists(onlinemod.OfflinePlayState.voicesFile))){
+			try{
+				vocals = new FlxSound().loadEmbedded(Sound.fromFile(onlinemod.OfflinePlayState.voicesFile));
 
-		} 
+			}catch(e){vocals=null;}
+		}
 		if(vocals == null){
+			if(_song.needsVoices) showTempmessage('Song says it needs voices but no voices are present!',FlxColor.RED);
 			vocals = new FlxSound();
 			noVocals = true;
 		}
@@ -1078,8 +1081,7 @@ class ChartingState extends ScriptMusicBeatState
 		FlxG.sound.music.pause();
 		vocals.pause();
 
-		FlxG.sound.music.onComplete = function()
-		{
+		FlxG.sound.music.onComplete = function() {
 			vocals.pause();
 			vocals.time = 0;
 			FlxG.sound.music.pause();
@@ -1090,8 +1092,7 @@ class ChartingState extends ScriptMusicBeatState
 		trace('Voices - ${vocals}');
 	}
 
-	function generateUI():Void
-	{
+	function generateUI():Void {
 		while (bullshitUI.members.length > 0) bullshitUI.remove(bullshitUI.members[0], true);
 
 		// general shit
@@ -1621,19 +1622,13 @@ class ChartingState extends ScriptMusicBeatState
 
 			var sample:Float = (byte / 65535);
 
-			if (sample > 0)
-			{
-				if (sample > max)
-					max = sample;
-			}
-			else if (sample < 0)
-			{
-				if (sample < min)
-					min = sample;
+			if (sample > 0) {
+				if (sample > max) max = sample;
+			} else if (sample < 0) {
+				if (sample < min) min = sample;
 			}
 
-			if ((index % samplesPerRow) == 0)
-			{
+			if ((index % samplesPerRow) == 0) {
 				// trace("min: " + min + ", max: " + max);
 
 				/*if (drawIndex > gridBG.height)
@@ -1643,8 +1638,7 @@ class ChartingState extends ScriptMusicBeatState
 
 				var pixelsMin:Float = Math.abs(min * (GRID_SIZE * 9));
 				var pixelsMax:Float = max * (GRID_SIZE * 9);
-				if(checkForVoices == 1)waveformSprite.pixels.fillRect(new Rectangle(Std.int((GRID_SIZE * 4) - pixelsMin), drawIndex, pixelsMin + pixelsMax, 1), FlxColor.BLUE);
-				else waveformSprite.pixels.fillRect(new Rectangle(Std.int((GRID_SIZE * 4) - pixelsMin), drawIndex, pixelsMin + pixelsMax, 1), FlxColor.RED);
+				waveformSprite.pixels.fillRect(new Rectangle(Std.int((GRID_SIZE * 4) - pixelsMin), drawIndex, pixelsMin + pixelsMax, 1), (checkForVoices == 1) ? FlxColor.BLUE : FlxColor.RED);
 				drawIndex++;
 
 				min = 0;

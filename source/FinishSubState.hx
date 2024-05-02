@@ -167,11 +167,21 @@ class FinishSubState extends MusicBeatSubstate
 				// if (SESave.data.camMovement){
 				PlayState.instance.followChar(0);
 				PlayState.instance.controlCamera = false;
-				// }
+				cam = new FlxCamera();
+				FlxG.cameras.add(cam);
+				FlxG.cameras.setDefaultDrawTarget(cam,true);
+				FlxG.state.persistentUpdate = FlxG.state.persistentDraw = !pauseGame;
+				add(PlayState.instance.remove(PlayState.bf));
+
+				cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]]; 
+					// ready = true;
+				PlayState.bf.cameras=cameras;
+				PlayState.bf.scrollFactor.set(0,0);
+				PlayState.bf.x = 700;
+				PlayState.bf.y = 0;
 				forceBFAnim = false;
 			}
 		}
-
 	}
 
 	public static var endingMusic:Sound;
@@ -204,6 +214,7 @@ class FinishSubState extends MusicBeatSubstate
 			// var timer = new FlxTimer().start(1,function(e:FlxTimer){FinishSubState.instance.ready=true;FlxTween.tween(FinishSubState.instance.contText,{alpha:1},0.5);});
 			Conductor.changeBPM(70);
 			if(isError) win = false;
+
 			if(name != "FORCEDMOMENT.MP4efdhseuifghbehu"){
 
 				FlxG.camera.alpha = PlayState.instance.camHUD.alpha = 1;
@@ -216,32 +227,27 @@ class FinishSubState extends MusicBeatSubstate
 				PlayState.instance.moveCamera = PlayState.instance.controlCamera = false;
 				PlayState.instance.camFollow.x = PlayState.instance.camGame.scroll.x = camPos[0];
 				PlayState.instance.camFollow.y = PlayState.instance.camGame.scroll.y = camPos[1];
-				FlxG.state.persistentUpdate = !isError && !pauseGame;
+				FlxG.state.persistentUpdate =  !isError && !pauseGame;
 				if (win) PlayState.playerCharacter.animation.finishCallback = null; else PlayState.dad.animation.finishCallback = null;
 				updateBF = false;
 			}
-			cam = new FlxCamera();
-			FlxG.cameras.add(cam);
-			FlxG.cameras.setDefaultDrawTarget(cam,true);
-			cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]]; 
-				// ready = true;
+
 			pauseGame = true;
 			autoEnd = true;
 			FlxG.sound.pause();
 
 			// if(!win)FlxG.sound.play(Paths.sound('fnf_loss_sfx'));
 			if(endingMusic == null){
-				music = new FlxSound().loadEmbedded(Paths.music( win ? 'StartItchBuild' : 'gameOver' ), true, true);
+				music = new FlxSound().loadEmbedded(SELoader.cache.loadSound( win ? 'assets/shared/music/resultsNORMAL.ogg' : 'assets/shared/music/resultsSHIT.ogg' ), true, true);
 			}else{
 				music = new FlxSound().loadEmbedded(endingMusic , true, true);
-
 			}
 			music.play(false);
 
-			if(win && endingMusic == null){
+			if(!win && endingMusic == null){
 				music.looped = false;
 				music.onComplete = function(){
-					music = new FlxSound().loadEmbedded(Paths.music('breakfast'), true, true);
+					music = new FlxSound().loadEmbedded(SELoader.cache.loadSound('assets/shared/music/breakfast.ogg'), true, true);
 					music.play(false);
 					FlxG.sound.list.add(music);
 				} 
@@ -255,9 +261,9 @@ class FinishSubState extends MusicBeatSubstate
 			// PlayState.songScore
 			
 
-			var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-			bg.alpha = 0;
-			bg.scrollFactor.set();
+			// var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+			// bg.alpha = 0;
+			// bg.scrollFactor.set();
 			if(isError){
 				// ready = false;
 				var finishedText:FlxText = new FlxText(20,-55,0, "Error caught!" );
@@ -299,12 +305,12 @@ class FinishSubState extends MusicBeatSubstate
 				// contText.alignment = CENTER;
 				contText.color = FlxColor.WHITE;
 				contText.scrollFactor.set();
-				FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut});
+				// FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut});
 				FlxTween.tween(finishedText, {y:20},0.5,{ease: FlxEase.expoInOut});
 				FlxTween.tween(errText, {x:_errText_X},0.5,{ease: FlxEase.expoInOut});
 				FlxTween.tween(contText, {y:FlxG.height - 90},0.5,{ease: FlxEase.expoInOut});
 				FlxTween.tween(reportText, {x:rep_x},0.5,{ease: FlxEase.expoInOut});
-				add(bg);
+				// add(bg);
 				add(finishedText);
 				add(errText);
 				add(contText);
@@ -405,7 +411,7 @@ class FinishSubState extends MusicBeatSubstate
 				// chartInfoText.scrollFactor.set();
 				
 
-				add(bg);
+				// add(bg);
 				add(finishedText);
 				add(comboText);
 				add(contText);
@@ -415,7 +421,7 @@ class FinishSubState extends MusicBeatSubstate
 				// add(chartInfoText);
 				healthBar.cameras = healthBarBG.cameras = iconP1.cameras = iconP2.cameras = [cam];
 
-				FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut});
+				// FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut});
 				FlxTween.tween(finishedText, {y:(finishedText.y-=55) + 55},0.5,{ease: FlxEase.bounceOut});
 				FlxTween.tween(songText, {y:(songText.y-=55) + 55},0.5,{ease: FlxEase.bounceOut});
 				FlxTween.tween(comboText, {x:(comboText.x-=200) + 200},0.5,{ease: FlxEase.bounceOut});

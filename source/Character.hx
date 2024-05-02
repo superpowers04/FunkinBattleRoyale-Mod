@@ -1,5 +1,4 @@
 package;
-
 import se.extensions.flixel.SEFlxFrames;
 
 import flixel.FlxG;
@@ -39,7 +38,12 @@ import hscriptfork.InterpSE;
 using StringTools;
 
 class CharAnimController extends FlxAnimationController{
-	override function findByPrefix(AnimFrames:Array<FlxFrame>, Prefix:String, logError = true):Void {
+	#if(flixel > "5.3.0")
+	override function findByPrefix(AnimFrames:Array<FlxFrame>, Prefix:String,logError:Bool = true):Void
+	#else
+	override function findByPrefix(AnimFrames:Array<FlxFrame>, Prefix:String):Void
+	#end
+	{
 		if(Prefix == "FORCEALLLMAOTHISISSHIT"){
 			fuckinAddAll(AnimFrames);
 		}
@@ -197,8 +201,8 @@ class CharAnimController extends FlxAnimationController{
 		public var useVoices:Bool = false;
 		public var singDuration:Float = 4; // Singduration?
 		public var dadVar(get,set):Float; // Singduration?
-		public function get_dadVar() return singDuration;
-		public function set_dadVar(x) return singDuration = x;
+		@:keep inline public function get_dadVar() return singDuration;
+		@:keep inline public function set_dadVar(x) return singDuration = x;
 		public var missSounds:Array<Sound> = [];
 		public var voiceSounds:Array<FlxSound> = [];
 		public var flip:Bool = true;
@@ -273,9 +277,9 @@ class CharAnimController extends FlxAnimationController{
 			interp.variables.set("hscriptPath", '${charLoc}/$curCharacter');
 			interp.variables.set("charName", curCharacter);
 			interp.variables.set("charProperties", charProperties);
-			interp.variables.set("PlayState", PlayState );
-			interp.variables.set("state", cast FlxG.state );
-			interp.variables.set("game", cast FlxG.state );
+			interp.variables.set("PlayState", PlayState);
+			interp.variables.set("state", cast FlxG.state);
+			interp.variables.set("game", cast FlxG.state);
 			interp.variables.set("animation", animation );
 			interp.variables.set("BRtools",new HSBrTools('${charLoc}/$curCharacter/'));
 			interp.execute(program);
@@ -381,6 +385,7 @@ class CharAnimController extends FlxAnimationController{
 		if (charProperties.cam_pos != null){camX+=charProperties.cam_pos[0];camY+=charProperties.cam_pos[1];}
 	}
 
+
 	function loadJSONChar(charProperties:CharacterJson){
 		
 		// Check if the XML has BF's animations, if so, add them
@@ -420,11 +425,12 @@ class CharAnimController extends FlxAnimationController{
 					if (anima.ifstate != null && PlayState.instance != null){
 						anima.ifstate.isFunc = false; //Force because funni
 						// PlayState.
-						if (anima.ifstate.check == 1 ){ // Do on step or beat
-							if (PlayState.stepAnimEvents[charType] == null) PlayState.stepAnimEvents[charType] = [anima.anim => anima.ifstate];
-						} else {
-							if (PlayState.beatAnimEvents[charType] == null) PlayState.beatAnimEvents[charType] = [anima.anim => anima.ifstate]; else PlayState.beatAnimEvents[charType][anima.anim] = anima.ifstate;
-						}
+						// Do on step or beat
+						var events = (anima.ifstate.check == 1 ? PlayState.stepAnimEvents : PlayState.beatAnimEvents);
+		
+						if (events[charType] == null) events[charType] = [anima.anim => anima.ifstate]; 
+						else events[charType][anima.anim] = anima.ifstate;
+						
 						
 						// PlayState.regAnimEvent(charType,anima.ifstate,anima.anim);
 					}
@@ -585,7 +591,7 @@ class CharAnimController extends FlxAnimationController{
 		namespace = charInfo.nameSpace;
 		if(SESave.data.doCoolLoading) LoadingScreen.loadingText = 'Loading Character "${getNamespacedName()}"';
 
-		if (!amPreview && FileSystem.exists('${charLoc}/$curCharacter/script.hscript')){
+		if (!amPreview && SELoader.exists('${charLoc}/$curCharacter/script.hscript')){
 			parseHScript(SELoader.loadText('${charLoc}/$curCharacter/script.hscript'));
 			var skipConstruct:Dynamic = callInterp("initCharacter",[]);
 			if(skipConstruct != null && skipConstruct == true){
@@ -614,6 +620,62 @@ class CharAnimController extends FlxAnimationController{
 			}catch(e){
 				MainMenuState.handleError(e,'Character ${curCharacter} is a hardcoded character and caused an error, Something went terribly wrong! ${e.message}');
 				return;
+			}
+		}else if(charInfo.psychChar){
+
+			if (charProperties == null) {
+				try{
+					charProperties = Json.parse(CoolUtil.cleanJSON(charPropJson = SELoader.loadText(charInfo.jsonLocation)));
+				}catch(e){
+					throw('Character ${curCharacter} has a missing config.json! ${e.message}');
+					return;
+				}
+			}
+			
+			if ((charProperties == null || charProperties.animations == null || charProperties.animations[0] == null) && !amPreview){
+				throw('$curCharacter\'s JSON is invalid!');
+				return;
+			} // Boot to main menu if character's JSON can't be loaded
+			// if ((charProperties == null || charProperties.animations == null || charProperties.animations[0] == null) && amPreview){
+
+			loadedFrom = '${charLoc}/$curCharacter/config.json';
+			if(frames == null){
+				var pngName:String = 'assets:'+charProperties.image+".png";
+				var xmlName:String = 'assets:'+charProperties.image+".xml";
+				if(!SELoader.exists(pngName)){
+					pngName = SELoader.getAssetPath('assets:images/'+charProperties.image+".png");
+					xmlName = SELoader.getAssetPath('assets:images/'+charProperties.image+".xml");
+				}
+				if(pngName == ""){
+					throw('Unable to find image "${charProperties.image}" for $curCharacter');
+					return;
+				}
+				if(xmlName == ""){
+					throw('Unable to find xml "${charProperties.image}" for $curCharacter');
+					return;
+				}
+				var forced:Int = 0;
+
+
+				if (tex == null){
+					var charJsonF:String = (xmlName).substr(0,-3) + "json";
+					if (SELoader.exists(charJsonF)){
+						charXml = SELoader.loadText(charJsonF);
+						if (charXml == null){throw('$curCharacter is missing their sprite JSON?');} // Boot to main menu if character's XML can't be loaded
+
+						tex = FlxAtlasFrames.fromTexturePackerJson(SELoader.loadGraphic('${charLoc}/$curCharacter/${pngName}'), charXml);
+					} else {
+						charXml = SELoader.loadXML(xmlName); // Loads the XML as a string. 
+						if (charXml == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's XML can't be loaded
+						// if(charXml.substr(2).replace(String.fromCharCode(0),'').contains('UTF-16')){ // Flash CS6 outputs a UTF-16 xml even though no UTF-16 characters are usually used. This reformats the file to be UTF-8 *hopefully*
+						// 	charXml = '<?' + charXml.substr(2).replace(String.fromCharCode(0),'').replace('UTF-16','utf-8');
+						// }
+						tex = SEFlxFrames.fromSparrow(SELoader.loadGraphic(pngName), charXml);
+					}
+					if (tex == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's texture can't be loaded
+				}
+				charProperties.char_pos = charProperties.position;
+				charProperties.char_pos[2] = -charProperties.char_pos[2];
 			}
 		}else{
 
@@ -648,12 +710,13 @@ class CharAnimController extends FlxAnimationController{
 						charProperties = Json.parse(CoolUtil.cleanJSON(charPropJson = SELoader.loadText('${charLoc}/$curCharacter/config.json')));
 					}
 				}catch(e){
-					handleError('Character ${curCharacter} has a broken config.json! ${e.message}');
+					throw('Character ${curCharacter} has a broken config.json! ${e.message}');
 					return;
 				}
 			}
 			if ((charProperties == null || charProperties.animations == null || charProperties.animations[0] == null) && !amPreview){
-				return handleError('$curCharacter\'s JSON is invalid!');
+				throw('$curCharacter\'s JSON is invalid!');
+				return;
 			} // Boot to main menu if character's JSON can't be loaded
 			// if ((charProperties == null || charProperties.animations == null || charProperties.animations[0] == null) && amPreview){
 
@@ -690,18 +753,18 @@ class CharAnimController extends FlxAnimationController{
 					var charJsonF:String = ('${charLoc}/$curCharacter/${xmlName}').substr(0,-3) + "json";
 					if (SELoader.exists(charJsonF)){
 						charXml = SELoader.loadText(charJsonF); 				
-						if (charXml == null){handleError('$curCharacter is missing their sprite JSON?');} // Boot to main menu if character's XML can't be loaded
+						if (charXml == null){throw('$curCharacter is missing their sprite JSON?');} // Boot to main menu if character's XML can't be loaded
 
 						tex = FlxAtlasFrames.fromTexturePackerJson(SELoader.loadGraphic('${charLoc}/$curCharacter/${pngName}'), charXml);
 					} else {
 						charXml = SELoader.loadXML('${charLoc}/$curCharacter/${xmlName}'); // Loads the XML as a string. 
-						if (charXml == null){handleError('$curCharacter is missing their XML!');} // Boot to main menu if character's XML can't be loaded
+						if (charXml == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's XML can't be loaded
 						// if(charXml.substr(2).replace(String.fromCharCode(0),'').contains('UTF-16')){ // Flash CS6 outputs a UTF-16 xml even though no UTF-16 characters are usually used. This reformats the file to be UTF-8 *hopefully*
 						// 	charXml = '<?' + charXml.substr(2).replace(String.fromCharCode(0),'').replace('UTF-16','utf-8');
 						// }
 						tex = SEFlxFrames.fromSparrow(SELoader.loadGraphic('${charLoc}/$curCharacter/${pngName}'), charXml);
 					}
-					if (tex == null){handleError('$curCharacter is missing their XML!');} // Boot to main menu if character's texture can't be loaded
+					if (tex == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's texture can't be loaded
 				}
 			}
 		}
@@ -854,7 +917,7 @@ class CharAnimController extends FlxAnimationController{
 		animation.callback = function(name:String,frameNumber:Int,frameIndex:Int){
 			callInterp("animFrame",[animation.curAnim,frameNumber,frameIndex]);
 		};
-		if(animation.curAnim == null && !lonely && !amPreview){return handleError('$curCharacter is missing an idle/dance animation!');}
+		if(animation.curAnim == null && !lonely && !amPreview){throw('$curCharacter is missing an idle/dance animation!');}
 		if(animation.getByName('songStart') != null && !lonely && !amPreview) playAnim('songStart',true);
 		if(!charProperties.editableSprite){
 			// graphic.canBeDumped = true;
@@ -862,6 +925,7 @@ class CharAnimController extends FlxAnimationController{
 		}
 		#if !debug
 		}catch(e){
+			trace(e.details());
 			return handleError('Error with $curCharacter: ${e}');
 			
 		}
@@ -1275,6 +1339,12 @@ class CharAnimController extends FlxAnimationController{
 			"player2": [-27, -13],
 			"player3": [0, 0],
 			"anim": "dodge"
+		},
+		{
+			"player1": [109, 493],
+			"player2": [0, 0],
+			"player3": [0, 0],
+			"anim": "win"
 		}
 	],
 	"no_antialiasing": false,
@@ -1425,6 +1495,16 @@ class CharAnimController extends FlxAnimationController{
 			"fps": 24,
 			"loopStart": 0,
 			"name": "BF hit",
+			"flipx": false,
+			"indices": []
+		},
+		{
+			"loop": false,
+			"priority": -1,
+			"anim": "win",
+			"fps": 18,
+			"loopStart": 0,
+			"name": "Boyfriend Good Anim",
 			"flipx": false,
 			"indices": []
 		}

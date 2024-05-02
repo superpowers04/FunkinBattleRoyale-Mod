@@ -175,6 +175,10 @@ class FuckState extends FlxUIState {
 		}
 		Main.renderLock.release();
 		if(Main.game == null || _rawError || !TitleState.initialized || useOpenFL){
+			// trace(Main.game == null);
+			// trace(_rawError);
+			// trace(!TitleState.initialized);
+			// trace(useOpenFL);
 			try{Main.instance.removeChild(Main.funniSprite);}catch(e){};
 			try{Main.funniSprite.removeChild(Main.game);}catch(e){};
 			if(Main.game != null){
@@ -183,6 +187,7 @@ class FuckState extends FlxUIState {
 			Main.game = null;
 			// Main.instance
 			trace('OpenFL error screen');
+
 			try{
 				if(!showingError){
 
@@ -196,7 +201,7 @@ class FuckState extends FlxUIState {
 					var textFieldTop = new TextField();
 					addChild(textFieldTop);
 					textFieldTop.width = 1280;
-					textFieldTop.text = "A fatal error occured!";
+					textFieldTop.text = "A fatal error occurred!";
 					textFieldTop.textColor = 0xFFFF0000;
 					textFieldTop.y = 30;
 					var textFieldBot = new TextField();
@@ -205,15 +210,12 @@ class FuckState extends FlxUIState {
 					textFieldBot.text = "Please take a screenshot and report this";
 					textFieldBot.y = 720 * 0.8;
 					if(saved){
-						var dateNow:String = Date.now().toString();
-
-						dateNow = StringTools.replace(dateNow, " ", "_");
-						dateNow = StringTools.replace(dateNow, ":", ".");
+						var dateNow:String = StringTools.replace(StringTools.replace(Date.now().toString(), " ", "_"), ":", ".");
 						textFieldBot.text = 'Saved crashreport to "crashReports/SUPERENGINE_CRASH-${dateNow}.log".\nPlease send this file when reporting this crash.';
 					}
 
 					// textField.x = (1280 * 0.5);
-					var tf = new TextFormat(CoolUtil.font, 32, 0xFFFFFF);
+					var tf = new TextFormat(CoolUtil.font, 24, 0xFFFFFF);
 					tf.align = "center";
 					textFieldBot.embedFonts = textFieldTop.embedFonts = textField.embedFonts = true;
 					textFieldBot.defaultTextFormat =textFieldTop.defaultTextFormat =textField.defaultTextFormat = tf;

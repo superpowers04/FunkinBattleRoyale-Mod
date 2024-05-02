@@ -24,7 +24,7 @@ class ErrorSprite extends Sprite{
 			var textFieldTop = new TextField();
 			super.addChild(textFieldTop);
 			textFieldTop.width = 1280;
-			textFieldTop.text = "A fatal error occured!";
+			textFieldTop.text = "A fatal error occurred!";
 			textFieldTop.textColor = 0xFFFF0000;
 			textFieldTop.y = 30;
 			var textFieldBot = new TextField();

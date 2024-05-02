@@ -1050,6 +1050,8 @@ class PlayState extends ScriptMusicBeatState
 			scoreTxt.wordWrap = false;
 			scoreTxt.alignment = "left";
 			scoreTxt.screenCenter(X);
+			scoreTxt.width = 350;
+			scoreTxt.height = 350;
 		}
 
 		
@@ -2496,7 +2498,7 @@ class PlayState extends ScriptMusicBeatState
 			var msTiming = HelperFunctions.truncateFloat(noteDiff, 3); 
 
 
-			var currentTimingShown = new FlxText(0,0,0,"0ms");
+			var currentTimingShown = new FlxText(0,0,100,"0ms");
 			if(SESave.data.showTimings){
 				timeShown = 0;
 				switch(daRating){
@@ -2516,7 +2518,8 @@ class PlayState extends ScriptMusicBeatState
 				// This if statement is shit but it should work
 				currentTimingShown.text = msTiming + "ms " + (if(_dist == 0) "=" else if(downscroll && _dist < 0 || !downscroll && _dist > 0) "^" else "v");
 				currentTimingShown.size = 20;
-				currentTimingShown.screenCenter();
+				currentTimingShown.alignment=CENTER;
+				// currentTimingShown.screenCenter();
 				currentTimingShown.updateHitbox();
 				currentTimingShown.x = (playerStrums.members[daNote.noteData].x + (playerStrums.members[daNote.noteData].width * 0.5)) - (currentTimingShown.width * 0.5);
 				currentTimingShown.y = daNote.y + (daNote.height * 0.5);
@@ -2885,6 +2888,7 @@ class PlayState extends ScriptMusicBeatState
 		callInterp('registerKeysAfter',[SEIKeyMap]);
 	}
 	var possibleNotes:Array<Note> = [];
+	var hitArray:Array<Bool>=[false,false,false,false];
 	function SEIKeyPress(event:KeyboardEvent){
 		if(this != FlxG.state){
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, SEIKeyPress);
@@ -2915,7 +2919,11 @@ class PlayState extends ScriptMusicBeatState
 		if(!pressArray.contains(true) || SEIBlockInput || !acceptInput) return;
 
 		playerCharacter.holdTimer = 0;
-		var hitArray = [false,false,false,false];
+		// var hitArray = [false,false,false,false];
+		{
+			var i = hitArray.length+1;
+			while(i > 0){hitArray[i--]=false;}
+		}
 		if(holdArray.contains(true)){
 			playerCharacter.isPressingNote = true;
 			var daNote = null;
@@ -2934,7 +2942,11 @@ class PlayState extends ScriptMusicBeatState
 				callInterp("susHit",[daNote]);
 			}
 		}
-		var possibleNotes:Array<Note> = [null,null,null,null]; // notes that can be hit
+		{
+			var i = possibleNotes.length;
+			while(i > 0){possibleNotes.pop();i--;}
+		}
+		// var possibleNotes:Array<Note> = [null,null,null,null]; // notes that can be hit
 		var onScreenNote:Bool = false;
 		var members = notes.members;
 		var i = members.length;

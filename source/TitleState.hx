@@ -58,8 +58,19 @@ typedef Scorekillme = {
 	public var nameSpace:String = null;
 	public var nameSpaceType:Int = 0; // 0: mods/characters, 1: mods/weeks, 2: mods/packs 
 	public var internal:Bool = false;
+	public var psychChar:Bool = false;
 	public var internalAtlas:String = "";
 	public var internalJSON:String = "";
+	public var imageLocation(get,default):String = null;
+	public function get_imageLocation(){
+		if(imageLocation == "" || imageLocation == null) return path+"character";
+		return imageLocation;
+	}
+	public var jsonLocation(get,default):String = null;
+	public function get_jsonLocation(){
+		if(jsonLocation == "" || jsonLocation == null) return path+"config.json";
+		return jsonLocation;
+	}
 	public var type:Int = 0x0; // 0: PNG/XML based, 1: Script based
 	public var hidden = false;
 
@@ -159,17 +170,17 @@ class TitleState extends MusicBeatState
 			if(retBF) return defaultChar;
 			return null;
 		}
-		if(Std.parseInt(char) != null && !Math.isNaN(Std.parseInt(char))){
-			var e = Std.parseInt(char);
-			if(characters[e] != null){
-
-				trace('Found char with ID of $e');
-				return characters[e];
-			}else{
-				trace('Invalid ID $e, out of range 0-${characters.length}');
-				if(retBF) return defaultChar;
-				return null;
+		var charID = Std.parseInt(char);
+		if(charID != null && !Math.isNaN(charID)){
+			var char = characters[charID];
+			if(char != null){
+				trace('Found char with ID of $charID');
+				return char;
 			}
+			trace('Invalid ID $charID, out of range 0-${characters.length}');
+			if(retBF) return defaultChar;
+			return null;
+			
 		}
 		char = char.replace(' ',"-").replace('_',"-").toLowerCase();
 		
@@ -407,11 +418,24 @@ class TitleState extends MusicBeatState
 				{
 					var dir = dataDir + _dir + "/characters/";
 					// trace('Checking ${dir} for characters');
-					for (char in FileSystem.readDirectory(dir))
-					{
-						if (!SELoader.isDirectory(dir+"/"+char)){continue;}
-						if (SELoader.exists(dir+"/"+char+"/config.json"))
-						{
+					for (char in FileSystem.readDirectory(dir)) {
+
+						if (!SELoader.isDirectory(dir+"/"+char)){
+							if (char.substring(char.length-5) == ".json"){ // Psych characters
+								characters.push({
+									id:char.substring(0,char.length-5).replace(' ',"-").replace('_',"-").toLowerCase()+'-pe',
+									folderName:char,
+									description:'Psych Engine character',
+									jsonLocation:'$dataDir$_dir/characters/$char',
+									psychChar:true,
+									path:dir,
+									nameSpaceType:ID,
+									nameSpace:_dir
+								});
+							}
+							continue;
+						}
+						if (SELoader.exists(dir+"/"+char+"/config.json")) {
 							var desc = "";
 							if (SELoader.exists('${dir}/${char}/description.txt'))
 								desc += ";" +SELoader.getContent('${dir}/${char}/description.txt');
@@ -833,7 +857,7 @@ class TitleState extends MusicBeatState
 			FlxG.mouse.enabled = true;
 			FlxG.fixedTimestep = false; // Makes the game not be based on FPS for things, thank you Forever Engine for doing this
 			FlxG.mouse.useSystemCursor = SESave.data.useSystemCursor; // Uses system cursor, did not know this was a thing until Forever Engine
-			CoolUtil.volKeys = [FlxG.sound.muteKeys,FlxG.sound.volumeUpKeys,FlxG.sound.volumeDownKeys];
+			CoolUtil.toggleVolKeys(true);
 			if(!SELoader.exists("mods/menuTimes.json")){ // Causes crashes if done while game is running, unknown why
 				try{
 					SELoader.saveContent("mods/menuTimes.json",Json.stringify([
@@ -1185,7 +1209,7 @@ class TitleState extends MusicBeatState
 		}
 
 		if (pressedEnter && !skippedIntro  && (!forcedText || SESave.data.seenForcedText))
-			skipIntro();
+			(initialized ? skipIntro() : __onComplete(null));
 
 		super.update(elapsed);
 	}

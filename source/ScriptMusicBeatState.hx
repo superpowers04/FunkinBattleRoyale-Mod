@@ -590,6 +590,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 				}
 				return super.switchTo(s);
 			}
+			#if(flixel > "5.3")
 			override public function startOutro(func:() -> Void){
 				if(useNormalCallbacks){
 					callInterp('startOutro',[func]);
@@ -598,6 +599,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 				super.startOutro(func);
 				return;
 			}
+			#end
 
 // 	/* End of base functions */
 }

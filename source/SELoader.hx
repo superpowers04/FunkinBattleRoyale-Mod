@@ -75,6 +75,10 @@ class SELoader {
 	// Basically clenses paths and returns the base path with the requested one. Used heavily for the Android port
 	@:keep inline public static function getPath(path:String,allowModded:Bool = true):String{
 		// Absolute paths should just return themselves without anything changed
+		if(path.substring(0,7) == "assets:"){
+			return getAssetPath(path);
+		}
+		// Rem
 		if(
 			#if windows
 				path.substring(1,2) == ':' || 
@@ -89,7 +93,41 @@ class SELoader {
 
 		return (PATH + path).replace('//','/'); // Fixes paths having //'s in them
 	}
-	
+	public static function getAssetPath(path:String,?namespace:String = ""):String{
+		if(#if windows path.substring(1,2) == ':' || #end path.substring(0,1) == "/"){
+			return path.replace('//','/');
+		}
+		if(path.indexOf(':') > 2) path = path.split(':')[1];
+		if(!path.startsWith('assets')) path = '$path';
+		var modsFolder = getPath('mods/');
+		var packsFolder = modsFolder+'packs/';
+		if(namespace!=""){
+			var e = packsFolder+namespace;
+			var the = SELoader.anyExists([
+				e+'/'+path,
+				e+'/shared/'+path,
+				e+'/assets/'+path,
+				e+'/assets/shared/'+path,
+				e+'/assets/preload/'+path
+			]);
+			if(the!=null) return the;
+		}
+		if(SELoader.exists(modsFolder + path)) return modsFolder+path;
+		for (directory in orderList(FileSystem.readDirectory(packsFolder))){
+			var e = packsFolder+directory;
+			var the = SELoader.anyExists([
+				e+'/'+path,
+				e+'/shared/'+path,
+				e+'/assets/'+path,
+				e+'/assets/shared/'+path,
+				e+'/assets/preload/'+path
+			]);
+			if(the!=null) return the;
+		}
+
+		if(SELoader.exists(path)) return path;
+		return "";
+	}
 
 	public static function loadText(textPath:String,?useCache:Bool = false):String{
 		textPath = getPath(textPath);
@@ -323,8 +361,12 @@ class SELoader {
 		}
 		if(path.isDirectory('data/')){ // Normal FNF
 			var songsFolder = path.newDirectory('songs/');
-			for (folder in path.readDirectory('data/')){
-				var path = path.newDirectory('data/$folder');
+			var data = path.newDirectory('data/');
+			if(data.exists('songData')){ // Legacy psych
+				data = data.newDirectory('songData');
+			}
+			for (folder in data.readDirectory()){
+				var path = data.newDirectory('$folder');
 				if(!path.isDirectory() || !songsFolder.exists('$folder/Inst.ogg')) continue;
 				var song:SongInfo = {
 					name:folder,

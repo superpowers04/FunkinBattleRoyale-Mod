@@ -1,10 +1,14 @@
 package se.extensions.flixel;
+import flixel.graphics.frames.FlxAtlasFrames;
+
+#if (flixel < "5.3.0")
+typedef SEFlxFrames = FlxAtlasFrames;
+#else
 
 import flash.geom.Rectangle;
 import flixel.FlxG;
 import flixel.util.FlxDestroyUtil;
 import flixel.graphics.FlxGraphic;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.frames.FlxFrame;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
 import flixel.graphics.frames.FlxFramesCollection.FlxFrameCollectionType;
@@ -20,7 +24,11 @@ import haxe.xml.Access;
 
 class SEFlxFrames extends FlxAtlasFrames{
 
-
+	#if (flixel < "5.3.0")
+		public var framesByName(get,set):Map<String,FlxFrame>;
+		@:keep inline public function get_framesByName() return framesHash;
+		@:keep inline public function set_framesByName(v) return framesHash = v;
+	#end
 	/**
 	 * Parsing method for Sparrow texture atlases
 	 * (they can be generated with Shoebox http://renderhjs.net/shoebox/ for example).
@@ -91,7 +99,8 @@ class SEFlxFrames extends FlxAtlasFrames{
 	 */
 	public function pushFrameWithName(frameObj:FlxFrame,name:String = ""):FlxFrame
 	{
-		if(name == "") name = frameObj.name;
+		if(name == "") 
+			name = frameObj.name;
 		else if(frameObj.name != name) {
 			framesByName.set(name,frameObj);
 			return frameObj;
@@ -149,3 +158,4 @@ class SEFlxFrames extends FlxAtlasFrames{
 		return frames.indexOf(framesByName.get(name));
 	}
 }
+#end

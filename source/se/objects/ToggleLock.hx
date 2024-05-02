@@ -23,8 +23,12 @@ class ToggleLock extends Lock{
 			locks--;
 		}
 	}
-
-
+}
+class RenderToggleLock extends ToggleLock{
+	override public function wait(?timeout:Float){
+		if(!SESave.data.doCoolLoading) return true;
+		return super.wait(timeout);
+	}
 }
 #else
 class ToggleLock{

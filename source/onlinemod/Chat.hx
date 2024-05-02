@@ -45,11 +45,20 @@ class Chat
 
 	public static function createChat(state:FlxUIState,?canHide:Bool = false){
 		Chat.created = true;
-
-		Chat.chatMessagesList = new FlxUIList(10, FlxG.height - 120, FlxG.width, 175);
+		if(Chat.chatMessagesList == null){
+			Chat.chatMessagesList = new FlxUIList(10, FlxG.height - 120, FlxG.width, 175);
+		}else{
+			Chat.chatMessagesList.x = 10;
+			Chat.chatMessagesList.y = FlxG.height - 120;
+		}
 		state.add(Chat.chatMessagesList);
 		for (chatMessage in Chat.chatMessages) Chat.OutputChatMessage(chatMessage[0], chatMessage[1], false);
-		Chat.chatField = new FlxInputText(10, FlxG.height - 70, 1152, 20);
+		if(Chat.chatField == null){
+			Chat.chatField = new FlxInputText(10, FlxG.height - 70, 1152, 20);
+		}else{
+			Chat.chatField.x=10;
+			Chat.chatField.y=FlxG.height - 70;
+		}
 		chatField.maxLength = 81;
 		state.add(Chat.chatField);
 

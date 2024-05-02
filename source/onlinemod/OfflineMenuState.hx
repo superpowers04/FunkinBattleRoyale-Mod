@@ -92,7 +92,7 @@ class OfflineMenuState extends SearchMenuState
 	songFiles = [];
 	var i:Int = 0;
 
-	var query = new EReg((~/[-_ ]/g).replace(search.toLowerCase(),'[-_ ]'),'i'); // Regex that allows _ and - for songs to still pop up if user puts space, game ignores - and _ when showing
+	var query = new EReg((~/[-_ ]/g).replace(search.toLowerCase().replace('\\','\\\\'),'[-_ ]'),'i'); // Regex that allows _ and - for songs to still pop up if user puts space, game ignores - and _ when showing
 	if (SELoader.exists(dataDir))
 	{
 	  var dirs = orderList(SELoader.readDirectory(dataDir));

@@ -100,8 +100,10 @@ typedef CharacterJson =
 	var ?scriptOptions:Map<String,Dynamic>; // Allows characters to tell scripts to use custom settings
 	var ?seVersionIdentifier:Null<Int>;
 
-
-	var healthIcon:String; // Psych character identification
+	// Psych Character compatibility
+	var healthIcon:String;
+	var image:String;
+	var position:Array<Float>;
 }
 
 typedef CharJsonAnimation ={

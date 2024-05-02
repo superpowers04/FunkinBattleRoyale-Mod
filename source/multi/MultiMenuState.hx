@@ -227,11 +227,11 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		if(!allowInput) return;
 		curSelected = 0;
 
-		if(reload) {
+		if(grpSongs != null) {
 			CoolUtil.clearFlxGroup(grpSongs);
 		}
 
-		var query = new EReg((~/[-_ ]/g).replace(search.toLowerCase(),'[-_ ]'),'i'); // Regex that allows _ and - for songs to still pop up if user puts space, game ignores - and _ when showing
+		var query = new EReg((~/[-_ ]/g).replace(search.toLowerCase().replace('\\','\\\\'),'[-_ ]'),'i'); // Regex that allows _ and - for songs to still pop up if user puts space, game ignores - and _ when showing
 		callInterp('reloadList',[reload,search,query]);
 
 		if(!cancelCurrentFunction && songInfoArray[0] != null && (reload || SESave.data.cacheMultiList)){
@@ -358,7 +358,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 			}
 		}
 		if(reload && lastSel == 1){
-			for(index => value in grpSongs){
+			for(index => value in grpSongs.members){
 				if(value.menuValue is SongInfo){
 					changeSelection(i);
 					break;

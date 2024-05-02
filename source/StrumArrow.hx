@@ -14,7 +14,7 @@ import NoteAssets;
 
 class StrumArrow extends FlxSprite{
 	public static var defColor:FlxColor = 0xFFFFFFFF;
-	var noteColor:FlxColor = 0xFFFFFFFF; 
+	public var noteColor:FlxColor = 0xFFFFFFFF; 
 	public var id:Int = 0; 
 	public var noteJSON:NoteAssetConfig;
 	public var updateStrumCenter:Bool = true;

@@ -1195,7 +1195,7 @@ class AnimationDebug extends MusicBeatState
 
 		if(chara.charType == 0){
 
-			var warning = new FlxText(2, 180,0,"Animations might not add correctly when editing as BF.\nIt is recommended to add anims as chara, save and then swap back to editing BF");
+			var warning = new FlxText(2, 180,0,"Anims might not add correctly when editing as BF.\nIt is recommended to add anims as opponent, save, then swap back to editing BF");
 			warning.setFormat(CoolUtil.font, 28, FlxColor.RED, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			warning.scrollFactor.set();
 			warning.screenCenter(X);

@@ -16,18 +16,7 @@ import openfl.net.ServerSocket;
 import openfl.utils.ByteArray;
 import openfl.events.ServerSocketConnectEvent;
 import openfl.utils.Endian;
-
-@:structInit class ConnectedPlayer {
-	public var nick:String;
-	public var socket:Socket;
-	public var receiver:Receiver;
-	public var admin:Bool = false;
-	public var afk:Bool = false;
-	public var alive:Bool = true;
-	public var muted:Bool = false;
-
-
-}
+import onlinemod.Player;
 
 
 class OnlineHostMenu extends ScriptMusicBeatState
@@ -36,21 +25,21 @@ class OnlineHostMenu extends ScriptMusicBeatState
 	var errorText:FlxText;
 	var portField:FlxInputText;
 	var pwdField:FlxInputText;
-	@:keep inline public static var socket(get,set):ServerSocket;
-	@:keep inline function get_socket() return SEServer.socket;
-	@:keep inline function set_socket(vari) return SEServer.socket = vari;
-	public static var connectedPlayers(get,set):Array<ConnectedPlayer> = [];
-	@:keep inline function get_connectedPlayers() return SEServer.connectedPlayers;
-	@:keep inline function set_connectedPlayers(vari) return SEServer.connectedPlayers = vari;
-	public static var clientsFromNames(get,set):Map<String,Null<Int>> = [];
-	@:keep inline function get_clientsFromNames() return SEServer.clientsFromNames;
-	@:keep inline function set_clientsFromNames(vari) return SEServer.clientsFromNames = vari;
+	public static var socket(get,set):ServerSocket;
+	@:keep inline public static function get_socket() return SEServer.socket;
+	@:keep inline public static function set_socket(vari) return SEServer.socket = vari;
+	public static var connectedPlayers(get,set):Array<ConnectedPlayer>;
+	@:keep inline public static function get_connectedPlayers() return SEServer.connectedPlayers;
+	@:keep inline public static function set_connectedPlayers(vari) return SEServer.connectedPlayers = vari;
+	public static var clientsFromNames(get,set):Map<String,Null<Int>>;
+	@:keep inline public static function get_clientsFromNames() return SEServer.clientsFromNames;
+	@:keep inline public static function set_clientsFromNames(vari) return SEServer.clientsFromNames = vari;
 	public static var serverVariables(get,set):Map<Dynamic,Dynamic>;
-	@:keep inline function get_serverVariables() return SEServer.serverVariables;
-	@:keep inline function set_serverVariables(vari) return SEServer.serverVariables = vari;
+	@:keep inline public static function get_serverVariables() return SEServer.serverVariables;
+	@:keep inline public static function set_serverVariables(vari) return SEServer.serverVariables = vari;
 
 	@:keep inline public static function shutdownServer() {
-		SEServer.shutdownServer()
+		SEServer.shutdownServer();
 	}
 	override function create() {
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
@@ -98,34 +87,8 @@ class OnlineHostMenu extends ScriptMusicBeatState
 			try{
 				serverVariables = new Map<Dynamic,Dynamic>();
 				serverVariables["password"] = pwdField.text;
-				var socket = new ServerSocket();
-				socket.bind(Std.parseInt(portField.text));
-				if(!socket.bound){
-					SetErrorText('Unable to bind to port ${portField.text}. Is it already in use or too low?');
-					return;
-				}
-				connectedPlayers = [];
-				clientsFromNames = [];
-				socket.addEventListener(Event.CONNECT, (e:ServerSocketConnectEvent) -> {
-					var ID = connectedPlayers.length;
-					connectedPlayers[ID] = {
-						socket:e.socket,
-						receiver:new Receiver(SEServer.HandleData.bind(ID,_,_)),
-						nick:"OUTDATED",
-						admin:(ID == 0)
-					}
-					trace('New connection! ${e.socket}');
-					var socket = e.socket;
-					socket.endian = LITTLE_ENDIAN;
-					socket.addEventListener(IOErrorEvent.IO_ERROR, SEServer.OnErrorSocket.bind(ID,_));
-					socket.addEventListener(Event.CLOSE, SEServer.OnCloseSock.bind(ID,_));
-					socket.addEventListener(ProgressEvent.SOCKET_DATA, SEServer.OnData.bind(ID,_));
-				});
-				socket.addEventListener(IOErrorEvent.IO_ERROR, SEServer.OnError);
-				socket.addEventListener(Event.CLOSE, SEServer.OnClose);
-				// socket.addEventListener(ProgressEvent.SOCKET_DATA, OnData);
-				socket.listen(12);
-				OnlineHostMenu.socket = socket;
+				SEServer.createServer(Std.parseInt(portField.text));
+				
 				// Literally just code from OnlinePlayMenu
 				var socket = new Socket();
 				socket.timeout = 10000;
@@ -162,6 +125,7 @@ class OnlineHostMenu extends ScriptMusicBeatState
 	override function update(elapsed:Float) {
 		if (controls.BACK) {
 			FlxG.switchState(new MainMenuState());
+			return;
 		}
 		
 

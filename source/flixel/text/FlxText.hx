@@ -212,8 +212,7 @@ class FlxText extends FlxSprite
 		if (Text == "") {
 			text = "";
 			Text = " ";
-		}
-		else text = Text;
+		} else text = Text;
 		Main.renderLock.wait();
 
 		textField = new TextField();
@@ -843,15 +842,11 @@ class FlxText extends FlxSprite
 		if (colorTransform == null)
 			colorTransform = new ColorTransform();
 
-		if (alpha != 1)
+		if (useColorTransform = (alpha != 1))
 		{
 			colorTransform.alphaMultiplier = alpha;
-			useColorTransform = true;
-		}
-		else
-		{
+		} else {
 			colorTransform.alphaMultiplier = 1;
-			useColorTransform = false;
 		}
 
 		dirty = true;
@@ -865,8 +860,8 @@ class FlxText extends FlxSprite
 		var oldHeight:Int = VERTICAL_GUTTER;
 
 		if (graphic != null) {
-			oldWidth = graphic.width;
-			oldHeight = graphic.height;
+			oldWidth = Std.int(graphic.width);
+			oldHeight = Std.int(graphic.height);
 		}
 
 		var newWidth:Int = Math.ceil(textField.width);
@@ -884,61 +879,35 @@ class FlxText extends FlxSprite
 			// Need to generate a new buffer to store the text graphic
 			height = newHeight;
 			width = newWidth;
-			var graph = graphic;
-				// var oldFrames = frames;
-				// var _KEY:String = null;
-				// if(graph != null) _KEY = graph.key;
-			// frames = FlxG.bitmap.create(1,1, FlxColor.TRANSPARENT, false, 'yourMother').imageFrame;
-
-			frames = FlxG.bitmap.create(newWidth, newHeight, FlxColor.TRANSPARENT, false, FlxG.bitmap.getUniqueKey("text")).imageFrame;
-
-			if(graph != null) graph.destroy();
-				// }else{
-					// _KEY = graphic.key;
-					// FlxDestroyUtil.destroy(graphic);
-				// graphic.bitmap = bitmap;
-					// super.set_graphic(FlxG.bitmap.create(newWidth, newHeight, FlxColor.TRANSPARENT, false, FlxG.bitmap.getUniqueKey("text")));
-				// frames = graphic.imageFrame;
-				// var bitmap = new BitmapData(newWidth, newHeight, true, FlxColor.TRANSPARENT);
-				// loadGraphic(bitmap,false,newWidth, newHeight,false,_KEY);
-				// }
-			// @:privateAccess{
-			// 	super.set_graphic(FlxGraphic.createGraphic(new BitmapData(newWidth, newHeight, true, FlxColor.TRANSPARENT), _KEY == "" ? FlxG.bitmap.getUniqueKey("text") : _KEY));
-			// }
-			// else{
-				
-
-			// }
-
+			var key:String = graphic?.key ?? FlxG.bitmap.getUniqueKey("text");
+			// @:privateAccess FlxG.bitmap.removeKey(key);
+			// if(graphic == null){
+			@:privateAccess FlxG.bitmap.removeKey(key);
+			frames = FlxG.bitmap.create(newWidth, newHeight, FlxColor.TRANSPARENT, true, key).imageFrame;
+			// var _old=graphic;
+			// if(_old != null)_old.destroy();
+			// graphic = FlxGraphic.fromRectangle(newWidth,newHeight,FlxColor.TRANSPARENT,key);
+			// FlxG.bitmap.remove(graphic);
 			// }else{
-			// 	var key = graphic.key;
-			// 	// FlxDestroyUtil.dispose(graphic.bitmap);
-			// 	// FlxG.bitmap.remove(graphic);
-				// graphic = FlxG.bitmap.create(newWidth, newHeight, FlxColor.TRANSPARENT, false, key)
-			// 	var bitmap = new BitmapData(newWidth, newHeight, true, FlxColor.TRANSPARENT);
-			// 	@:privateAccess{
-					
-					
-			// 	}
-
+				// graphic.bitmap.dispose();
+				// _regen = false;
+				// return;
+				// graphic.bitmap = new BitmapData(newWidth, newHeight,true,0x00000000);
 			// }
-			// else{
-			// 	makeGraphic(newWidth, newHeight, FlxColor.TRANSPARENT, false, key);
+			// makeGraphic(newWidth, newHeight, FlxColor.TRANSPARENT, false, key);
 
-			// 	graphic.bitmap = ;
-			// }
-			// trace(graphic);
-			// graphic = FlxG.bitmap.create(newWidth, newHeight, FlxColor.TRANSPARENT, false, key);
-
+		
+			if (_borderPixels != null) _borderPixels.dispose();
 			if (_hasBorderAlpha) _borderPixels = graphic.bitmap.clone();
 
 			if (_autoHeight) textField.height = newHeight;
-
+			
+			frameHeight = Std.int(height);
+			// _textField.height = height * 1.2;
 			_flashRect.x = 0;
 			_flashRect.y = 0;
 			_flashRect.width = newWidth;
 			_flashRect.height = newHeight;
-			
 		} else { // Else just clear the old buffer before redrawing the text
 		
 			graphic.bitmap.fillRect(_flashRect, FlxColor.TRANSPARENT);
@@ -950,8 +919,7 @@ class FlxText extends FlxSprite
 			}
 		}
 
-		if (textField != null && textField.text != null)
-		{
+		if (textField != null && textField.text != null) {
 			// Now that we've cleared a buffer, we need to actually render the text to it
 			copyTextFormat(_defaultFormat, _formatAdjusted);
 
@@ -966,9 +934,7 @@ class FlxText extends FlxSprite
 		_regen = false;
 		resetFrame();
 	}
-	inline function getMemInfo(){
-		return cpp.NativeGc.memInfo(0);
-	}
+
 	/**
 	 * Internal function to draw textField to a BitmapData, if flash it calculates every line x to avoid blurry lines.
 	 */
@@ -979,16 +945,12 @@ class FlxText extends FlxSprite
 		{
 			var h:Int = 0;
 			var tx:Float = _matrix.tx;
-			for (i in 0...textField.numLines)
-			{
+			for (i in 0...textField.numLines) {
 				var lineMetrics = textField.getLineMetrics(i);
 
 				// Workaround for blurry lines caused by non-integer x positions on flash
 				var diff:Float = lineMetrics.x - Std.int(lineMetrics.x);
-				if (diff != 0)
-				{
-					_matrix.tx = tx + diff;
-				}
+				if (diff != 0) _matrix.tx = tx + diff;
 				_textFieldRect.setTo(0, h, textField.width, lineMetrics.height + lineMetrics.descent);
 
 				graphic.draw(textField, _matrix, null, null, _textFieldRect, false);
@@ -1000,11 +962,11 @@ class FlxText extends FlxSprite
 			return;
 		}
 		graphic.draw(textField, _matrix);
-		#elseif !web
-		// Fix to render desktop and mobile text in the same visual location as web
-		_matrix.translate(-1, -1); // left and up
-		graphic.draw(textField, _matrix);
-		_matrix.translate(1, 1); // return to center
+		// #elseif !web
+		// // Fix to render desktop and mobile text in the same visual location as web
+		// // _matrix.translate(-1, -1); // left and up
+		// graphic.draw(textField, _matrix);
+		// // _matrix.translate(1, 1); // return to center
 		#else
 		graphic.draw(textField, _matrix);
 		#end
@@ -1019,8 +981,7 @@ class FlxText extends FlxSprite
 		for (i in 0...textField.numLines)
 		{
 			var lineMetricsX = textField.getLineMetrics(i).x;
-			if (lineMetricsX - Std.int(lineMetricsX) != 0)
-			{
+			if (lineMetricsX - Std.int(lineMetricsX) != 0) {
 				return true;
 			}
 		}
@@ -1041,10 +1002,7 @@ class FlxText extends FlxSprite
 	 */
 	override function calcFrame(RunOnCpp:Bool = false):Void
 	{
-		if (textField == null)
-			return;
-
-		if (FlxG.renderTile && !RunOnCpp)
+		if ((textField == null) || (FlxG.renderTile && !RunOnCpp))
 			return;
 
 		regenGraphic();

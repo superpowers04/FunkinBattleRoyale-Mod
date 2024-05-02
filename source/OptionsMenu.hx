@@ -225,7 +225,7 @@ class OptionsMenu extends MusicBeatState
 	var titleText:FlxText;
 	function addTitleText(str:String = "se.options.title"){
 		if (titleText != null) titleText.destroy();
-		titleText = new FlxText(FlxG.width * 0.5 - (str.length * 10), 20, 0, str, 12);
+		titleText = new FlxText(FlxG.width * 0.5 - (str.length * 10), 20, 0, se.translation.Lang.get(str), 12);
 		titleText.scrollFactor.set();
 		titleText.setFormat(CoolUtil.font, 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(titleText);
@@ -432,9 +432,9 @@ class OptionsMenu extends MusicBeatState
 		// versionShit.color = FlxColor.WHITE;
 		if (isCat)
 			versionShit.text = (if(currentSelectedCat.getOptions()[curSelected].acceptValues) currentSelectedCat.getOptions()[curSelected].getValue() + " - " else "") + 
-				"Description - " + currentDescription;
+				"Description - " + se.translation.Lang.get(currentDescription);
 		else
-			versionShit.text = "Offset (Left, Right, Shift for slow): " + HelperFunctions.truncateFloat(SESave.data.offset,2) + " - Description - " + currentDescription;
+			versionShit.text = "Offset (Left, Right, Shift for slow): " + HelperFunctions.truncateFloat(SESave.data.offset,2) + " - Description - " + se.translation.Lang.get(currentDescription);
 	}
 
 	function changeSelection(change:Int = 0) {

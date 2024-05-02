@@ -31,11 +31,11 @@ using StringTools;
 class KeyBindMenu extends FlxSubState
 {
 
-	var keyTextDisplay:FlxText;
+	var keyTextDisplay:FlxTypedGroup<FlxText> = new FlxTypedGroup<FlxText>();
 	var keyWarning:FlxText;
 	var warningTween:FlxTween;
 	var keyText:Array<Array<String>> = [
-		["UI LEFT", "UI DOWN", "UI UP", "UI RIGHT", "ALT LEFT", "ALT DOWN", "ALT UP", "ALT RIGHT"],
+		["UI LEFT", "UI DOWN", "UI UP", "UI RIGHT", "ALT LEFT", "ALT DOWN", "ALT UP", "ALT RIGHT","RESET","MUTE","VOLUME DOWN","VOLUME UP"],
 		["LEFT","DOWN"],
 		["LEFT","MIDDLE","DOWN"],
 		["LEFT", "DOWN", "UP", "RIGHT", "ALT LEFT", "ALT DOWN", "ALT UP", "ALT RIGHT"],
@@ -68,7 +68,7 @@ class KeyBindMenu extends FlxSubState
 
 	var blackBox:FlxSprite;
 	var infoText:FlxText;
-
+	var selectorText:FlxText;
 	var state:String = "select";
 	var keyMode:Int = 3;
 
@@ -79,8 +79,7 @@ class KeyBindMenu extends FlxSubState
 		return '${SESave.data.leftBind}-${SESave.data.downBind}-${SESave.data.upBind}-${SESave.data.rightBind} Alt ${SESave.data.AltleftBind}-${SESave.data.AltdownBind}-${SESave.data.AltupBind}-${SESave.data.AltrightBind}';
 	}
 
-	override function create()
-	{   
+	override function create() {
 
 		var _keys:Array<Array<String>> =SESave.data.keys;
 		for(count => keyArr in _keys){
@@ -96,30 +95,34 @@ class KeyBindMenu extends FlxSubState
 
 		persistentUpdate = true;
 
-		keyTextDisplay = new FlxText(-10, 0, 1280, "", 72);
-		keyTextDisplay.scrollFactor.set(0, 0);
-		keyTextDisplay.setFormat(CoolUtil.font, 42, FlxColor.WHITE, FlxTextAlign.CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		keyTextDisplay.borderSize = 2;
-		keyTextDisplay.borderQuality = 3;
+
 
 		blackBox = new FlxSprite(0,0).makeGraphic(FlxG.width,FlxG.height,FlxColor.BLACK);
 		add(blackBox);
 
-		infoText = new FlxText(-10, 580, 1280, 'Key mode: ${keyMode}. Press TAB to switch\n(Escape to save, Backspace to leave without saving.)', 72);
+		infoText = new FlxText(-10, 580, 1280, '< ${keyMode} >. Press TAB to switch\n(Escape to save, Backspace to leave without saving.)', 72);
 		infoText.scrollFactor.set(0, 0);
 		infoText.setFormat(CoolUtil.font, 24, FlxColor.WHITE, FlxTextAlign.CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		infoText.borderSize = 2;
 		infoText.borderQuality = 3;
 		infoText.screenCenter(FlxAxes.X);
 		add(infoText);
+		selectorText = new FlxText(0,0, 45, ">", 72);
+		selectorText.scrollFactor.set(0, 0);
+		selectorText.setFormat(CoolUtil.font, 42, FlxColor.WHITE, FlxTextAlign.CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		selectorText.borderSize = 2;
+		selectorText.borderQuality = 3;
+		selectorText.screenCenter(FlxAxes.X);
+		add(selectorText);
 		add(keyTextDisplay);
 
-		infoText.alpha = blackBox.alpha = keyTextDisplay.alpha = 0;
+		infoText.alpha = blackBox.alpha = 0;
 
-		FlxTween.tween(keyTextDisplay, {alpha: 1}, 1, {ease: FlxEase.expoInOut});
+		// FlxTween.tween(keyTextDisplay, {alpha: 1}, 1, {ease: FlxEase.expoInOut});
 		FlxTween.tween(infoText, {alpha: 1}, 1.4, {ease: FlxEase.expoInOut});
 		FlxTween.tween(blackBox, {alpha: 0.7}, 1, {ease: FlxEase.expoInOut});
-
+		FlxTween.tween(selectorText, {alpha: 1}, 1, {ease: FlxEase.expoInOut});
+		// for (i in keyTextDisplay) FlxTween.tween(i, {alpha: 1}, 1, {ease: FlxEase.expoInOut});
 		OptionsMenu.instance.acceptInput = false;
 
 		textUpdate();
@@ -136,7 +139,11 @@ class KeyBindMenu extends FlxSubState
 		#end
 		if (frames <= 10) frames++;
 
-		infoText.text = #if(!mobile) 'Key mode: ${(keyModeText[keyMode] ?? '${keyMode + 1}K')}. Press Left/Right to switch' + #end'\n(' + #if(mobile) 'Tap or press ' + #end'Escape to save, Backspace to leave without saving. )\n${lastKey != "" ? lastKey + " is blacklisted!" : ""}'; //'//Shitty haxe syntax moment
+		#if mobile
+			infoText.text = '\n(Tap the screen or press Escape to save, Backspace to leave without saving. )\n${lastKey != "" ? lastKey + " is blacklisted!" : ""}'; //'//Shitty haxe syntax moment
+		#else
+			infoText.text = (keyText[keyMode - 1] == null ? "|":"<")+' ' + (keyModeText[keyMode] ?? '${keyMode + 1}K') + (keyText[keyMode + 1] == null ? " |":" >") + '\nPress Left/Right to switch\nEscape to save, Backspace to leave without saving.'+(lastKey == "" ? "" : '\n$lastKey is blacklisted!');
+		#end
 
 		switch(state){
 
@@ -150,6 +157,7 @@ class KeyBindMenu extends FlxSubState
 				}
 				#if !mobile
 				else if (FlxG.keys.justPressed.A || FlxG.keys.justPressed.LEFT){
+					lastLength = -1;
 					if(keyText[keyMode - 1] == null){
 						FlxG.sound.play(Paths.sound('cancelMenu'));
 					}else{
@@ -158,6 +166,7 @@ class KeyBindMenu extends FlxSubState
 					}
 					
 				}else if (FlxG.keys.justPressed.D || FlxG.keys.justPressed.RIGHT){
+					lastLength = -1;
 					if(keyText[keyMode + 1] == null){
 						FlxG.sound.play(Paths.sound('cancelMenu'));
 					}else{
@@ -185,8 +194,7 @@ class KeyBindMenu extends FlxSubState
 					keys[keyMode][curSelected] = tempKey;
 					state = "select";
 					FlxG.sound.play(Paths.sound('confirmMenu'));
-				}
-				else if(FlxG.keys.justPressed.ENTER){
+				}else if(FlxG.keys.justPressed.ENTER){
 					addKey(KeyBinds.defaultKeys[keyMode][curSelected]);
 					save();
 					state = "select";
@@ -195,6 +203,7 @@ class KeyBindMenu extends FlxSubState
 					save();
 					state = "select";
 				}
+				CoolUtil.toggleVolKeys(true);
 
 
 			case "exiting":
@@ -210,19 +219,71 @@ class KeyBindMenu extends FlxSubState
 		super.update(elapsed);
 		
 	}
-
+	var lastLength = 0;
 	function textUpdate(){
 
-		keyTextDisplay.text = "\n\n";
-		for(i => str in keyText[keyMode]){
-
-			var textStart = (i == curSelected) ? "> " : "  ";
-			keyTextDisplay.text += textStart + str + ": " + keys[keyMode][i] + " / " + (keyMode == 3 && keyAlt[i] != null ? keyAlt[i] : "") + "\n";
-
+		// keyTextDisplay.text = "\n\n";
+		var mode = keyText[keyMode];
+		var keyList = keys[keyMode];
+		var AMOUNT:Int = mode.length;
+		// CoolUtil.clearFlxGroup(keyTextDisplay);
+		if(AMOUNT != lastLength){
+			curSelected = 0;
+			lastLength = keyTextDisplay.members.length;
+			// 	var e = keyTextDisplay.members[keyTextDisplay.members.length];
+			// 	if(e == null) break;
+			// 	e.destroy();
+			// }
+			for (i in keyTextDisplay.members){
+				i.destroy();
+			}
+			while(keyTextDisplay.members.pop() != null){}
 		}
+		var size:Int = 32;
+		for (i in 0...AMOUNT){
+			var keyText = keyTextDisplay.members[i];
+			var text = '${mode[i]}:${keyList[i]}';
+			if(keyMode == 3 && keyAlt[i] != null) text += ' / ${keyAlt[i]}';
+			if(keyText == null || text != keyText.text){
+
+				if(keyText == null){
+					var _keyText = new FlxText(0,100+(50*(1-(AMOUNT / 18)))+ ((i / AMOUNT) * (AMOUNT * size)), 1220, text, 72);
+					_keyText.scrollFactor.set(0, 0);
+					_keyText.setFormat(CoolUtil.font, size, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+					_keyText.borderSize = 2;
+					_keyText.borderQuality = 3;
+					_keyText.screenCenter(FlxAxes.X);
+					keyTextDisplay.add(_keyText);
+					keyText=_keyText;
+				}else{
+					keyText.text=text;
+					keyText.screenCenter(FlxAxes.X);
+				}
+			}
+			if(i == curSelected){
+				selectorText.y = keyText.y;
+				selectorText.x = keyText.x - 40;
+			}
+			// var i=i+AMOUNT;
+			// var part = mode[i];
+			// if(part != null){
+			// 	keyTextDisplay.text += ' | '+((i == curSelected) ? ">" : "*")+'$part:${keys[keyMode][i]}';
+			// 	if(keyMode == 3 && keyAlt[i] != null) keyTextDisplay.text += ' / ${keyAlt[i]}';
+			// }
+			// keyTextDisplay.text+='\n';
+			// keyTextDisplay.x=  - offset;
+			// textStart + str + ": " + keys[keyMode][i] + " / " + (keyMode == 3 && keyAlt[i] != null ? keyAlt[i] : "") + "\n";
+		}
+
+		// for(i => str in keyText[keyMode]){
+
+		// 	var textStart = (i == curSelected) ? "> " : "  ";
+		// 	keyTextDisplay.text += textStart + str + ": " + keys[keyMode][i] + " / " + (keyMode == 3 && keyAlt[i] != null ? keyAlt[i] : "") + "\n";
+
+		// }
 		
 
-		keyTextDisplay.screenCenter();
+		
 
 	}
 
@@ -233,20 +294,12 @@ class KeyBindMenu extends FlxSubState
 			_keys[count] = keyArr.copy();
 			if(keyText[count] == null) continue;
 			for(i in 0...keyText[count].length){
-				if(_keys[count][i] == null){
-					_keys[count][i] = "F12";
-				}
+				if(_keys[count][i] != null) continue;
+				_keys[count][i] = "F12";
 			}
 			
 		}
-		SESave.data.upBind = _keys[3][2];
-		SESave.data.downBind = _keys[3][1];
-		SESave.data.leftBind = _keys[3][0];
-		SESave.data.rightBind = _keys[3][3];
-		SESave.data.AltupBind = _keys[3][6];
-		SESave.data.AltdownBind = _keys[3][5];
-		SESave.data.AltleftBind = _keys[3][4];
-		SESave.data.AltrightBind = _keys[3][7];
+		KeyBinds.keyCheck();
 		PlayerSettings.player1.controls.loadKeyBinds();
 
 	}
@@ -258,8 +311,7 @@ class KeyBindMenu extends FlxSubState
 		save();
 
 		OptionsMenu.instance.acceptInput = true;
-
-		FlxTween.tween(keyTextDisplay, {alpha: 0}, 1, {ease: FlxEase.expoInOut});
+		for (i in keyTextDisplay.members) FlxTween.tween(i, {alpha: 0}, 1, {ease: FlxEase.expoInOut});
 		FlxTween.tween(blackBox, {alpha: 0}, 1.1, {ease: FlxEase.expoInOut, onComplete: function(flx:FlxTween){close();}});
 		FlxTween.tween(infoText, {alpha: 0}, 1, {ease: FlxEase.expoInOut});
 	}

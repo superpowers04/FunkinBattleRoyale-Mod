@@ -195,10 +195,10 @@ class OnlinePlayMenuState extends ScriptMusicBeatState {
 		super.update(elapsed);
 	}
 
-	static function SetErrorText(text:String, color:FlxColor=FlxColor.RED)
+	static function SetErrorText(text:String, ?color:FlxColor)
 	{
 		OnlinePlayMenuState.errorText.text = text;
-		OnlinePlayMenuState.errorText.setFormat(32, color);
+		OnlinePlayMenuState.errorText.setFormat(32, color ?? FlxColor.RED);
 		OnlinePlayMenuState.errorText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 	}
 
