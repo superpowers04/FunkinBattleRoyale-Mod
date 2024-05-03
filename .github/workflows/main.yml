@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: MacBuild
-          path: /tmp/fnfbrbin/macos/bin/      
+          path: /tmp/fnfbrbin/macos/bin/
   buildLinux:
     runs-on: ubuntu-latest
     
@@ -63,7 +63,7 @@ jobs:
 
       - uses: krdlab/setup-haxe@master
         with:
-          haxe-version: 4.3.0
+          haxe-version: 4.3.4
       - name: Cache HaxeLib
         uses: actions/cache@v2
         with:
@@ -112,7 +112,7 @@ jobs:
 
       - uses: krdlab/setup-haxe@master
         with:
-          haxe-version: 4.3.0
+          haxe-version: 4.3.4
       - name: Cache HaxeLib
         uses: actions/cache@v2
         with:
