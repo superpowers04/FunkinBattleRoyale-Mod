@@ -94,7 +94,13 @@ class Note extends FlxSprite
 		});
 	}
 	public override function toString(){
-		return toJson();
+		return Std.string({
+			type:"Note",
+			strumTime:strumTime,
+			noteData:noteData,
+			noteType:type,
+			mustPress:mustPress
+		});
 	}
 	public var noteJSON:NoteAssetConfig;
 	// public var multikeyNoteNames:Array<Array<String>> = [
@@ -448,6 +454,7 @@ class Note extends FlxSprite
 		if(PlayState.instance != null){
 			callInterp('noteDestroy',[this]);
 			if(PlayState.instance.cancelCurrentFunction) return;
+			
 		}
 		super.destroy();
 	}

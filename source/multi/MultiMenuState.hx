@@ -51,6 +51,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 	var songProgress:FlxBar = new FlxBar();
 	var songProgressParent:Alphabet;
 	var songProgressText:FlxText = new FlxText(0,0,"00:00/00:00. Playing voices",12);
+	var favButton:FlxUIButton;
 	public static var importedSong = false;
 	override function draw(){
 		if(shouldDraw){
@@ -108,7 +109,10 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		songProgress.width = 180;
 		songProgress.createFilledBar(0xff000000,0xffffaaff,true,0xff000000);
 
-
+		favButton = new FlxUIButton(750, 65, "Un/Fav Chart", favChart); 
+		add(favButton);
+		favButton.setLabelFormat(24, FlxColor.BLACK, CENTER);
+		favButton.resize(250, 30);
 		searchField.text = lastSearch;
 		if(lastSearch != "") reloadList(true,lastSearch);
 
@@ -146,6 +150,16 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		grpSongs.add(controlLabel);
 		callInterp('addListingAfter',[controlLabel,name,i]);
 		return controlLabel;
+	}
+	function favChart(){
+		var songInfo = grpSongs.members[curSelected].menuValue;
+		if(songInfo == null) return showTempmessage('This is not a song!',FlxColor.RED);
+		if(!SESave.data.favourites.remove(songInfo)){
+			SESave.data.favourites.push(songInfo);
+		}
+		SEFlxSaveWrapper.save();
+		reloadList(false,'');
+		reloadList(true,searchField.text);
 	}
 	function addCategory(name:String,i:Int,addToCats:Bool = true):Alphabet{
 		callInterp('addCategory',[name,i]);
@@ -234,7 +248,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		var query = new EReg((~/[-_ ]/g).replace(search.toLowerCase().replace('\\','\\\\'),'[-_ ]'),'i'); // Regex that allows _ and - for songs to still pop up if user puts space, game ignores - and _ when showing
 		callInterp('reloadList',[reload,search,query]);
 
-		if(!cancelCurrentFunction && songInfoArray[0] != null && (reload || SESave.data.cacheMultiList)){
+		if(!cancelCurrentFunction && songInfoArray[0] != null && ((reload && search != "") || SESave.data.cacheMultiList)){
 			if(selMode == -1) {
 				reloadListFromMemory(search,query);
 				return;
@@ -261,11 +275,35 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		callInterp('generateList',[reload,search,query]);
 		if(!cancelCurrentFunction){
 			var emptyCats:Array<String> = [];
+			var _packCount:Int = 0;
+
+			if(SESave.data.favourites != null && SESave.data.favourites.length > 0){
+				var containsSong = false;
+				var missingSongs:Array<SongInfo> = [];
+				_packCount++;
+				for (song in SESave.data.favourites){
+					if(!SELoader.exists(song.path)){
+						missingSongs.push(song);
+						continue;
+					}
+					if(search != "" && !query.match(song.name.toLowerCase())) continue;
+					if(!containsSong){
+						containsSong = true;
+						addCategory('Favourites',i,false);
+						i++;
+					}
+					addListing(song.name,i,song);
+					// songInfoArray.push(song);
+					i++;
+				}
+				for (song in missingSongs){SESave.data.favourites.remove(song);}
+			}
 			if (SELoader.exists(dataDir)){
 				var dirs = orderList(SELoader.readDirectory(dataDir));
 				var catID = 0;
 				var containsSong = false;
 				LoadingScreen.loadingText = 'Scanning mods/charts';
+				_packCount++;
 				for (directory in dirs){
 					if (!SELoader.isDirectory('${dataDir}${directory}') || (search != "" && !query.match(directory.toLowerCase()))) continue; // Handles searching
 					var song = addSong('${dataDir}${directory}',directory,catID);
@@ -273,6 +311,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 					if(!containsSong){
 						containsSong = true;
 						addCategory('Charts Folder',i);
+						
 						i++;
 					}
 					addListing(directory,i,song);
@@ -283,7 +322,6 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 					emptyCats.push('Charts Folder');
 				}
 			}
-			var _packCount:Int = 0;
 			if (SELoader.exists("mods/weeks")){
 				for (name in orderList(SELoader.readDirectory("mods/weeks"))){
 					var catID = categories.length;
@@ -320,17 +358,21 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 			}
 			if (SELoader.exists("mods/packs")){
 				for (name in orderList(SELoader.readDirectory("mods/packs"))){
-					var catID = categories.length;
 					// dataDir = "mods/packs/" + dataDir + "/charts/";
 					var catMatch = query.match(name.toLowerCase());
-					var baseDir = 'mods/packs/$name/';
 					// var dataDir = SELoader.anyExists(['${baseDir}charts/','${baseDir}data/']);
 					// !SELoader.exists(dataDir) && !SELoader.exists(dataDir = "mods/packs/" + name + "/data/")
 					// if(dataDir == null) continue;
 					_packCount++;
+					if(!catMatch){
+						emptyCats.push(name);
+						continue;
+					}
+					var catID = categories.length;
 					// var containsSong = false;
-					var dirs = orderList(SELoader.readDirectory(dataDir));
+					// var dirs = orderList(SELoader.readDirectory(dataDir));
 					
+					var baseDir = 'mods/packs/$name/';
 					var folderSongs:Array<SongInfo> = SELoader.getSongsFromFolder(baseDir);
 					if(folderSongs.length == 0){
 						emptyCats.push(name);
@@ -339,15 +381,13 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 					addCategory(name,i);
 					i++;
 					for (song in folderSongs){
+
 						song.categoryID=catID;
 						song.namespace=name;
 						addListing(song.name,i,song);
 						songInfoArray.push(song);
+						i++;
 					}
-					
-					i++;
-
-					// if(!containsSong) emptyCats.push(name);
 					
 				}
 			}

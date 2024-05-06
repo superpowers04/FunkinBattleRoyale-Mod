@@ -483,7 +483,7 @@ class OptionsMenu extends MusicBeatState
 					}
 				}
 
-				if(sOptions.options == null){'$script has no options defined in it\'s options.json!';continue;}
+				if(sOptions.options == null){trace('$script has no options defined in its options.json!');continue;}
 				var saveOptions:Bool = false;
 				var category:Array<Option> = [];
 				for (v in sOptions.options) {

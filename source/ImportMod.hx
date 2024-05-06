@@ -67,9 +67,11 @@ class ImportModFromFolder extends MusicBeatState
 	var selectedLength = false;
 	var chartPrefix:String = "";
 	var songList:Array<SongInfo> = [];
+	var txt:String = '';
+	var acceptInput = false;
 	function changeText(str){
-		loadingText.text = str;
-		loadingText.screenCenter(X);
+		txt = str;
+		// loadingText.screenCenter(X);
 		return;
 	}
 
@@ -90,7 +92,7 @@ class ImportModFromFolder extends MusicBeatState
 		add(bg);
 
 
-		loadingText = new FlxText(100, 100, FlxG.width, "empty");
+		loadingText = new FlxText(100, 100, FlxG.width, "Finding songs");
 		loadingText.setFormat(CoolUtil.font, 28, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		
 
@@ -103,37 +105,39 @@ class ImportModFromFolder extends MusicBeatState
 			// loadingText.color = FlxColor.RED;
 			// FlxG.sound.play(Paths.sound('cancelMenu'));
 			// return;
-		changeText('sex');
-		
-		if (folder == Sys.getCwd() || folder == SELoader.getPath('')) {//This folder is the same folder that FNFBR is running in!
-			done = selectedLength = true;
-			changeText('You\'re trying to import songs from me!');
+		// changeText('Finding songs');
+		sys.thread.Thread.create(() -> {
+			if (folder == Sys.getCwd() || folder == SELoader.getPath('')) {//This folder is the same folder that FNFBR is running in!
+				acceptInput = done = selectedLength = true;
+				changeText('You\'re trying to import songs from me!');
+				loadingText.color = FlxColor.RED;
+				FlxG.sound.play(Paths.sound('cancelMenu'));
+				return;
+			}
+			var _songList = SELoader.getSongsFromFolder(folder);
+			for(song in _songList){
+				if(!importExisting && existingSongs.contains(song.name.toLowerCase())) continue;
+				songList.push(song);
+			}
+
+
+			if(songList.length > 0){
+				chartPrefix = name;
+				loadingText.alignment = CENTER;
+				acceptInput = true;
+				changeText('${songList.length} songs will be placed under:'+
+					'\nmods/packs/${name}/charts'+
+					'\nPress Enter to continue'+
+					"\nPress Escape to go back");
+				return;
+			}
+			acceptInput = done = selectedLength = true;
 			loadingText.color = FlxColor.RED;
 			FlxG.sound.play(Paths.sound('cancelMenu'));
-			return;
-		}
-		var _songList = SELoader.getSongsFromFolder(folder);
-		for(song in _songList){
-			if(!importExisting && existingSongs.contains(song.name.toLowerCase())) continue;
-			songList.push(song);
-		}
+			// trace(folder);
+			changeText('${folder.substr(-17)} doesn\'t contain any songs!' + (if(!importExisting) "\nMaybe try allowing vanilla songs to be imported?\n*(Press 1 to toggle importing vanilla songs in the list)" else ""));
 
-
-		if(songList.length > 0){
-			chartPrefix = name;
-			loadingText.alignment = CENTER;
-			changeText('${songList.length} songs will be placed under:'+
-				'\nmods/packs/${name}/charts'+
-				'\nPress Enter to continue'+
-				"\nPress Escape to go back");
-			return;
-		}
-		done = selectedLength = true;
-		loadingText.color = FlxColor.RED;
-		FlxG.sound.play(Paths.sound('cancelMenu'));
-		trace(folder);
-		changeText('${folder.substr(-17)} doesn\'t contain any songs!' + (if(!importExisting) "\nMaybe try allowing vanilla songs to be imported?\n*(Press 1 to toggle importing vanilla songs in the list)" else ""));
-
+		});
 		
 		}catch(e){MainMenuState.handleError(e,'Something went wrong when trying to scan for songs! ${e.message}');}
 	}
@@ -161,31 +165,35 @@ class ImportModFromFolder extends MusicBeatState
 		}
 	}
 	
-	override function update(elapsed:Float)
-	{
-		loadingText.screenCenter(XY);
-		if ((done && FlxG.keys.justPressed.ANY) || FlxG.keys.justPressed.ESCAPE) {
-			FlxG.switchState(new MainMenuState());
-		}
-		if(!selectedLength){
-			if(FlxG.keys.justPressed.ENTER){
-				selectedLength = true;
-				changeText("Scanning for songs..\nThe game may "+ (Sys.systemName() == "Windows" ? "'not respond'" : "freeze") + " during this process");
-				// sys.thread.Thread.create(() -> {
-					// new FlxTimer().start(0.6, function(tmr:FlxTimer){
-					scanSongs();
-					changeText('Imported ${songsImported} songs.\n They should appear under "mods/packs/${name}/charts" \nPress any key to go to the main menu');
-					loadingText.x -= 70;
-					done = true;
-					// });
-				// }); // Make sure the text is actually printed onto the screen before doing anything
+	override function update(elapsed:Float) {
+		if(acceptInput) {
+
+			if ((done && FlxG.keys.justPressed.ANY) || FlxG.keys.justPressed.ESCAPE) {
+				FlxG.switchState(new MainMenuState());
 			}
-			// if(FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.RIGHT){
-			// 	updateLoadinText(FlxG.keys.pressed.SHIFT,FlxG.keys.justPressed.LEFT);
-			// }
-		}else{
-			super.update(elapsed);
+			if(!selectedLength){
+				if(FlxG.keys.justPressed.ENTER){
+					selectedLength = true;
+					changeText("Scanning for songs..\nThe game may "+ (Sys.systemName() == "Windows" ? "'not respond'" : "freeze") + " during this process");
+					sys.thread.Thread.create(() -> {
+						// new FlxTimer().start(0.6, function(tmr:FlxTimer){
+						scanSongs();
+						changeText('Imported ${songsImported} songs.\n They should appear under "mods/packs/${name}/charts" \nPress any key to go to the main menu');
+						// loadingText.x -= 70;
+						done = true;
+						// });
+					}); // Make sure the text is actually printed onto the screen before doing anything
+				}
+				// if(FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.RIGHT){
+				// 	updateLoadinText(FlxG.keys.pressed.SHIFT,FlxG.keys.justPressed.LEFT);
+				// }
+			}
 		}
+		if(txt != loadingText.text){
+			loadingText.text = txt;
+		}
+		loadingText.screenCenter(XY);
+		super.update(elapsed);
 		
 	}
 

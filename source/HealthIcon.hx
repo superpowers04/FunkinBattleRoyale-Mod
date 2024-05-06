@@ -7,9 +7,6 @@ import flixel.tweens.FlxTween;
 
 class HealthIcon extends FlxSprite
 {
-	/**
-	 * Used for FreeplayState! If you use it elsewhere, prob gonna annoying
-	 */
 	public var sprTracker:FlxSprite;
 	var vanIcon:Bool = false;
 	var isPlayer:Bool = false;

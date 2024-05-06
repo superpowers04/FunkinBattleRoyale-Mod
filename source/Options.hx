@@ -111,12 +111,12 @@ class SEJudgement extends Option
 		description = 'Adjust your hit window for $name';
 		acceptValues = true;
 		glob = Reflect.getProperty(SESave.data,"judge" + name);
-		trace('$name - $glob');
+		// trace('$name - $glob');
 	}
 	function setVal(val:Float){
 		if(val > 1){val = 0.01;}
 		if(val < 0.01){val = 0.99;}
-		trace('' + glob + ' -> ' + val);
+		// trace('' + glob + ' -> ' + val);
 		glob = val;
 		Reflect.setField(SESave.data,"judge" + name,val);
 	}

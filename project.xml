@@ -46,9 +46,11 @@
 	<set name="BUILD_DIR" value="export/debug" if="debug" />
 
 
-
+	<!-- <haxedef name="haxe5"/> -->
+	<!-- (haxe > '4.3.4') -->
 	<classpath name="source" />
 	<classpath name="othersources" />
+	<classpath name="haxe5" if="haxe5"/>
 
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" embed='false' unless="web"/>
@@ -112,6 +114,7 @@
 	<haxelib name="flixel-ui" version="2.6.0" />
 
 	<haxedef name='usingcppia' if='cppia'/>
+	<define name='message.no-color'/>
 
 	<!-- <haxedef name='FLXRUNTIMESHADER' if='desktop'> -->
 

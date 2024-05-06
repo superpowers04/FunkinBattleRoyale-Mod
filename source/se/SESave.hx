@@ -99,6 +99,11 @@ typedef YourMother = Dynamic;
 	var debounce:Bool = false;
 	var legacyCharter:Bool = false;
 	var savedServers:Array<Array<Dynamic>> = [];
+	var favourites(get,default):Array<se.formats.SongInfo> = [];
+	function get_favourites() {
+		if(favourites == null){favourites = [];} 
+		return favourites;
+	}
 	var discordDRP:Bool = true;
 	var doCoolLoading:Bool = false;
 	var fullscreen:Bool = false;

@@ -1,5 +1,2 @@
-24.05.02.1724;
-* Some fixes
-* Partial support for Psych Characters
-* Finally add re-bindable volume keys(Under the first page on keybinds)
-* Switch to static versions of Flixel(5.6.2), Flixel-addons(3.2.2) and Flixel-ui(2.6.0)
+24.05.05.2144;
+* Multimenu Favourites

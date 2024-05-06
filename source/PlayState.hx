@@ -2416,196 +2416,195 @@ class PlayState extends ScriptMusicBeatState
 	var currentTimingShown:FlxText = null;
 	var lastNoteSplash:NoteSplash;
 	private function popUpScore(daNote:Note){
-			var daRating = daNote.rating;
-			if(daRating == "miss") return noteMiss(daNote.noteData,null,null,true);
-			var noteDiff:Float = Math.abs(Conductor.songPosition - daNote.strumTime);
-			vocals.volume = SESave.data.voicesVol;
-			
-			var placement:String = Std.string(combo);
-			var camHUD = camHUD;
-			if(useNoteCameras) camHUD = playerNoteCamera;
-			
-			var score:Float = 350;
+		var daRating = daNote.rating;
+		if(daRating == "miss") return noteMiss(daNote.noteData,null,null,true);
+		var noteDiff:Float = Math.abs(Conductor.songPosition - daNote.strumTime);
+		vocals.volume = SESave.data.voicesVol;
+		
+		var placement:String = Std.string(combo);
+		var camHUD = camHUD;
+		if(useNoteCameras) camHUD = playerNoteCamera;
+		
+		var score:Float = 350;
 
-			if (SESave.data.accuracyMod == 1) totalNotesHit += EtternaFunctions.wife3(noteDiff, Conductor.timeScale);
-			else if (SESave.data.accuracyMod == 2) totalNotesHit += daNote.hitDistance;
+		if (SESave.data.accuracyMod == 1) totalNotesHit += EtternaFunctions.wife3(noteDiff, Conductor.timeScale);
+		else if (SESave.data.accuracyMod == 2) totalNotesHit += daNote.hitDistance;
 
-			switch(daRating.toLowerCase())
-			{
+		switch(daRating.toLowerCase())
+		{
 
-				case 'shit':
-					score = -300;
-					// combo = 0;
-					// misses++; A shit should not equal a miss
-					ss = false;
-					shits++;
-					if(handleHealth) health -= 0.2;
-					if(SESave.data.shittyMiss){noteMiss(daNote.noteData,null,null,true);}
-					if (SESave.data.accuracyMod == 0) totalNotesHit += 0.25;
-				case 'bad':
-					score = 0;
-					ss = false;
-					bads++;
-					if(handleHealth) health -= 0.06;
-					if(SESave.data.badMiss) noteMiss(daNote.noteData,null,null,true);
-					if (SESave.data.accuracyMod == 0) totalNotesHit += 0.50;
-				case 'good':
-					score = 200;
-					ss = false;
-					goods++;
-					if (handleHealth && health < 2) health += 0.04;
-					if(SESave.data.goodMiss) noteMiss(daNote.noteData,null,null,true);
-					if (SESave.data.accuracyMod == 0) totalNotesHit += 0.75;
-				case 'sick':
-					sicks++;
-					if (SESave.data.noteSplash){
-						var a:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
-						a.setupNoteSplash(daNote, daNote.noteData);
-						lastNoteSplash = a;
-						grpNoteSplashes.add(a);
-						callInterp('spawnNoteSplash',[a]);
-					}
-					if (handleHealth && health < 2) health += 0.1;
-					if (SESave.data.accuracyMod == 0) totalNotesHit += 1;
-			}
-			if(flippy && daRating != "sick"){
-				practiceMode = false;
-				health = 0;
-			}
-			var rating:FlxSprite = new FlxSprite();
-	
-			
-			songScore += Math.round(score);
-			songScoreDef += Math.round(Ratings.convertScore(noteDiff));
-	
-			if(!SESave.data.noterating && !SESave.data.showTimings && !SESave.data.showCombo) return;
-	
-			if(SESave.data.noterating){
-
-				rating.loadGraphic(Paths.image(daRating)); // TODO: Add mod folder support and precaching
-				rating.x = playerStrums.members[0].x - (playerStrums.members[0].width);
-				rating.y = playerStrums.members[0].y + (playerStrums.members[0].height * 0.5);
-				rating.acceleration.y = 550;
-				rating.velocity.y = (FlxG.random.int(140, 175) * -(daNote.hitDistance - 0.5) * 2);
-				rating.velocity.x = -FlxG.random.int(-10, 10);
-				rating.angularVelocity = rating.velocity.x * 1.5;
-
-				rating.setGraphicSize(Std.int(rating.width * 0.3));
-				rating.antialiasing = true;
-				rating.updateHitbox();
-			}
-			
-			var msTiming = HelperFunctions.truncateFloat(noteDiff, 3); 
-
-
-			var currentTimingShown = new FlxText(0,0,100,"0ms");
-			if(SESave.data.showTimings){
-				timeShown = 0;
-				switch(daRating){
-					case 'shit':
-						currentTimingShown.color = FlxColor.RED;
-					case 'bad':
-						currentTimingShown.color = FlxColor.ORANGE;
-					case 'good':
-						currentTimingShown.color = FlxColor.GREEN;
-					case 'sick':
-						currentTimingShown.color = FlxColor.CYAN;
+			case 'shit':
+				score = -300;
+				// combo = 0;
+				// misses++; A shit should not equal a miss
+				ss = false;
+				shits++;
+				if(handleHealth) health -= 0.2;
+				if (SESave.data.shittyMiss){noteMiss(daNote.noteData,null,null,true);}
+				if (SESave.data.accuracyMod == 0) totalNotesHit += 0.25;
+			case 'bad':
+				score = 0;
+				ss = false;
+				bads++;
+				if(handleHealth) health -= 0.06;
+				if (SESave.data.badMiss) noteMiss(daNote.noteData,null,null,true);
+				if (SESave.data.accuracyMod == 0) totalNotesHit += 0.50;
+			case 'good':
+				score = 200;
+				ss = false;
+				goods++;
+				if (handleHealth && health < 2) health += 0.04;
+				if (SESave.data.goodMiss) noteMiss(daNote.noteData,null,null,true);
+				if (SESave.data.accuracyMod == 0) totalNotesHit += 0.75;
+			case 'sick':
+				sicks++;
+				if (SESave.data.noteSplash){
+					var a:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
+					a.setupNoteSplash(daNote, daNote.noteData);
+					lastNoteSplash = a;
+					grpNoteSplashes.add(a);
+					callInterp('spawnNoteSplash',[a]);
 				}
-				currentTimingShown.borderStyle = OUTLINE;
-				currentTimingShown.borderSize = 1;
-				currentTimingShown.borderColor = FlxColor.BLACK;
-				var _dist = (Conductor.songPosition - daNote.strumTime);
-				// This if statement is shit but it should work
-				currentTimingShown.text = msTiming + "ms " + (if(_dist == 0) "=" else if(downscroll && _dist < 0 || !downscroll && _dist > 0) "^" else "v");
-				currentTimingShown.size = 20;
-				currentTimingShown.alignment=CENTER;
-				// currentTimingShown.screenCenter();
-				currentTimingShown.updateHitbox();
-				currentTimingShown.x = (playerStrums.members[daNote.noteData].x + (playerStrums.members[daNote.noteData].width * 0.5)) - (currentTimingShown.width * 0.5);
-				currentTimingShown.y = daNote.y + (daNote.height * 0.5);
-				currentTimingShown.cameras = [camHUD]; 
-
-
-				add(currentTimingShown);
-			}
-			if(SESave.data.noterating){
-				rating.cameras = [camHUD];
-				add(rating);
-			}
-	
-
-			
-			var scoreObjs = [];
-			if(SESave.data.showCombo){
-
-				var seperatedScore:Array<Int> = [];
-		
-				var comboSplit:Array<String> = (combo + "").split('');
-
-
-
-				var comboSize = 1.20 - (seperatedScore.length * 0.1);
-				var lastStrum = playerStrums.members[playerStrums.members.length - 1];
-				for (i in 0...comboSplit.length) {
-					var num:Int = Std.parseInt(comboSplit[i]);
-					var numScore:FlxSprite = new FlxSprite().loadGraphic(Paths.image('num' + num));
-					// numScore.screenCenter();
-					numScore.x = lastStrum.x + (lastStrum.width) + ((43 * comboSize) * i);
-
-					numScore.y = rating.y;
-					numScore.cameras = rating.cameras;
-
-					numScore.antialiasing = true;
-					numScore.setGraphicSize(Std.int((numScore.width * comboSize) * 0.5));
-
-					numScore.updateHitbox();
-		
-					numScore.acceleration.y = FlxG.random.int(200, 300);
-					numScore.velocity.y -= FlxG.random.int(140, 160);
-					numScore.velocity.x = FlxG.random.float(-5, 5);
-					numScore.angularVelocity = numScore.velocity.x;
-					add(numScore);
-					scoreObjs.push(numScore);
-					FlxTween.tween(numScore, {alpha: 0}, 0.2, {
-						onComplete: function(tween:FlxTween)
-						{
-							numScore.destroy();
-						},
-						startDelay: Conductor.crochet * 0.002
-					});
-		
-				}
-			}
-
-			if(SESave.data.noterating){
-				FlxTween.tween(rating, {alpha: 0}, 0.3, {
-					startDelay: Conductor.crochet * 0.001,
-					onComplete: function(tween:FlxTween)
-					{
-						rating.destroy();
-					}
-				});
-			}
-			if(SESave.data.showTimings){
-				FlxTween.tween(currentTimingShown, {alpha: 0,y:currentTimingShown.y - 60}, 0.8, {
-					onComplete: function(tween:FlxTween)
-					{
-						currentTimingShown.destroy();
-					},
-					startDelay: Conductor.crochet * 0.001,
-				});
-			}
-			callInterp('popUpScore',[rating,scoreObjs,currentTimingShown]);
-
-
-
+				if (handleHealth && health < 2) health += 0.1;
+				if (SESave.data.accuracyMod == 0) totalNotesHit += 1;
 		}
+		if(flippy && daRating != "sick"){
+			practiceMode = false;
+			health = 0;
+		}
+		var rating:FlxSprite = new FlxSprite();
+
+		
+		songScore += Math.round(score);
+		songScoreDef += Math.round(Ratings.convertScore(noteDiff));
+
+		if(!SESave.data.noterating && !SESave.data.showTimings && !SESave.data.showCombo) return;
+
+		if(SESave.data.noterating){
+
+			rating.loadGraphic(Paths.image(daRating)); // TODO: Add mod folder support and precaching
+			rating.x = playerStrums.members[0].x - (playerStrums.members[0].width);
+			rating.y = playerStrums.members[0].y + (playerStrums.members[0].height * 0.5);
+			rating.acceleration.y = 550;
+			rating.velocity.y = (FlxG.random.int(140, 175) * -(daNote.hitDistance - 0.5) * 2);
+			rating.velocity.x = -FlxG.random.int(-10, 10);
+			rating.angularVelocity = rating.velocity.x * 1.5;
+
+			rating.setGraphicSize(Std.int(rating.width * 0.3));
+			rating.antialiasing = true;
+			rating.updateHitbox();
+		}
+		
+		var msTiming = HelperFunctions.truncateFloat(noteDiff, 3); 
+
+
+		var currentTimingShown = new FlxText(0,0,100,"0ms");
+		if(SESave.data.showTimings){
+			timeShown = 0;
+			switch(daRating){
+				case 'shit':
+					currentTimingShown.color = FlxColor.RED;
+				case 'bad':
+					currentTimingShown.color = FlxColor.ORANGE;
+				case 'good':
+					currentTimingShown.color = FlxColor.GREEN;
+				case 'sick':
+					currentTimingShown.color = FlxColor.CYAN;
+			}
+			currentTimingShown.borderStyle = OUTLINE;
+			currentTimingShown.borderSize = 1;
+			currentTimingShown.borderColor = FlxColor.BLACK;
+			var _dist = (Conductor.songPosition - daNote.strumTime);
+			// This if statement is shit but it should work
+			currentTimingShown.text = msTiming + "ms " + (if(_dist == 0) "=" else if(downscroll && _dist < 0 || !downscroll && _dist > 0) "^" else "v");
+			currentTimingShown.size = 20;
+			currentTimingShown.alignment=CENTER;
+			// currentTimingShown.screenCenter();
+			currentTimingShown.updateHitbox();
+			currentTimingShown.x = (playerStrums.members[daNote.noteData].x + (playerStrums.members[daNote.noteData].width * 0.5)) - (currentTimingShown.width * 0.5);
+			currentTimingShown.y = daNote.y + (daNote.height * 0.5);
+			currentTimingShown.cameras = [camHUD]; 
+
+
+			add(currentTimingShown);
+		}
+		if(SESave.data.noterating){
+			rating.cameras = [camHUD];
+			add(rating);
+		}
+
+
+		
+		var scoreObjs = [];
+		if(SESave.data.showCombo){
+
+			var seperatedScore:Array<Int> = [];
+	
+			var comboSplit:Array<String> = (combo + "").split('');
+
+
+
+			var comboSize = 1.20 - (seperatedScore.length * 0.1);
+			var lastStrum = playerStrums.members[playerStrums.members.length - 1];
+			for (i in 0...comboSplit.length) {
+				var num:Int = Std.parseInt(comboSplit[i]);
+				var numScore:FlxSprite = new FlxSprite().loadGraphic(Paths.image('num' + num));
+				// numScore.screenCenter();
+				numScore.x = lastStrum.x + (lastStrum.width) + ((43 * comboSize) * i);
+
+				numScore.y = rating.y;
+				numScore.cameras = rating.cameras;
+
+				numScore.antialiasing = true;
+				numScore.setGraphicSize(Std.int((numScore.width * comboSize) * 0.5));
+
+				numScore.updateHitbox();
+	
+				numScore.acceleration.y = FlxG.random.int(200, 300);
+				numScore.velocity.y -= FlxG.random.int(140, 160);
+				numScore.velocity.x = FlxG.random.float(-5, 5);
+				numScore.angularVelocity = numScore.velocity.x;
+				add(numScore);
+				scoreObjs.push(numScore);
+				FlxTween.tween(numScore, {alpha: 0}, 0.2, {
+					onComplete: function(tween:FlxTween)
+					{
+						numScore.destroy();
+					},
+					startDelay: Conductor.crochet * 0.002
+				});
+	
+			}
+		}
+
+		if(SESave.data.noterating){
+			FlxTween.tween(rating, {alpha: 0}, 0.3, {
+				startDelay: Conductor.crochet * 0.001,
+				onComplete: function(tween:FlxTween)
+				{
+					rating.destroy();
+				}
+			});
+		}
+		if(SESave.data.showTimings){
+			FlxTween.tween(currentTimingShown, {alpha: 0,y:currentTimingShown.y - 60}, 0.8, {
+				onComplete: function(tween:FlxTween)
+				{
+					currentTimingShown.destroy();
+				},
+				startDelay: Conductor.crochet * 0.001,
+			});
+		}
+		callInterp('popUpScore',[rating,scoreObjs,currentTimingShown]);
+
+
+
+	}
 
 	@:keep inline public function NearlyEquals(value1:Float, value2:Float, unimportantDifference:Float = 10):Bool return Math.abs(FlxMath.roundDecimal(value1, 1) - FlxMath.roundDecimal(value2, 1)) < unimportantDifference;
 
 	@:keep inline private function fromBool(input:Bool):Int{
-		if (input) return 1;
-		return 0; 
+		return input ? 1 : 0; 
 	}
 	@:keep inline private function fromInt(?input:Int = 0):Bool{
 		return (input == 1);
@@ -2625,8 +2624,8 @@ class PlayState extends ScriptMusicBeatState
 			return;
 		}
 		inputMode = SESave.data.inputEngine;
-		var inputEngines = ["SE-LEGACY" + (if (SESave.data.accurateNoteSustain) "-ACNS" else ""),
-							'SE'+ (if (SESave.data.accurateNoteSustain) "-ACNS" else "")
+		var inputEngines = ["SE-LEGACY" + (SESave.data.accurateNoteSustain ? "-ACNS" : ""),
+							'SE'+ (SESave.data.accurateNoteSustain ? "-ACNS" : "")
 		];
 		trace('Using ${inputMode}');
 		// noteShit handles moving notes around and opponent hitting them
@@ -2710,7 +2709,7 @@ class PlayState extends ScriptMusicBeatState
 
 	function SENoteShit(){
 		if (!generatedMusic) return;
-		var _scrollSpeed = FlxMath.roundDecimal(SESave.data.scrollSpeed == 1 ? SONG.speed : SESave.data.scrollSpeed, 2); // Probably better to calculate this beforehand
+		var _scrollSpeed = Math.floor((SESave.data.scrollSpeed == 1 ? SONG.speed : SESave.data.scrollSpeed)*1000)*0.001; // Probably better to calculate this beforehand
 		if(currentSpeed != 1) _scrollSpeed /= currentSpeed;
 		var strumNote:FlxSprite;
 		var i = notes.members.length - 1;
@@ -2731,7 +2730,11 @@ class PlayState extends ScriptMusicBeatState
 				daNote.visible = true;
 				daNote.active = true;
 			}
-			strumNote = (if (daNote.parentSprite != null) daNote.parentSprite else if (daNote.mustPress) playerStrums.members[Math.floor(Math.abs(daNote.noteData))] else strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))] );
+			strumNote = (
+						(daNote.parentSprite != null) ? daNote.parentSprite :
+						(daNote.mustPress ? playerStrums.members[daNote.noteData] :
+						 strumLineNotes.members[daNote.noteData])
+					);
 			daNote.distanceToSprite = 0.45 * (Conductor.songPosition - daNote.strumTime) * _scrollSpeed;
 			
 			if(daNote.updateY){
@@ -2799,9 +2802,6 @@ class PlayState extends ScriptMusicBeatState
 				daNote.kill();
 				notes.remove(daNote, true);
 			}
-
-
-			
 		}
 	}
 	@:keep inline function updateNotePosition(daNote:Note,strumNote:FlxSprite){
@@ -2820,7 +2820,7 @@ class PlayState extends ScriptMusicBeatState
 		callInterp("holdShit",[holdArray]);
 		charCall("holdShit",[holdArray],true);
 
-		if (generatedMusic && acceptInput && !boyfriend.isStunned && holdArray.contains(true)) {
+		if (acceptInput && !boyfriend.isStunned && holdArray.contains(true)) {
 
  			var daNote:Note;
  			var i:Int = 0;
@@ -2890,130 +2890,144 @@ class PlayState extends ScriptMusicBeatState
 	var possibleNotes:Array<Note> = [];
 	var hitArray:Array<Bool>=[false,false,false,false];
 	function SEIKeyPress(event:KeyboardEvent){
-		if(this != FlxG.state){
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, SEIKeyPress);
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, SEIKeyRelease);
-			return;
-		}
-		if(playerStrums == null || !generatedMusic || !generatedArrows) return;
-		SEIBlockInput = false;
-		for(i in 0 ... pressArray.length) pressArray[i] = false;
-		for(i in 0 ... releaseArray.length) releaseArray[i] = false;
-		callInterp('keyPress',[event.keyCode]);
-		if (SEIBlockInput || cancelCurrentFunction || !acceptInput || playerCharacter.isStunned || subState != null || paused ) return;
-		
-		for(key => data in SEIKeyMap){
-			if(FlxG.keys.checkStatus(key, JUST_PRESSED) && !SEIKeyHeld[key]){
-				pressArray[data] = true;
-				holdArray[data] = true;
-				var strum = playerStrums.members[data];
-				SEIKeyHeld[key] = true;
-				if(strum != null) strum.press();
-			}else if(FlxG.keys.checkStatus(key, PRESSED)){
-				SEIKeyHeld[key] = true;
-				holdArray[data] = true;
+		try{
+			if(this != FlxG.state){
+				FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, SEIKeyPress);
+				FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, SEIKeyRelease);
+				return;
 			}
-		}
-		callInterp('keyShit',[pressArray,holdArray]);
-		charCall("keyShit",[pressArray,holdArray]);
-		if(!pressArray.contains(true) || SEIBlockInput || !acceptInput) return;
-
-		playerCharacter.holdTimer = 0;
-		// var hitArray = [false,false,false,false];
-		{
-			var i = hitArray.length+1;
-			while(i > 0){hitArray[i--]=false;}
-		}
-		if(holdArray.contains(true)){
-			playerCharacter.isPressingNote = true;
-			var daNote = null;
-			var i = notes.members.length;
-			var acns = SESave.data.accurateNoteSustain;
-			while(i < notes.members.length){
-				daNote = notes.members[i];
-				i++;
-				if(daNote == null || !holdArray[daNote.noteData] || !daNote.mustPress || !daNote.isSustainNote || !daNote.updateCanHit()) continue;
-				if(!acns || daNote.strumTime <= Conductor.songPosition - (50 * Conductor.timeScale) || daNote.isSustainNoteEnd) // Only destroy the note when properly hit
-					{goodNoteHit(daNote);continue;}
-				// Tell note to be clipped to strumline
-				daNote.isPressed = true;
-				hitArray[daNote.noteData] = true;
-				daNote.susHit(0,daNote);
-				callInterp("susHit",[daNote]);
-			}
-		}
-		{
-			var i = possibleNotes.length;
-			while(i > 0){possibleNotes.pop();i--;}
-		}
-		// var possibleNotes:Array<Note> = [null,null,null,null]; // notes that can be hit
-		var onScreenNote:Bool = false;
-		var members = notes.members;
-		var i = members.length;
-		var daNote:Note;
-		while (i >= 0) {
-			daNote = members[i];
-			i--;
-			if (daNote == null || !daNote.alive || daNote.skipNote || !daNote.mustPress) continue;
+			if(playerStrums == null || !generatedMusic || !generatedArrows) return;
+			SEIBlockInput = false;
+			for(i in 0 ... pressArray.length) pressArray[i] = false;
+			for(i in 0 ... releaseArray.length) releaseArray[i] = false;
+			callInterp('keyPress',[event.keyCode]);
+			if (SEIBlockInput || cancelCurrentFunction || !acceptInput || playerCharacter.isStunned || subState != null || paused ) return;
 			
-			if (!onScreenNote) onScreenNote = true;
-			if (!pressArray[daNote.noteData] || !daNote.updateCanHit(Conductor.songPosition + ((Sys.time() * 1000) - lastMusicUpdate)) || daNote.tooLate || daNote.wasGoodHit) continue;
-			var coolNote = possibleNotes[daNote.noteData];
-			if (coolNote != null){
-				if((Math.abs(daNote.strumTime - coolNote.strumTime) < 7 * Conductor.timeScale)){
-					notes.remove(daNote);
-					daNote.destroy();
+			for(key => data in SEIKeyMap){
+				if(FlxG.keys.checkStatus(key, JUST_PRESSED) && !SEIKeyHeld[key]){
+					pressArray[data] = true;
+					holdArray[data] = true;
+					var strum = playerStrums.members[data];
+					SEIKeyHeld[key] = true;
+					if(strum != null) strum.press();
+				}else if(FlxG.keys.checkStatus(key, PRESSED)){
+					SEIKeyHeld[key] = true;
+					holdArray[data] = true;
+				}
+			}
+			callInterp('keyShit',[pressArray,holdArray]);
+			charCall("keyShit",[pressArray,holdArray]);
+			if(!pressArray.contains(true) || SEIBlockInput || !acceptInput) return;
+
+			playerCharacter.holdTimer = 0;
+			// var hitArray = [false,false,false,false];
+			{
+				var i = hitArray.length+1;
+				while(i > 0){hitArray[i--]=false;}
+			}
+			if(holdArray.contains(true)){
+				playerCharacter.isPressingNote = true;
+				var daNote = null;
+				var i = notes.members.length;
+				var acns = SESave.data.accurateNoteSustain;
+				while(i < notes.members.length){
+					daNote = notes.members[i];
+					i++;
+					if(daNote == null || !holdArray[daNote.noteData] || !daNote.mustPress || !daNote.isSustainNote || !daNote.updateCanHit()) continue;
+					if(!acns || daNote.strumTime <= Conductor.songPosition - (50 * Conductor.timeScale) || daNote.isSustainNoteEnd) {// Only destroy the note when properly hit
+							goodNoteHit(daNote);
+
+							continue;
+						}
+					// Tell note to be clipped to strumline
+					daNote.isPressed = true;
+					hitArray[daNote.noteData] = true;
+					daNote.susHit(0,daNote);
+					callInterp("susHit",[daNote]);
+				}
+			}
+			{
+				var i = possibleNotes.length;
+				while(i > 0){possibleNotes.pop();i--;}
+			}
+			// var possibleNotes:Array<Note> = [null,null,null,null]; // notes that can be hit
+			var onScreenNote:Bool = false;
+			var members = notes.members;
+			var i = members.length;
+			var daNote:Note;
+			while (i >= 0) {
+				daNote = members[i];
+				i--;
+				if (daNote == null || !daNote.alive || daNote.skipNote || !daNote.mustPress) continue;
+				
+				if (!onScreenNote) onScreenNote = true;
+				if (!pressArray[daNote.noteData] || !daNote.updateCanHit(Conductor.songPosition + ((Sys.time() * 1000) - lastMusicUpdate)) || daNote.tooLate || daNote.wasGoodHit) continue;
+				var coolNote = possibleNotes[daNote.noteData];
+				if (coolNote != null){
+					if((Math.abs(daNote.strumTime - coolNote.strumTime) < 7 * Conductor.timeScale)){
+						notes.remove(daNote);
+						daNote.destroy();
+						continue;
+					}
+					if(daNote.strumTime > coolNote.strumTime) continue;
+				}
+				possibleNotes[daNote.noteData] = daNote;
+			}
+
+			if(onScreenNote) timeSinceOnscreenNote = 0.5;
+			i = pressArray.length;
+			daNote = null;
+			var ghostTapping = SESave.data.ghost;
+			while(i > 0) {
+				i--;
+				daNote = possibleNotes[i];
+				possibleNotes[i]=null;
+				if(daNote == null && pressArray[i] && timeSinceOnscreenNote > 0){
+					ghostTaps += 1;
+					if(!ghostTapping) noteMiss(i, null);
 					continue;
 				}
-				if(daNote.strumTime > coolNote.strumTime) continue;
+				if(daNote == null) continue;
+				hitArray[daNote.noteData] = true;
+				goodNoteHit(daNote);
 			}
-			possibleNotes[daNote.noteData] = daNote;
-		}
-
-		if(onScreenNote) timeSinceOnscreenNote = 0.5;
-		i = pressArray.length;
-		daNote = null;
-		var ghostTapping = SESave.data.ghost;
-		while(i > 0) {
-			i--;
-			daNote = possibleNotes[i];
-			possibleNotes[i]=null;
-			if(daNote == null && pressArray[i] && timeSinceOnscreenNote > 0){
-				ghostTaps += 1;
-				if(!ghostTapping) noteMiss(i, null);
-				continue;
-			}
-			if(daNote == null) continue;
-			hitArray[daNote.noteData] = true;
-			goodNoteHit(daNote);
-		}
-		callInterp('keyShitAfter',[pressArray,holdArray,hitArray]);
-		charCall("keyShitAfter",[pressArray,holdArray,hitArray]);
-
-	}
-	function SEIKeyRelease(event:KeyboardEvent){
-		if(this != FlxG.state){
+			callInterp('keyShitAfter',[pressArray,holdArray,hitArray]);
+			charCall("keyShitAfter",[pressArray,holdArray,hitArray]);
+		}catch(e){
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, SEIKeyPress);
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, SEIKeyRelease);
-			return;
+			FuckState.FUCK(e,'PlayState.SEIKeyPress');
 		}
-		if(playerStrums == null) return;
-		for(i in 0 ... holdArray.length) holdArray[i]=false;
-		callInterp('keyRelease',[event.keyCode]);
-		if (cancelCurrentFunction || subState != null || paused ) return;
-
-		for(key => data in SEIKeyMap){
-			if(FlxG.keys.checkStatus(key, PRESSED) && acceptInput && !playerCharacter.isStunned){
-				holdArray[data] = true;
-			}else{
-				SEIKeyHeld[key] = false;
+	}
+	function SEIKeyRelease(event:KeyboardEvent){
+		try{
+			if(this != FlxG.state){
+				FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, SEIKeyPress);
+				FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, SEIKeyRelease);
+				return;
 			}
-		}
-		for(id => bool in holdArray){
-			if(bool) continue;
-			var strum = playerStrums.members[id];
-			if(strum == null) return;
-			strum.playStatic();
+			if(playerStrums == null) return;
+			for(i in 0 ... holdArray.length) holdArray[i]=false;
+			callInterp('keyRelease',[event.keyCode]);
+			if (cancelCurrentFunction || subState != null || paused ) return;
+
+			for(key => data in SEIKeyMap){
+				if(FlxG.keys.checkStatus(key, PRESSED) && acceptInput && !playerCharacter.isStunned){
+					holdArray[data] = true;
+				}else{
+					SEIKeyHeld[key] = false;
+				}
+			}
+			for(id => bool in holdArray){
+				if(bool) continue;
+				var strum = playerStrums.members[id];
+				if(strum == null) return;
+				strum.playStatic();
+			}
+		}catch(e){
+			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, SEIKeyPress);
+			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, SEIKeyRelease);
+			FuckState.FUCK(e,'PlayState.SEIKeyPress');
 		}
 
 	}
@@ -3021,8 +3035,7 @@ class PlayState extends ScriptMusicBeatState
 	function BotplayKeyShit(){
 		if(!botPlay) return kadeBRKeyShit();
 		// pressArray = [for(i in 0 ... pressArray.length) false];
-		for(i in 0 ... pressArray.length) 
-			pressArray[i] = holdArray[i] = releaseArray[i] = false;
+		for(i in 0 ... pressArray.length) pressArray[i] = holdArray[i] = releaseArray[i] = false;
 		var i = 0;
 		var daNote:Note = null;		
 		// pressArray = [for(i in 0 ... pressArray.length) false];
@@ -3034,7 +3047,12 @@ class PlayState extends ScriptMusicBeatState
 			i++;
 			if(daNote == null || !daNote.mustPress || !daNote.updateCanHit() || daNote.shouldntBeHit || !daNote.aiShouldPress) continue;
 			
-			if(daNote.strumTime <= Conductor.songPosition){playerCharacter.holdTimer = 0;pressArray[daNote.noteData] = true;goodNoteHit(daNote);continue;}
+			if(daNote.strumTime <= Conductor.songPosition){
+				playerCharacter.holdTimer = 0;
+				pressArray[daNote.noteData] = true;
+				goodNoteHit(daNote);
+				continue;
+			}
 			if(!daNote.isSustainNote) continue;
 			playerCharacter.holdTimer = 0;
 			// hitArray[daNote.noteData] = true;

@@ -167,7 +167,6 @@ class SickMenuState extends ScriptMusicBeatState
 	override function create() {
 		// if (ChartingState.charting) ChartingState.charting = false;
 		SearchMenuState.resetVars();
-		trace('Loading new menu state!');
 		// if (SESave.data.songUnload && PlayState.SONG != null) {PlayState.SONG = null;}
 		// PlayState.songScript = "";PlayState.hsBrTools = null;
 		if(SearchMenuState.background == null){

@@ -217,17 +217,17 @@ class FinishSubState extends MusicBeatSubstate
 
 			if(name != "FORCEDMOMENT.MP4efdhseuifghbehu"){
 
-				FlxG.camera.alpha = PlayState.instance.camHUD.alpha = 1;
-				FlxG.camera.visible = PlayState.instance.camHUD.visible  = PlayState.instance.camTOP.visible = true;
-				FlxG.camera.zoom = PlayState.instance.camTOP.zoom = PlayState.instance.camHUD.zoom = 1;
+				// FlxG.camera.alpha = PlayState.instance.camHUD.alpha = 1;
+				// FlxG.camera.visible = PlayState.instance.camHUD.visible  = PlayState.instance.camTOP.visible = true;
+				// FlxG.camera.zoom = PlayState.instance.camTOP.zoom = PlayState.instance.camHUD.zoom = 1;
 				// FlxG.camera.zoom = PlayState.instance.defaultCamZoom;
-				PlayState.instance.generatedMusic = false;
-				var camPos = PlayState.instance.getDefaultCamPos(false);
+				// PlayState.instance.generatedMusic = false;
+				// var camPos = PlayState.instance.getDefaultCamPos(false);
 				// PlayState.instance.camFollow.setPosition(camPos[0],camPos[1]);
-				PlayState.instance.moveCamera = PlayState.instance.controlCamera = false;
-				PlayState.instance.camFollow.x = PlayState.instance.camGame.scroll.x = camPos[0];
-				PlayState.instance.camFollow.y = PlayState.instance.camGame.scroll.y = camPos[1];
-				FlxG.state.persistentUpdate =  !isError && !pauseGame;
+				// PlayState.instance.moveCamera = PlayState.instance.controlCamera = false;
+				// PlayState.instance.camFollow.x = PlayState.instance.camGame.scroll.x = camPos[0];
+				// PlayState.instance.camFollow.y = PlayState.instance.camGame.scroll.y = camPos[1];
+				FlxG.state.persistentUpdate = false;
 				if (win) PlayState.playerCharacter.animation.finishCallback = null; else PlayState.dad.animation.finishCallback = null;
 				updateBF = false;
 			}
@@ -363,7 +363,7 @@ class FinishSubState extends MusicBeatSubstate
 						: "")
 				+'\n Safe Frames: ${SESave.data.frames}' 
 				+'\n HitWindows: ${Ratings.ratingMS("sick")},${Ratings.ratingMS("good")},${Ratings.ratingMS("bad")},${Ratings.ratingMS("shit")} MS'
-				+'\n Input Engine: ${PlayState.inputEngineName}, V${MainMenuState.ver}'
+				+'\n Input Engine: ${PlayState.inputEngineName}, V${MainMenuState.nightly == "" ? MainMenuState.ver : MainMenuState.nightly}'
 				+'\n Song Offset: ${HelperFunctions.truncateFloat(SESave.data.offset + PlayState.songOffset,2)}ms'
 				);
 				settingsText.size = 20;
@@ -571,9 +571,9 @@ class FinishSubState extends MusicBeatSubstate
 	}
 	override function draw(){
 
-		if(updateBF && PlayState.playerCharacter != null){
-			PlayState.playerCharacter.draw();
-		}
+		// if(updateBF && PlayState.playerCharacter != null){
+		// 	PlayState.playerCharacter.draw();
+		// }
 		super.draw();
 
 	}

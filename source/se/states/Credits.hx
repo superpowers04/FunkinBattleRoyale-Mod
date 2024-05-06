@@ -24,7 +24,7 @@ class Credits extends SearchMenuState
 * Superpowers04 - Pretty much everything specific to Super Engine
 * NayToon - Many fixes, multiplayer improvements, providing early Windows builds, etc.
 * Henry.xml/Harley.xml - Created the note splash animation
-* BeastlyGabi/BeastlyGhost - Some general help
+* Crowplexus - Some general help
 * XieneDev - Made Battle Royale. This engine actually wouldn't exist if it wasn't for this mod
 "],["Funkin' Team" , "The base game!
 

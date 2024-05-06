@@ -400,7 +400,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 			
 		}
 		var scriptSubDirectory:String = "nil/"; 
-		public var scriptPaths = [];
+		public var scriptPaths:Array<String> = [];
 		public function loadScript(v:String,?path:String = "mods/scripts/",?nameSpace:String="global",?brtool:HSBrTools = null){
 			if(!parseMoreInterps) return;
 			var _path = '${path}${v}${scriptSubDirectory}';

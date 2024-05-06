@@ -31,10 +31,10 @@ class SESONG{
 		// }
 
 	/*Player Shite*/
-		public var player1:String; // Player
-		public var player2:String; // Opponent
-		public var gf:String; // GF
-		public var stage:String; // The stage
+		public var player1:String = "bf"; // Player
+		public var player2:String = "bf"; // Opponent
+		public var gf:String = "gf"; // GF
+		public var stage:String = "stage"; // The stage
 		public var forceCharacters(get,default):Bool = false; // Whether characters from the chart should be forced. Always enabled when charting
 			public function get_forceCharacters() return ChartingState.charting || PlayState.isStoryMode || forceCharacters;
 		/* Helper variables */
@@ -66,21 +66,17 @@ class SESONG{
 		var curBPM:Float = Math.abs(song.bpm);
 		var totalSteps:Int = 0;
 		var totalPos:Float = 0;
-		var mustHit:Bool = false;
-		for (i in 0...song.notes.length)
-		{
+		var mustHit:Bool = focusPlayer = song.notes[0].mustHitSection;
+		for (i in 0...song.notes.length) {
 			var section = song.notes[i];
-			if(section.changeBPM && section.bpm != curBPM)
-			{
+			if(section.changeBPM && section.bpm != curBPM) {
 				curBPM = Math.abs(section.bpm);
 				BPMChanges.push([totalPos,curBPM]);
 			}
-			if(i == 0){
-				focusPlayer = mustHit = section.mustHitSection;
-			}else if (section.mustHitSection != mustHit){
-				mustHit = section.mustHitSection;
-				mustHitSwitches.push([totalPos,mustHit]);
+			if (section.mustHitSection != mustHit){
+				eventNotes.push([totalPos,'movecam',mustHit ? 0 : 1]);
 			}
+			mustHit = section.mustHitSection
 			var nid:Int = 0; // Note ID
 			while (nid < section.sectionNotes.length){
 				var note = section.sectionNotes[nid];
@@ -107,6 +103,7 @@ class SESONG{
 		name = song.song;
 		needsVoices = song.needsVoices;
 		forceCharacters = song.forceCharacters;
+		rawJSON = song.rawJSON;
 		return this;
 	}
 
@@ -119,7 +116,7 @@ class SESONG{
 
 	public function update(el:Float){
 		var bpm:Float = cast getCurrentPast(BPMChanges,Conductor.songPosition);
-		focusPlayer = cast getCurrentPast(mustHitSwitches,Conductor.songPosition);
+		// focusPlayer = cast getCurrentPast(mustHitSwitches,Conductor.songPosition);
 		if(Conductor.bpm != bpm) Conductor.changeBPM(bpm);
 	}
 	// public function stepHit(step:Int){
