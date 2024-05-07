@@ -745,7 +745,7 @@ class TitleState extends MusicBeatState
 			// music.loadStream(Paths.music('freakyMenu'));
 			// FlxG.sound.list.add(music);
 			// music.play();
-			FlxG.sound.playMusic(Paths.music('StartItchBuild'), 0.1);
+			FlxG.sound.playMusic(SELoader.loadSound('assets/music/StartItchBuild.ogg'), 0.1);
 			FlxG.sound.music.pause();
 			// LoadingState.loadingText = new FlxText(FlxG.width * 0.8,FlxG.height * 0.8,"Loading...");
 			// LoadingState.loadingText.setFormat();
@@ -1495,7 +1495,8 @@ class TitleState extends MusicBeatState
 		} 
 		initialized = true;
 		destHaxe();
-		FlxG.sound.music.play();
+		if(FlxG.sound.music == null) FlxG.sound.playMusic(SELoader.loadSound('assets/music/StartItchBuild.ogg'), 0.1);
+		else FlxG.sound.music.play();
 		FlxG.sound.music.fadeIn(0.1,SESave.data.instVol);
 
 		if(!isShift){

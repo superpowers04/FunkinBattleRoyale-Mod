@@ -181,6 +181,7 @@ class OptionsMenu extends MusicBeatState
 			new HCBoolOption('NPS Display', "Keeps track of and shows your current notes per second",'npsDisplay'),
 			new HCBoolOption('Show Note Ratings', "Shows note ratings next to the strumline",'noterating'),
 			new HCBoolOption('Show Note Timings', "Shows note timings over the strumline",'showTimings'),
+			new HCBoolOption('Note ratings on hit note', "Note ratings will shoot off of the note instead of being on the side",'ratingOnNote'),
 			new HCBoolOption("Show Current Combo","Shows your combo next to the strumline",'showCombo'),
 			new HCBoolOption("Beat Bouncing", "Toggle text bouncing, Useful if you can't read some text",'beatBouncing'),
 			new HCBoolOption("Flashing Lights", "Toggle flashing lights that can cause seizures and strain",'flashing'),

@@ -170,8 +170,8 @@ class FinishSubState extends MusicBeatSubstate
 				cam = new FlxCamera();
 				FlxG.cameras.add(cam);
 				FlxG.cameras.setDefaultDrawTarget(cam,true);
-				FlxG.state.persistentUpdate = FlxG.state.persistentDraw = !pauseGame;
 				add(PlayState.instance.remove(PlayState.bf));
+				FlxG.state.persistentUpdate = FlxG.state.persistentDraw = !pauseGame;
 
 				cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]]; 
 					// ready = true;
@@ -522,9 +522,9 @@ class FinishSubState extends MusicBeatSubstate
 		if(FlxG.keys.pressed.ESCAPE){
 			retMenu();
 		}
-		if(updateBF && PlayState.playerCharacter != null){
-			PlayState.playerCharacter.update(elapsed);
-		}
+		// if(updateBF && PlayState.playerCharacter != null){
+		// 	PlayState.playerCharacter.update(elapsed);
+		// }
 
 		if (ready){
 			if (controls.ACCEPT){

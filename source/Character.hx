@@ -934,28 +934,38 @@ class CharAnimController extends FlxAnimationController{
 
 	}
 
-	override function update(elapsed:Float)
-	{	try{
+	override function update(elapsed:Float) {
+		try{
 
-		if(!amPreview && !debugMode && animation.curAnim != null){
+			if(amPreview || debugMode || animation.curAnim == null) return super.update(elapsed);
 
-			if(animation.curAnim.finished || animation.curAnim.curFrame >= animation.curAnim.numFrames) animHasFinished = true;
-			if(animHasFinished && loopAnimTo[animation.curAnim.name] != null) playAnim(loopAnimTo[animation.curAnim.name]);
-			else if(animHasFinished && animLoops[animation.curAnim.name] != null && animLoops[animation.curAnim.name]) {playAnim(animation.curAnim.name);currentAnimationPriority = -1;}
+
+			if(animation.curAnim.finished || animation.curAnim.curFrame >= animation.curAnim.numFrames) 
+				animHasFinished = true;
+			if(animHasFinished){
+				if(loopAnimTo[animation.curAnim.name] != null) 
+					playAnim(loopAnimTo[animation.curAnim.name]);
+				else if(animLoops[animation.curAnim.name] == true) {
+					playAnim(animation.curAnim.name);
+					currentAnimationPriority = -1;
+				}
+			}
 			if (currentAnimationPriority == 11 && isDonePlayingAnim()) {
 				// playAnim('idle', true, false, 10);
 				dance();
 			}
-			(currentAnimationPriority == 10 ? holdTimer += elapsed : holdTimer = 0);
+			if(currentAnimationPriority == 10) holdTimer += elapsed;
+			else holdTimer = 0;
+
 			if (!isPlayer && holdTimer >= Conductor.stepCrochet * singDuration * 0.001) {
 				holdTimer = 0;
 				dance();
 			}
 			callInterp("update",[elapsed]);
-		}
 
-		super.update(elapsed);
-	}catch(e:Dynamic){handleError('Caught character "update" crash: ${e}');}}
+			super.update(elapsed);
+		}catch(e:Dynamic){handleError('Caught character "update" crash: ${e}');}
+	}
 
 	
 	/**
@@ -963,24 +973,20 @@ class CharAnimController extends FlxAnimationController{
 	 */
 	public function dance(Forced:Bool = false,beatDouble:Bool = false,useDanced:Bool = true) {
 		if (amPreview){
-			if (dance_idle || charType == 2 ){
-				playAnim('danceRight');
-			}else{playAnim('idle');}
-		}else{
-			if(dance_idle){
-
-				if (animation.curAnim == null || animation.curAnim.name.startsWith("dance") || animHasFinished){
-					if(useDanced){
-						playAnim('dance${(danced ? 'Right' : 'Left')}',Forced/*,beatProg*/);
-
-					}else{
-						playAnim('dance${(beatDouble ? 'Right' : 'Left')}',Forced);
-					}
-				}
-			}else{
-				playAnim('idle'/*,frame*/);
-			}
+			playAnim((dance_idle || charType == 2 ? 'danceRight' : 'idle'));
+			return;
 		}
+		if(dance_idle){
+			if (animation.curAnim != null && !animation.curAnim.name.startsWith("dance") && !animHasFinished) return;
+			if (useDanced){
+				playAnim('dance${(danced ? 'Right' : 'Left')}',Forced/*,beatProg*/);
+				return;
+			}
+			playAnim('dance${(beatDouble ? 'Right' : 'Left')}',Forced);
+			return;
+		}
+		playAnim('idle'/*,frame*/);
+		
 	}
 	public function getJSONAnimation(name:String = ""):CharJsonAnimation{
 		for(anim in charProperties.animations){
@@ -994,26 +1000,28 @@ class CharAnimController extends FlxAnimationController{
 	// Added for Animation debug
 	public function idleEnd(?ignoreDebug:Bool = false)
 	{
-		if (!debugMode || ignoreDebug){
-			if (dance_idle){
-				playAnim('danceRight', true, false, animation.getByName('danceRight').numFrames - 1);
-			}
-		}
+		if (debugMode || !ignoreDebug || !dance_idle) return;
+		playAnim('danceRight', true, false, animation.getByName('danceRight').numFrames - 1);
+
 	}
 	var baseColor = 0xffffff;
 	var tintColor = 0x330066;
 	public function setOffsets(?AnimName:String = "",?offsetX:Float = 0,?offsetY:Float = 0){
-		if (tintedAnims.contains(animation.curAnim.name) && this.color != tintColor){baseColor = color;color = tintColor;}else if(this.color == tintColor){this.color = baseColor;}
+		if (tintedAnims.contains(animation.curAnim.name) && this.color != tintColor){
+			baseColor = color;
+			color = tintColor;
+		}else if(this.color == tintColor) this.color = baseColor;
 		
+		var x = offsetX;
+		var y = offsetY;
 		var daOffset = animOffsets.get(AnimName); // Get offsets
-		var offsets:Array<Float> = [offsetX,offsetY];
 		if (daOffset != null){ // Set offsets if animation has any
-			offsets[0]+=daOffset[0];
-			offsets[1]+=daOffset[1];
+			x+=daOffset[0];
+			y+=daOffset[1];
 		}
-		offsets[0]+=animOffsets["all"][0]; // Add "all" offsets
-		offsets[1]+=animOffsets["all"][1];
-		offset.set(offsets[0], offsets[1]); // Set offsets
+		x+=animOffsets["all"][0]; // Add "all" offsets
+		y+=animOffsets["all"][1];
+		offset.set(x, y); // Set offsets
 	}
 	// function setSprite(?id:Int = 0){
 	// 	if(curSprite != id){

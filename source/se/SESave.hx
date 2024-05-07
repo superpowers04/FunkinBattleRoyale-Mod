@@ -89,6 +89,7 @@ typedef YourMother = Dynamic;
 	var badMiss:Bool = false;
 	var goodMiss:Bool = false;
 	var beatBouncing:Bool = true;
+	var ratingOnNote:Bool = false;
 	var scrollOSUSpeed:Float = 2;
 	var luaScripts:Bool = true;
 	var judgeSick:Float = Ratings.getDefRating("sick");

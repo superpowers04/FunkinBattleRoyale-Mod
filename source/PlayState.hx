@@ -701,6 +701,7 @@ class PlayState extends ScriptMusicBeatState
 		camTOP = new FlxCamera();
 		camGame.bgColor = 0xFF000000;
 		camHUD.bgColor = camTOP.bgColor = 0x00000000;
+		defaultScoreCameras=[camHUD];
 
 
 
@@ -2140,7 +2141,6 @@ class PlayState extends ScriptMusicBeatState
 			Overlay.debugVar += '\nResync count:${resyncCount}'
 				+'\nCond/Music/Vocals time:${Std.int(Conductor.songPosition)}/${Std.int(FlxG.sound.music.time)}/${vt}'
 				+'\nHealth:${health}'
-				+'\nCameraZoom/DefCamZoom:${camGame.zoom}/${defaultCamZoom}'
 				+'\nCamFocus: ${Std.int(camFollow.x * 10) * 0.1},${Std.int(camFollow.y * 10) * 0.1}/${Std.int(e[0] * 10) * 0.1},${Std.int(e[1] * 10) * 0.1}   | ${if(!moveCamera) "Locked by script" else if(!SESave.data.camMovement || camLocked) "Locked" else '${focusedCharacter}' } ' //' // extra ' to prevent bad syntaxes interpeting the entire file as a string
 				+'\nScript Count:${interpCount}'
 				+'\nChartType: ${SONG.chartType}';
@@ -2159,8 +2159,7 @@ class PlayState extends ScriptMusicBeatState
 				practiceText.screenCenter(X);
 			} else finishSong(false);
 		}
- 		if (SESave.data.resetButton && onlinemod.OnlinePlayMenuState.socket == null && controls.RESET)
-			finishSong(false);
+ 		if (SESave.data.resetButton && onlinemod.OnlinePlayMenuState.socket == null && controls.RESET) finishSong(false);
 		try{
 			addNotes();
 		}catch(e){trace('Error adding notes to pool? ${e.message}');}
@@ -2256,10 +2255,7 @@ class PlayState extends ScriptMusicBeatState
 		try{noteShit();}catch(e){handleError('Error during noteShit: ${e.message}\n ${e.stack}}');}
 		callInterp("draw",[]);
 		try{
-
-			if(!SESave.data.preformance){
-				notes.sort(FlxSort.byY,(downscroll ? FlxSort.DESCENDING : FlxSort.ASCENDING));
-			}
+			if(!SESave.data.preformance) notes.sort(FlxSort.byY,(downscroll ? FlxSort.DESCENDING : FlxSort.ASCENDING));
 		}catch(e){}
 		super.draw();
 		callInterp("drawAfter",[]);
@@ -2415,6 +2411,7 @@ class PlayState extends ScriptMusicBeatState
 	var timeShown = 0;
 	var currentTimingShown:FlxText = null;
 	var lastNoteSplash:NoteSplash;
+	var defaultScoreCameras:Array<FlxCamera>=[];
 	private function popUpScore(daNote:Note){
 		var daRating = daNote.rating;
 		if(daRating == "miss") return noteMiss(daNote.noteData,null,null,true);
@@ -2430,8 +2427,7 @@ class PlayState extends ScriptMusicBeatState
 		if (SESave.data.accuracyMod == 1) totalNotesHit += EtternaFunctions.wife3(noteDiff, Conductor.timeScale);
 		else if (SESave.data.accuracyMod == 2) totalNotesHit += daNote.hitDistance;
 
-		switch(daRating.toLowerCase())
-		{
+		switch(daRating.toLowerCase()) {
 
 			case 'shit':
 				score = -300;
@@ -2472,7 +2468,6 @@ class PlayState extends ScriptMusicBeatState
 			practiceMode = false;
 			health = 0;
 		}
-		var rating:FlxSprite = new FlxSprite();
 
 		
 		songScore += Math.round(score);
@@ -2480,80 +2475,82 @@ class PlayState extends ScriptMusicBeatState
 
 		if(!SESave.data.noterating && !SESave.data.showTimings && !SESave.data.showCombo) return;
 
-		if(SESave.data.noterating){
+		var rating:FlxSprite=null;
+		var strum =playerStrums.members[daNote.noteData];
+		var firstStrum =playerStrums.members[0];
 
-			rating.loadGraphic(Paths.image(daRating)); // TODO: Add mod folder support and precaching
-			rating.x = playerStrums.members[0].x - (playerStrums.members[0].width);
-			rating.y = playerStrums.members[0].y + (playerStrums.members[0].height * 0.5);
+		if(SESave.data.noterating){
+			rating = new FlxSprite().loadGraphic(SELoader.cache.loadGraphic('assets/shared/images/$daRating.png')); // TODO: Add mod folder support and precaching
+			rating.x = (SESave.data.ratingOnNote ? strum.x : (firstStrum.x - firstStrum.width));
+
+			rating.y = strum.y + (strum.height * 0.5);
 			rating.acceleration.y = 550;
 			rating.velocity.y = (FlxG.random.int(140, 175) * -(daNote.hitDistance - 0.5) * 2);
-			rating.velocity.x = -FlxG.random.int(-10, 10);
+			rating.velocity.x = FlxG.random.int(-10, 10);
 			rating.angularVelocity = rating.velocity.x * 1.5;
 
 			rating.setGraphicSize(Std.int(rating.width * 0.3));
 			rating.antialiasing = true;
 			rating.updateHitbox();
+			FlxTween.tween(rating, {alpha: 0}, 0.3, {
+				startDelay: Conductor.crochet * 0.001,
+				onComplete: function(tween:FlxTween)
+				{
+					rating.destroy();
+				}
+			});
+			rating.cameras = defaultScoreCameras;
+			add(rating);
 		}
 		
-		var msTiming = HelperFunctions.truncateFloat(noteDiff, 3); 
 
-
-		var currentTimingShown = new FlxText(0,0,100,"0ms");
+		var currentTimingShown:FlxText=null;
 		if(SESave.data.showTimings){
+			var _dist = (Conductor.songPosition - daNote.strumTime);
+			currentTimingShown = new FlxText(0,0,100,Std.string(Math.floor(noteDiff * 1000) * 0.001) + "ms " + ((_dist == 0) ? "=" :((downscroll && _dist < 0 || !downscroll && _dist > 0) ? "^" : "v")));
 			timeShown = 0;
 			switch(daRating){
-				case 'shit':
-					currentTimingShown.color = FlxColor.RED;
-				case 'bad':
-					currentTimingShown.color = FlxColor.ORANGE;
-				case 'good':
-					currentTimingShown.color = FlxColor.GREEN;
-				case 'sick':
-					currentTimingShown.color = FlxColor.CYAN;
+				case 'shit': currentTimingShown.color = FlxColor.RED;
+				case 'bad': currentTimingShown.color = FlxColor.ORANGE;
+				case 'good': currentTimingShown.color = FlxColor.GREEN;
+				case 'sick': currentTimingShown.color = FlxColor.CYAN;
 			}
 			currentTimingShown.borderStyle = OUTLINE;
 			currentTimingShown.borderSize = 1;
 			currentTimingShown.borderColor = FlxColor.BLACK;
-			var _dist = (Conductor.songPosition - daNote.strumTime);
 			// This if statement is shit but it should work
-			currentTimingShown.text = msTiming + "ms " + (if(_dist == 0) "=" else if(downscroll && _dist < 0 || !downscroll && _dist > 0) "^" else "v");
 			currentTimingShown.size = 20;
 			currentTimingShown.alignment=CENTER;
 			// currentTimingShown.screenCenter();
 			currentTimingShown.updateHitbox();
-			currentTimingShown.x = (playerStrums.members[daNote.noteData].x + (playerStrums.members[daNote.noteData].width * 0.5)) - (currentTimingShown.width * 0.5);
+			currentTimingShown.x = (strum.x + (strum.width * 0.5)) - (currentTimingShown.width * 0.5);
 			currentTimingShown.y = daNote.y + (daNote.height * 0.5);
-			currentTimingShown.cameras = [camHUD]; 
-
-
+			currentTimingShown.cameras = defaultScoreCameras; 
+			FlxTween.tween(currentTimingShown, {alpha: 0,y:currentTimingShown.y - 60}, 0.8, {
+				onComplete: function(tween:FlxTween) {currentTimingShown.destroy();},
+				startDelay: Conductor.crochet * 0.001,
+			});
 			add(currentTimingShown);
 		}
-		if(SESave.data.noterating){
-			rating.cameras = [camHUD];
-			add(rating);
-		}
+
 
 
 		
 		var scoreObjs = [];
 		if(SESave.data.showCombo){
 
-			var seperatedScore:Array<Int> = [];
-	
-			var comboSplit:Array<String> = (combo + "").split('');
+			var comboSplit:Array<String> = ('$combo').split('');
 
-
-
-			var comboSize = 1.20 - (seperatedScore.length * 0.1);
+			var comboSize = 1.20 - (comboSplit.length * 0.1);
 			var lastStrum = playerStrums.members[playerStrums.members.length - 1];
 			for (i in 0...comboSplit.length) {
 				var num:Int = Std.parseInt(comboSplit[i]);
-				var numScore:FlxSprite = new FlxSprite().loadGraphic(Paths.image('num' + num));
+				var numScore:FlxSprite = new FlxSprite().loadGraphic(SELoader.cache.loadGraphic('assets/images/num$num.png'));
 				// numScore.screenCenter();
 				numScore.x = lastStrum.x + (lastStrum.width) + ((43 * comboSize) * i);
 
-				numScore.y = rating.y;
-				numScore.cameras = rating.cameras;
+				numScore.y = lastStrum.y;
+				numScore.cameras = defaultScoreCameras;
 
 				numScore.antialiasing = true;
 				numScore.setGraphicSize(Std.int((numScore.width * comboSize) * 0.5));
@@ -2567,34 +2564,15 @@ class PlayState extends ScriptMusicBeatState
 				add(numScore);
 				scoreObjs.push(numScore);
 				FlxTween.tween(numScore, {alpha: 0}, 0.2, {
-					onComplete: function(tween:FlxTween)
-					{
-						numScore.destroy();
-					},
+					onComplete: function(tween:FlxTween) {numScore.destroy();},
 					startDelay: Conductor.crochet * 0.002
 				});
 	
 			}
+
 		}
 
-		if(SESave.data.noterating){
-			FlxTween.tween(rating, {alpha: 0}, 0.3, {
-				startDelay: Conductor.crochet * 0.001,
-				onComplete: function(tween:FlxTween)
-				{
-					rating.destroy();
-				}
-			});
-		}
-		if(SESave.data.showTimings){
-			FlxTween.tween(currentTimingShown, {alpha: 0,y:currentTimingShown.y - 60}, 0.8, {
-				onComplete: function(tween:FlxTween)
-				{
-					currentTimingShown.destroy();
-				},
-				startDelay: Conductor.crochet * 0.001,
-			});
-		}
+
 		callInterp('popUpScore',[rating,scoreObjs,currentTimingShown]);
 
 

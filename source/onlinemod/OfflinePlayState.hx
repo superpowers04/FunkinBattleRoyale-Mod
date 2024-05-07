@@ -321,6 +321,7 @@ class OfflinePlayState extends PlayState {
 		["p2/player2",'Change the player2 of the chart, save it and reload it'],
 		["gf/p3/player3",'Change the gf of the chart, save it and reload it'],
 		["stage",'Change the stage of the chart, save it and reload it'],
+		["memberlist",'List all members by class name/id'],
 	];
 	override public function consoleCommand(text:String,args:Array<String>):Dynamic{
 		switch(args[0]){
@@ -330,6 +331,13 @@ class OfflinePlayState extends PlayState {
 					ret += (v[1] == null ? '\n${v[0]}' : '\n`${v[0]}` - ${v[1]}');
 				}
 				Console.print(ret);
+			case "memberlist":
+				var ret = 'Member list:';
+				for(i => v in members){
+					// var v:Dynamic = cast v;
+					ret += ('\n$i: ${v.ID} - ${Type.typeof(v)}');
+				}
+				trace(ret);
 			case "p1" | "p2" | "p3" | "player1" |  "player2" |  "player3" | "gf" | "stage":{
 				var type = args.shift();
 				switch(type){
@@ -358,11 +366,10 @@ class OfflinePlayState extends PlayState {
 
 					}catch(e){trace(e);}
 				}
-				return true;
 			}
-
+			default: return null;
 		}
-		return null;
+		return true;
 	}
 }
 
