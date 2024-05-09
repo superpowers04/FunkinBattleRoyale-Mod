@@ -13,47 +13,6 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  buildMac:
-    runs-on: macos-latest
-    
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      - uses: krdlab/setup-haxe@master
-        with:
-          haxe-version: 4.3.0
-      - name: Cache HaxeLib
-        uses: actions/cache@v2
-        with:
-          path: |
-            /tmp/haxelib
-          key: Haxelib
-      # Cache to prevent 30 minute compile time for smallest of changes
-      - name: Cache FNFBRBIN
-        uses: actions/cache@v2
-        with:
-          path: |
-            /tmp/fnfbrbin
-          key: Bin
-      # Runs a set of commands using the runners shell
-          
-          # haxelib git hxCodec https://github.com/polybiusproxy/hxCodec
-      - name: Install Haxelib
-        run: |
-          haxelib setup /tmp/haxelib
-          sh installDeps.bat
-        shell: sh
-      - name: Create Version Tag
-        run: echo "${{github.run_id}}" > VERSION
-      - name: Compile
-        run: haxelib run lime build macos --app-version="4.3.0-${{ github.run_id}}" -Dghaction
-      - name: Publish Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: MacBuild
-          path: /tmp/fnfbrbin/macos/bin/
   buildLinux:
     runs-on: ubuntu-latest
     

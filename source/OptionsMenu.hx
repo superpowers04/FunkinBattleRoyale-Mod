@@ -363,7 +363,6 @@ class OptionsMenu extends MusicBeatState
 		}
 		
 		if (isCat){
-			
 			if (currentSelectedCat.getOptions()[curSelected].acceptValues){
 				if((FlxG.keys.pressed.SHIFT && FlxG.keys.pressed.RIGHT || _right ) && currentSelectedCat.getOptions()[curSelected].right()) 
 					updateAlphabet(grpControls.members[curSelected],currentSelectedCat.getOptions()[curSelected].display);

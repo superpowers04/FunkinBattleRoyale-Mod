@@ -18,7 +18,6 @@ import lime.media.AudioManager;
 import openfl.Lib; 
 import Section.SwagSection;
 import Song.SwagSong;
-import WiggleEffect.WiggleEffectType;
 import flixel.FlxBasic;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -2187,9 +2186,9 @@ class PlayState extends ScriptMusicBeatState
 		if(!_dadShow && SONG.needsVoices){
 			var note:Note = null;
 			if(notes.length > 0){
-				var daNote:Note = notes.members[0];
+				// var daNote:Note = notes.members[0];
 				while (notes.members[0] != null){
-					daNote = notes.members[0];
+					var daNote = notes.members[0];
 					if (daNote.skipNote || daNote.mustPress || !daNote.wasGoodHit) break;
 					daNote.active = false;
 					vocals.volume = 0;
@@ -2199,9 +2198,8 @@ class PlayState extends ScriptMusicBeatState
 			}
 		}
 		if(eventNotes.length > 0){
-			var note:Note = null;
 			while (eventNotes[0] != null && eventNotes[0].strumTime < Conductor.songPosition){
-				note = eventNotes.shift();
+				var note = eventNotes.shift();
 				try{
 					note.hit((note.mustPress ? 0 : 1),note);
 					note.destroy();

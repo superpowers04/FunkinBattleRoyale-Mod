@@ -135,7 +135,6 @@ class TitleState extends MusicBeatState
 	public static var outdated:Bool = false;
 	public static var checkedUpdate:Bool = false;
 	public static var updatedVer:String = "";
-	public static var osuBeatmapLoc:String = "";
 	public static var songScores:Scorekillme;
 	public static var pauseMenuMusic:Sound;
 
@@ -649,20 +648,6 @@ class TitleState extends MusicBeatState
 		trace('Found ${stages.length} stages');
 		#end
 	}
-	#if !android
-	public static function findosuBeatmaps(){
-		var loc = "";
-		#if windows
-			if (Sys.getEnv("LOCALAPPDATA") != null && FileSystem.exists('${Sys.getEnv("LOCALAPPDATA")}/osu!/Songs/')) loc = '${Sys.getEnv("LOCALAPPDATA")}/osu!/Songs/';
-			if (Sys.getEnv("LOCALAPPDATA") != null && FileSystem.exists('${Sys.getEnv("LOCALAPPDATA")}/osu-stable/Songs/')) loc = '${Sys.getEnv("LOCALAPPDATA")}/osu-stable/Songs/';
-		#else
-			if (Sys.getEnv("HOME") != null && FileSystem.exists('${Sys.getEnv("HOME")}/.local/share/osu-stable/Songs/')) loc = '${Sys.getEnv("HOME")}/.local/share/osu-stable/Songs/';
-			// if (loc == "") trace('${Sys.getEnv("HOME")}/.local/share/osu-stable/songs/ doesnt exist!');
-		#end
-
-		osuBeatmapLoc = loc;
-	}
-	#end
 
 	override public function create():Void
 	{
@@ -830,9 +815,6 @@ class TitleState extends MusicBeatState
 				LoadingScreen.initScreen();
 				if((CoolUtil.font = if(SELoader.exists('mods/font.ttf')) SELoader.getPath('mods/font.ttf') else Paths.font(CoolUtil.fontName)
 					) != Paths.font("vcr.ttf")) flixel.system.FlxAssets.FONT_DEFAULT = CoolUtil.font;
-			#end
-			#if !android
-				findosuBeatmaps();
 			#end
 			var isUsingPaths = false;
 			if(SELoader.exists('path.txt')){

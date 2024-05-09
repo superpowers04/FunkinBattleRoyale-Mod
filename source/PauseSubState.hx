@@ -12,7 +12,9 @@ import flixel.input.keyboard.FlxKey;
 import flixel.sound.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase; 
+import flixel.graphics.FlxGraphic;
 import flixel.tweens.FlxTween;
+import openfl.display.BitmapData;
 // import flixel.tweens.FlxTweenManager;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
@@ -88,11 +90,13 @@ class PauseSubState extends MusicBeatSubstate {
 		FlxG.sound.music.onComplete = null;
 		FlxG.sound.music.looped = true;
 		// FlxG.sound.list.add(pauseMusic);
-
-		bg = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		bg.alpha = 0;
+		var bit=new BitmapData(FlxG.width,FlxG.height,true,);
+		bit.draw(FlxG.stage);
+		bg = new FlxSprite().loadGraphic(FlxGraphic.fromBitmapData(bit));
+		bg.alpha = 1;
 		bg.scrollFactor.set();
 		add(bg);
+
 		CoolUtil.setFramerate(60,null,true);
 
 		levelInfo = new FlxText(20, -15, 0, "", 32);
@@ -146,7 +150,7 @@ class PauseSubState extends MusicBeatSubstate {
 			FlxTween.tween(songText,{x : sX},0.9,{ease:FlxEase.cubeInOut});
 		}
 		changeSelection();
-
+		FlxG.state.persistentDraw = false;
 		quitHeldBG = new FlxSprite(0, 10).loadGraphic(Paths.image('healthBar','shared'));
 		quitHeldBG.screenCenter(X);
 		quitHeldBG.scrollFactor.set();
@@ -278,7 +282,7 @@ class PauseSubState extends MusicBeatSubstate {
 		for (_ => v in grpMenuShit.members)
 		{
 			ready = false;
-			FlxTween.tween(v,{x : -(100 + v.width),alpha : 0},time,{ease:FlxEase.quartIn});
+			FlxTween.tween(v,{x : -(100 + v.width)},time,{ease:FlxEase.quartIn});
 		}
 	}
 	function quit(){
@@ -410,7 +414,7 @@ class PauseSubState extends MusicBeatSubstate {
 		Conductor.songPosition = FlxG.sound.music.time = time;
 		disappearMenu(0.4);
 		callInterp("pauseResume",[]);
-		FlxTween.tween(bg,{alpha:0},2.5,{ease:FlxEase.quartOut});
+		// FlxTween.tween(bg,{alpha:0},2.5,{ease:FlxEase.quartOut});
 
 
 		var spr = new FlxSprite();

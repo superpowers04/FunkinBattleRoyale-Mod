@@ -227,8 +227,9 @@ class SelectScriptableState extends SearchMenuState{
 
 	override function changeSelection(change:Int = 0){
 		super.changeSelection(change);
-		if (songs[curSelected] != "" && descriptions[songs[curSelected]] != null ){
-		  updateInfoText('${defText}; ' + descriptions[songs[curSelected]]);
+		var song = songs[curSelected];
+		if (song != "" && descriptions[song] != null ){
+		  updateInfoText('${defText}; ' + descriptions[song]);
 		}else{
 		  updateInfoText('${defText}; No description for this script.');
 		}
