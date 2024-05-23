@@ -568,16 +568,16 @@ class PlayState extends ScriptMusicBeatState
 		botPlay = QuickOptionsSubState.getSetting("BotPlay") && (onlinemod.OnlinePlayMenuState.socket == null);
 		practiceMode = (SESave.data.practiceMode || ChartingState.charting || onlinemod.OnlinePlayMenuState.socket != null || botPlay);
 		introAudio = [
-			Paths.sound('intro3'),
-			Paths.sound('intro2'),
-			Paths.sound('intro1'),
-			Paths.sound('introGo'),
+			SELoader.loadSound('assets/shared/sounds/intro3.ogg',true),
+			SELoader.loadSound('assets/shared/sounds/intro2.ogg',true),
+			SELoader.loadSound('assets/shared/sounds/intro1.ogg',true),
+			SELoader.loadSound('assets/shared/sounds/introGo.ogg',true),
 		];
 		introGraphics = [
 			"",
-			Paths.image('ready'),
-			Paths.image("set"),
-			Paths.image("go"),
+			SELoader.loadGraphic('assets/shared/images/ready.png',true),
+			SELoader.loadGraphic("assets/shared/images/set.png",true),
+			SELoader.loadGraphic("assets/shared/images/go.png",true),
 		];
 		songStarted = false;
 	}
@@ -628,6 +628,7 @@ class PlayState extends ScriptMusicBeatState
 	}
 	public static var hasStarted = false;
 	override public function new(){
+		ISMENU=false;
 		LoadingScreen.loadingText = "Starting Playstate";
 		parseMoreInterps = (!QuickOptionsSubState.getSetting("Song hscripts") && !isStoryMode);
 		useNormalCallbacks = false;
@@ -645,13 +646,13 @@ class PlayState extends ScriptMusicBeatState
 		if(simple) {
 			stageTags.push('performance');stageTags.push('simple');
 		}else {
-			var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('stageback'));
+			var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(SELoader.loadGraphic('assets/shared/images/stageback.png'),true);
 			bg.antialiasing = true;
 			bg.scrollFactor.set(0.9, 0.9);
 			bg.active = false;
 			add(bg);
 		}
-		var stageFront:FlxSprite = new FlxSprite(-650, 600).loadGraphic(Paths.image('stagefront'));
+		var stageFront:FlxSprite = new FlxSprite(-650, 600).loadGraphic(SELoader.loadGraphic('assets/shared/images/stagefront.png'),true);
 		stageFront.setGraphicSize(Std.int(stageFront.width * 1.1));
 		stageFront.updateHitbox();
 		stageFront.antialiasing = true;
@@ -659,7 +660,7 @@ class PlayState extends ScriptMusicBeatState
 		stageFront.active = false;
 		add(stageFront);
 		if(!simple){
-			var stageCurtains:FlxSprite = new FlxSprite(-500, -300).loadGraphic(Paths.image('stagecurtains'));
+			var stageCurtains:FlxSprite = new FlxSprite(-500, -300).loadGraphic(SELoader.loadGraphic('assets/shared/images/stagecurtains.png'),true);
 			stageCurtains.setGraphicSize(Std.int(stageCurtains.width * 0.9));
 			stageCurtains.updateHitbox();
 			stageCurtains.antialiasing = true;
@@ -994,13 +995,13 @@ class PlayState extends ScriptMusicBeatState
 		FlxG.fixedTimestep = false;
 
 		if (SESave.data.songPosition){ // This is just to prevent null object references. These variables are properly setup later
-			songPosBG_ = new FlxSprite(0, 10 + SESave.data.guiGap).loadGraphic(Paths.image('healthBar'));
+			songPosBG_ = new FlxSprite(0, 10 + SESave.data.guiGap).loadGraphic(SELoader.loadGraphic('assets/shared/images/healthBar.png',true));
 			songPosBar_ = new FlxBar(0,0, LEFT_TO_RIGHT, Std.int(songPosBG_.width - 8), Std.int(songPosBG_.height - 8), this, 'songPositionBar', 0, 1);
 			songName = new FlxText(0,0,0,SONG.song, 16);
 			songTimeTxt = new FlxText(0,0,0,"00:00/00:00", 16);
 		}
 
-		healthBarBG = new FlxSprite(0, FlxG.height * 0.9 - SESave.data.guiGap).loadGraphic(Paths.image('healthBar'));
+		healthBarBG = new FlxSprite(0, FlxG.height * 0.9 - SESave.data.guiGap).loadGraphic(SELoader.loadGraphic('assets/shared/images/healthBar.png',true));
 		if (downscroll) healthBarBG.y = 50 + SESave.data.guiGap;
 		healthBarBG.screenCenter(X);
 		healthBarBG.scrollFactor.set();
@@ -1557,7 +1558,7 @@ class PlayState extends ScriptMusicBeatState
 
 	@:keep inline function addSongBar(?minimal:Bool = false){
 
-		if(songPosBG_ == null) songPosBG_ = new FlxSprite(0, 10 + SESave.data.guiGap).loadGraphic(Paths.image('healthBar'));
+		if(songPosBG_ == null) songPosBG_ = new FlxSprite(0, 10 + SESave.data.guiGap).loadGraphic(SELoader.loadGraphic('assets/shared/images/healthBar.png',true));
 		// songPosBG_.scale.set(1,2);
 		// songPosBG_.updateHitbox();
 		if (downscroll) songPosBG_.y = FlxG.height * 0.9 + 45 + SESave.data.guiGap; 
@@ -2024,6 +2025,19 @@ class PlayState extends ScriptMusicBeatState
 		if(currentSpeed != speed || currentSpeed != 1){
 
 			currentSpeed = speed;
+			#if(openfl < "9.3")
+			@:privateAccess
+			{
+				// The __backend.handle attribute is only available on native.
+				try{
+					// We need to make CERTAIN vocals exist and are non-empty
+					// before we try to play them. Otherwise the game crashes.
+					lime.media.openal.AL.sourcef(FlxG.sound.music._channel.__source.__backend.handle, lime.media.openal.AL.PITCH, speed);
+					if (vocals != null && vocals.length > 0) 
+						lime.media.openal.AL.sourcef(vocals._channel.__source.__backend.handle, lime.media.openal.AL.PITCH, speed);
+				}catch (e) {}
+			}
+			#else
 			@:privateAccess
 			{
 				// The __backend.handle attribute is only available on native.
@@ -2035,6 +2049,7 @@ class PlayState extends ScriptMusicBeatState
 						lime.media.openal.AL.sourcef(vocals._channel.__audioSource.__backend.handle, lime.media.openal.AL.PITCH, speed);
 				}catch (e) {}
 			}
+			#end
 		}
 	}
 	override public function update(elapsed:Float)

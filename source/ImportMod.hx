@@ -38,7 +38,7 @@ class ImportMod extends DirectoryListing
 		if (FlxG.keys.justPressed.ONE) {
 			importExisting = !importExisting;
 			showTempmessage(if(importExisting)"Importing vanilla songs enabled" else "importing vanilla songs disabled");
-			FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
+			SELoader.playSound("assets/sounds/scrollMenu.ogg");
 		}
 	}
 	override function selDir(sel:String){
@@ -88,7 +88,7 @@ class ImportModFromFolder extends MusicBeatState
 	{
 		try{
 
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('onlinemod/online_bg2'));
+		var bg:FlxSprite = SELoader.loadFlxSprite('assets/preload/images/onlinemod/online_bg2.png');
 		add(bg);
 
 
@@ -111,7 +111,7 @@ class ImportModFromFolder extends MusicBeatState
 				acceptInput = done = selectedLength = true;
 				changeText('You\'re trying to import songs from me!');
 				loadingText.color = FlxColor.RED;
-				FlxG.sound.play(Paths.sound('cancelMenu'));
+				SELoader.playSound('assets/sounds/cancelMenu.ogg');
 				return;
 			}
 			var _songList = SELoader.getSongsFromFolder(folder);
@@ -133,7 +133,7 @@ class ImportModFromFolder extends MusicBeatState
 			}
 			acceptInput = done = selectedLength = true;
 			loadingText.color = FlxColor.RED;
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			SELoader.playSound('assets/sounds/cancelMenu.ogg');
 			// trace(folder);
 			changeText('${folder.substr(-17)} doesn\'t contain any songs!' + (if(!importExisting) "\nMaybe try allowing vanilla songs to be imported?\n*(Press 1 to toggle importing vanilla songs in the list)" else ""));
 

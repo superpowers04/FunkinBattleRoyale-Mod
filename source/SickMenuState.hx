@@ -300,7 +300,7 @@ class SickMenuState extends ScriptMusicBeatState
 	{
 		callInterp('changeSelection',[change]);
 		if(cancelCurrentFunction) return;
-		FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
+		SELoader.playSound('assets/sounds/scrollMenu.ogg',true);
 
 		curSelected += change;
 

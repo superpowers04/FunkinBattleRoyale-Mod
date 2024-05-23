@@ -61,9 +61,16 @@ class CoolUtil {
 	}
 	public static function toggleVolKeys(?toggle:Bool = true){
 		if (toggle){
-			FlxG.sound.muteKeys = [FlxKey.fromStringMap[SESave.data.keys[0][9]]];
-			FlxG.sound.volumeDownKeys = [FlxKey.fromStringMap[SESave.data.keys[0][10]]];
-			FlxG.sound.volumeUpKeys = [FlxKey.fromStringMap[SESave.data.keys[0][11]]];
+			try{
+				FlxG.sound.muteKeys = [FlxKey.fromStringMap[SESave.data.keys[0][9]]];
+				FlxG.sound.volumeDownKeys = [FlxKey.fromStringMap[SESave.data.keys[0][10]]];
+				FlxG.sound.volumeUpKeys = [FlxKey.fromStringMap[SESave.data.keys[0][11]]];
+			}catch(e){
+				FlxG.sound.muteKeys = null;
+				FlxG.sound.volumeDownKeys = null;
+				FlxG.sound.volumeUpKeys = null;
+				trace('Unable to bind sound keys? ${e.details()}');
+			}
 
 			return;
 		}

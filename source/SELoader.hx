@@ -23,8 +23,10 @@ import se.formats.SongInfo;
 // import vlc.VLCSound;
 using StringTools;
 
-@:publicFields class SEDirectory {
-	public var path = "";
+// This uses rawmode all of the time because this uses absolute pathing. 
+// I plan to support more storage locations so we HAVE to use SELoader
+@:publicFields class SEDirectory { 
+	var path:String;
 	function new(_path:String = ""){
 		path=SELoader.getPath(_path);
 		if(path.substring(-1) != "/") path+="/";
@@ -32,14 +34,15 @@ using StringTools;
 	@:keep inline function appendPath(?part:String){
 		return part == null ? path : path + part;
 	}
-	function exists(?path:String){
+	function exists(?path:String):Bool{
 		SELoader.rawMode=true;
 		return SELoader.exists(appendPath(path));
 	}
-	function newDirectory(?path:String){
+	function newDirectory(?path:String):SEDirectory{
+		SELoader.rawMode=true;
 		return new SEDirectory(appendPath(path));
 	}
-	function isDirectory(?path:String){
+	function isDirectory(?path:String):Bool{
 		SELoader.rawMode=true;
 		return SELoader.isDirectory(appendPath(path));
 	}
@@ -47,24 +50,29 @@ using StringTools;
 		SELoader.rawMode=true;
 		return SELoader.readDirectory(appendPath(path));
 	}
-	function toString(){
+	function getContent(?path:String):String{
+		SELoader.rawMode=true;
+		return SELoader.getContent(appendPath(path));
+	}
+	@:keep inline function toString(){
 		return path;
 	}
-
 }
 
 class SELoader {
 
 	static public var cache:InternalCache = new InternalCache();
+	public static var AssetPathCache:Map<String,String>=[];
 	
 	public static var PATH(default,set):String = '';
 	public static function set_PATH(_path:String):String{
-		if(!_path.endsWith('/')) _path = _path + "/"; // SELoader expects the main path to have a / at the end
 		_path = _path.replace('\\',"/"); // Unix styled paths, Windows \\ paths are weird and fucky and i hate it
+		if(!_path.endsWith('/')) _path = _path + "/"; // SELoader expects the main path to have a / at the end
 		
 		return PATH = _path.replace('//','/'); // Fixes paths having //'s in them 
 	}
 	public static var rawMode = false;
+	public static var defaultRawMode = false;
 	public static var id = "SELoader";
 
 	inline public static function handleError(e:String){
@@ -74,34 +82,55 @@ class SELoader {
 	}
 	// Basically clenses paths and returns the base path with the requested one. Used heavily for the Android port
 	@:keep inline public static function getPath(path:String,allowModded:Bool = true):String{
+		
 		// Absolute paths should just return themselves without anything changed
-		if(path.substring(0,7) == "assets:"){
-			return getAssetPath(path);
-		}
-		// Rem
-		if(
+		if( rawMode ||
 			#if windows
 				path.substring(1,2) == ':' || 
 			#end
-				path.substring(0,1) == "/" || rawMode){
-			rawMode = false;
+				path.substring(0,1) == "/"){
+			rawMode = defaultRawMode;
+			return path.replace('//','/');
+		}
+		// Allow custom assets
+		if(path.substring(0,7) == "assets:" || (allowModded && path.substring(0,7) == "assets/")){
+			return getAssetPath(path);
+		}
+		// Remove library from path
+		if(path.indexOf(":") > 3) path = path.substring(path.indexOf(":") + 1);
+		// if( && FileSystem.exists('${PATH}mods${path}')) path = 'mods/' + path; // Return modded assets before vanilla assets
+
+		return (PATH + path).replace('//','/'); // Fixes paths having //'s in them
+	}
+	// The above but skips the getAssetPath check
+	@:keep inline public static function getRawPath(path:String,allowModded:Bool = true):String{
+		
+		// Absolute paths should just return themselves without anything changed
+		if(rawMode || 
+			#if windows
+				path.substring(1,2) == ':' || 
+			#end
+				path.substring(0,1) == "/"){
+			rawMode = defaultRawMode;
 			return path.replace('//','/');
 		}
 		// Remove library from path
 		if(path.indexOf(":") > 3) path = path.substring(path.indexOf(":") + 1);
-		if(allowModded && path.startsWith("assets/") && FileSystem.exists('${PATH}mods${path}')) path = 'mods/' + path; // Return modded assets before vanilla assets
 
 		return (PATH + path).replace('//','/'); // Fixes paths having //'s in them
 	}
+
 	public static function getAssetPath(path:String,?namespace:String = ""):String{
-		if(#if windows path.substring(1,2) == ':' || #end path.substring(0,1) == "/"){
+		if(#if windows path.substring(1,2) == ':' || #end path.substring(0,1) == "/" || rawMode){
+			rawMode=false;
 			return path.replace('//','/');
 		}
-		if(path.indexOf(':') > 2) path = path.split(':')[1];
-		if(!path.startsWith('assets')) path = '$path';
-		var modsFolder = getPath('mods/');
-		var packsFolder = modsFolder+'packs/';
-		if(namespace!=""){
+		// Remove library
+		if(path.indexOf(':') > 2) path = path.substring(path.indexOf(":") + 1);
+		if(path.startsWith('assets/')) path = path.substring(7);
+		var modsFolder = new SEDirectory(getRawPath('mods/'));
+		var packsFolder = modsFolder.newDirectory('packs/');
+		if(namespace!=""){ // We always want to check the namespace first, It has top priority
 			var e = packsFolder+namespace;
 			var the = SELoader.anyExists([
 				e+'/'+path,
@@ -112,21 +141,51 @@ class SELoader {
 			]);
 			if(the!=null) return the;
 		}
-		if(SELoader.exists(modsFolder + path)) return modsFolder+path;
-		for (directory in orderList(FileSystem.readDirectory(packsFolder))){
-			var e = packsFolder+directory;
-			var the = SELoader.anyExists([
-				e+'/'+path,
-				e+'/shared/'+path,
-				e+'/assets/'+path,
-				e+'/assets/shared/'+path,
-				e+'/assets/preload/'+path
-			]);
-			if(the!=null) return the;
+		{ // If the path has already been found before, just use that. No need to re-scan
+			var PATH = AssetPathCache[path];
+			if(PATH!=null) return PATH == "" ? SELoader.getRawPath("assets/"+path,false) :PATH; 
 		}
+		{ // Mods folder
+			var the = SELoader.anyExists([
+				'mods/'+path,
+				'mods/shared/'+path,
+				'mods/assets/'+path,
+				'mods/assets/shared/'+path,
+				'mods/assets/preload/'+path
+			]);
+			if(the!=null) return AssetPathCache[path]=the;
+		}
+		var p = SELoader.getRawPath("assets/"+path);
+		// Cache as an empty string, literally no fucking reason to store the same string twice in memory
+		AssetPathCache[path]="";
 
-		if(SELoader.exists(path)) return path;
-		return "";
+		if(!exists(p)){ // I am honestly too lazy at the moment to add a proper mods menu
+			{
+				var e = getRawPath('assets/');
+				rawMode=defaultRawMode=true;
+				var the = SELoader.anyExists([
+					e+'/'+path,
+					e+'/shared/'+path,
+				]);
+				rawMode=defaultRawMode=false;
+				if(the!=null) return AssetPathCache[path]=the;
+			}
+			if(!SESave.data.HDDMode){
+				if(SELoader.exists(modsFolder + path)) return AssetPathCache[path]=modsFolder+path;
+				for (directory in orderList(SELoader.readDirectory(packsFolder.toString()))){
+					var e = packsFolder+directory;
+					var the = SELoader.anyExists([
+						e+'/'+path,
+						e+'/shared/'+path,
+						e+'/assets/'+path,
+						e+'/assets/shared/'+path,
+						e+'/assets/preload/'+path
+					]);
+					if(the!=null) return AssetPathCache[path]=the;
+				}
+			}
+		}
+		return p;
 	}
 
 	public static function loadText(textPath:String,?useCache:Bool = false):String{
@@ -149,7 +208,7 @@ class SELoader {
 	}
 
 
-	public static function loadFlxSprite(x:Int = 0,y:Int = 0,pngPath:String,?useCache:Bool = false):FlxSprite{
+	public static function loadFlxSprite(x:Float = 0,y:Float = 0,pngPath:String,?useCache:Bool = false):FlxSprite{
 		if(!SELoader.exists('${pngPath}')){
 			handleError('${id}: Image "${pngPath}" doesn\'t exist!');
 			return new FlxSprite(x, y); // Prevents the script from throwing a null error or something
@@ -187,7 +246,7 @@ class SELoader {
 		}
 		return FlxAtlasFrames.fromSparrow(loadGraphic(pngPath),loadXML('${pngPath}.xml'));
 	}
-	public static function loadSparrowSprite(x:Int,y:Int,pngPath:String,?anim:String = "",?loop:Bool = false,?fps:Int = 24,?useCache:Bool = false):FlxSprite{
+	public static function loadSparrowSprite(x:Float,y:Float,pngPath:String,?anim:String = "",?loop:Bool = false,?fps:Int = 24,?useCache:Bool = false):FlxSprite{
 		pngPath = getPath(pngPath);
 		var spr = new FlxSprite(x, y);
 		var _f = spr.frames;
@@ -205,7 +264,7 @@ class SELoader {
 	}
 	public static function reset(){
 		cache.clear();
-		cache = new InternalCache();
+		gc();
 	}
 	@:keep inline public static function getContent(textPath:String):String{return loadText(textPath,false);}
 	@:keep inline public static function saveContent(textPath:String,content:String):String{return saveText(textPath,content,false);}
@@ -245,23 +304,50 @@ class SELoader {
 		return null;
 	}
 	public static function loadSound(soundPath:String,?useCache:Bool = false):Null<Sound>{
-		soundPath = getPath(soundPath);
-		if(cache.soundArray[soundPath] != null || useCache){
-			return cache.loadSound(soundPath);
+		if(soundPath.lastIndexOf('.') == -1){
+			soundPath+='.ogg';
+		}
+		final rawPath = getPath(soundPath);
+		if(cache.soundArray[rawPath] != null || useCache){
+			return cache.loadSound(rawPath);
 		}
 		if(!exists(soundPath)){
-			handleError('${id}: Sound "${getPath(soundPath)}" doesn\'t exist!');
+			handleError('${id}: Sound "$soundPath" > "$rawPath" doesn\'t exist!');
 			// return null;
 		}
-		return Sound.fromFile(getPath(soundPath));
+		return Sound.fromFile(getPath(rawPath));
 	}
-	@:keep inline public static function loadFlxSound(soundPath:String):FlxSound{
-		return new FlxSound().loadEmbedded(loadSound(soundPath));
+	@:keep inline public static function loadFlxSound(soundPath:String,?useCache:Bool=false):FlxSound{
+		return new FlxSound().loadEmbedded(loadSound(soundPath,useCache));
 	}
 
-	public static function playSound(soundPath:String,?volume:Float = -1):FlxSound{
-		if(volume == -1) volume = SESave.data.otherVol;
-		return FlxG.sound.play(loadSound(soundPath),volume);
+	static public function playSound(soundPath:String,?volume:Dynamic = null,?cache:Bool = false):FlxSound{
+		if(soundPath == null || soundPath == ""){
+			try{
+				throw('Tried to play a "" sound');
+			}catch(e){
+				trace('UNABLE TO PLAY SOUND: ${e.details()}');
+			}
+			return null;
+		}
+		var _vol = SESave.data.otherVol;
+		if(volume != null){
+
+			if(volume is String){
+				switch(volume.toLowerCase()){
+					case "inst": _vol = SESave.data.instVol;
+					case "voices": _vol = SESave.data.voicesVol;
+					case "master": _vol = SESave.data.masterVol;
+					case "hit": _vol = SESave.data.hitVol;
+					case "misses": _vol = SESave.data.missVol;
+					default: _vol = SESave.data.otherVol;
+				}
+			}else if(volume is Int || volume is Float){
+				_vol = volume;
+			}
+		}
+		// if(volume == 0.662121) volume = SESave.data.otherVol;
+		return FlxG.sound.play(loadSound(soundPath,cache),_vol);
 	}
 
 
@@ -293,6 +379,18 @@ class SELoader {
 			if(exists(_path) && isDirectory(_path)){
 				for(item in readDirectory(_path)){
 					ret.push('$path/$item');
+				}
+			}
+		}
+		return ret;
+	}
+	public static function readDirectoriesAsPaths(paths:Array<String>):Array<SEDirectory>{
+		var ret = [];
+		for(path in paths){
+			var _path = new SEDirectory(path);
+			if(_path.exists() && _path.isDirectory()){
+				for(item in _path.readDirectory()){
+					ret.push(_path.newDirectory(item));
 				}
 			}
 		}
@@ -519,9 +617,25 @@ class InternalCache{
 		return soundArray[soundPath];
 	}
 
-	public function playSound(soundPath:String,?volume:Float = 0.662121):FlxSound{
-		if(volume == 0.662121) volume = SESave.data.otherVol;
-		return FlxG.sound.play(loadSound(soundPath),volume);
+	public function playSound(soundPath:String,?volume:Dynamic = null):FlxSound{
+		var _vol = SESave.data.otherVol;
+		if(volume != null){
+
+			if(volume is String){
+				switch(volume.toLowerCase()){
+					case "inst": _vol = SESave.data.instVol;
+					case "voices": _vol = SESave.data.voicesVol;
+					case "master": _vol = SESave.data.masterVol;
+					case "hit": _vol = SESave.data.hitVol;
+					case "misses": _vol = SESave.data.missVol;
+					default: _vol = SESave.data.otherVol;
+				}
+			}else if(volume is Int || volume is Float){
+				_vol = volume;
+			}
+		}
+		// if(volume == 0.662121) volume = SESave.data.otherVol;
+		return FlxG.sound.play(loadSound(soundPath),_vol);
 	}
 
 	public function unloadSound(soundPath:String){

@@ -58,14 +58,14 @@ class OptionsMenu extends MusicBeatState
 			{
 				new QuickOption(name);
 			}
-		],"Chart options. THESE ARE TEMPORARY AND RESET WHEN GAME IS CLOSED"),
+		],"Chart options.\nTHESE ARE TEMPORARY AND RESET WHEN GAME IS CLOSED!"),
 		new OptionCategory("Modifications", [
 			new OpponentOption("Change the opponent character"),
 			new PlayerOption("Change the player character"),
 			new GFOption("Change the GF used"),
 			new NoteSelOption("Change the note assets used, pulled from mods/noteassets"),
 			new SelStageOption("Select the stage to use, Default will use song default"),
-			new SelScriptOption("Enable/Disable scripts that run withsongs"),
+			new SelScriptOption("Enable/Disable scripts that run with songs"),
 
 			new HCBoolOption("Use Song Stage","Whether to allow the song to choose the stage if you have them installed or force the stage you've selected",'stageAuto'),
 			new HCBoolOption("Use Song Opponent Char","Whether to allow the song to choose the opponent if you have them installed or force the opponent you've selected",'charAuto'),
@@ -77,12 +77,12 @@ class OptionsMenu extends MusicBeatState
 			#end
 			// new HCBoolOption("Show player on main menu","Show your player character on the main menu, MAY CAUSE CRASHES!","mainMenuChar"),
 			
-			new HCBoolOption("Content Creation/Debug Mode","Enables the Character/chart editor, F10 console, displays some extra info in the FPS Counter, and some other debug stuff","animDebug"),
+			new HCBoolOption("Content Creation/Debug Mode","Enables the Character/chart editor, F10 console,\ndisplays some extra info in the FPS Counter, and some other debug stuff","animDebug"),
 			new ReloadCharlist("Refreshes list of stages, characters and scripts"),
 		],"Settings relating to Characters, scripts, etc"),
 		new OptionCategory("Online", [
 			// new HCBoolOption("Saves charts to disk whenever you recieve one","Save charts from servers","onlineSaveChart"),
-			new HCBoolOption('Allow Server Scripts',"Allow servers to run scripts. THIS IS DANGEROUS, ONLY ENABLE IF YOU TRUST THE SERVERS",'allowServerScripts'),
+			new HCBoolOption('Allow Server Scripts',"Allow servers to run scripts.\nTHIS IS DANGEROUS, ONLY ENABLE IF YOU TRUST THE SERVERS",'allowServerScripts'),
 		],"Settings relating to online play"),
 		new OptionCategory("Gameplay", [
 			new DFJKOption(controls),
@@ -95,13 +95,13 @@ class OptionsMenu extends MusicBeatState
 			new HCBoolOption('Flip Strumline Y','Flip the strumline vertically. May break with some scripts','flipScrollY'),
 			new HCBoolOption('Center strumline',"Move the strumline to the middle of the screen",'middleScroll'),
 
-			new AccuracyDOption("Change how accuracy is calculated. ( Simple = Rating based, SE = Distance from note to time, Complex = Etterna(?) )"),
+			new AccuracyDOption("Change how accuracy is calculated.\n Simple = Rating based | SE = Distance from note to time | Complex = Kade Etterna"),
 			// new OffsetMenu("Get a note offset based off of your inputs!"),
 			new InputEngineOption("Change the input engine used, only works locally."),
 			new ResetKeybindsOption("Backs up your options to SESETTINGS-BACK.json and then resets them"),
 		],"Edit things like Keybinds, scroll direction, etc"),
 		new OptionCategory("Judgements", [
-			new AccuracyDOption("Change how accuracy is calculated. ( Simple = Rating based, SE = Distance from note to time, Complex = Etterna(?) )"),
+			new AccuracyDOption("Change how accuracy is calculated.\n Simple = Rating based | SE = Distance from note to time | Complex = Kade Etterna"),
 			new Judgement("Customize your Hit Timings (LEFT or RIGHT)"),
 			new SEJudgement("Sick"),
 			new SEJudgement("Good"),
@@ -157,6 +157,7 @@ class OptionsMenu extends MusicBeatState
 		],"Misc things"),
 		new OptionCategory("Compatibility", [
 			new HCBoolOption("Legacy hurt notes","Load legacy Tricky mod format notes","useHurtArrows"),
+			new HCBoolOption("Seperate PE chars from SE Chars","Add -pe to Psych character ID's to prevent conflicts","PECharSeperate"),
 		],'Toggle compatibility with specific features from mods/engines'),
 		new OptionCategory("Performance", [
 			new FPSCapOption("Cap your Frames Per Second, This controls how fast the game will update your screen"),
@@ -168,7 +169,9 @@ class OptionsMenu extends MusicBeatState
 			new HCBoolOption("Persistant GF","Doesn't destroy GF when you exit a song. Makes loading quicker but uses more ram and might cause issues","persistGF"),
 			// new HCBoolOption("Cache Modded Songs list", "Toggle whether the song list entirely reloads every time it's opened",'cacheMultiList'),
 			new HCBoolOption("Threaded loading screen","Makes the loading screen use threads and show loading progress but is buggy and can cause crashes","doCoolLoading"),
-	
+			new HCBoolOption("Pause screen transparency","Toggle the pause screen using transparency. Can help with lag on some machines","transparentPause"),
+			new HCBoolOption("Hard Drive Mode","Changes some loading routines to work better with slower drives.\nMay increase ram usage, disable stuff like pack asset replacing and/or disable hot reloading","HDDMode"),
+
 			// new HCBoolOption("Doesn't destroy the opponent when you exit a song. Makes loading quicker but uses more ram and might cause issues","Persistant Opponent","persistOpp"),
 			// new UnloadSongOption("Unload the song when exiting the game"),
 			// new MMCharOption("**CAN PUT GAME INTO CRASH LOOP! IF STUCK, HOLD SHIFT AND DISABLE THIS OPTION. Show character on main menu"),
@@ -249,10 +252,10 @@ class OptionsMenu extends MusicBeatState
 			}
 		}
 
-		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
+		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image("settingsMenu"+(FlxG.random.float(0,1)>0.9 ? "2" : "")));
 
 		menuBG.color = 0x793397;
-		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
+		// menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
 		menuBG.updateHitbox();
 		menuBG.screenCenter();
 		menuBG.antialiasing = true;
@@ -261,8 +264,7 @@ class OptionsMenu extends MusicBeatState
 		grpControls = new FlxTypedGroup<Alphabet>();
 		add(grpControls);
 
-		for (i in 0...options.length)
-		{
+		for (i in 0...options.length){
 			var controlLabel:Alphabet = new Alphabet(0, (70 * i) + 730, options[i].name, true, false, false);
 			controlLabel.isMenuItem = true;
 			controlLabel.targetY = i;
@@ -272,19 +274,19 @@ class OptionsMenu extends MusicBeatState
 
 		currentDescription = "none";
 
-		versionShit = new FlxText(5, FlxG.height + 40, 0, "Offset (Left, Right, Shift for slow): " + HelperFunctions.truncateFloat(SESave.data.offset,2) + " - Description - " + se.translation.Lang.get(currentDescription), 12);
+		versionShit = new FlxText(2, FlxG.height - 38, 0, "Offset (Left, Right, Shift for slow): " + HelperFunctions.truncateFloat(SESave.data.offset,2) + " | " + se.translation.Lang.get(currentDescription), 12);
 		versionShit.scrollFactor.set();
-		versionShit.setFormat(CoolUtil.font, 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		versionShit.setFormat(CoolUtil.font, 18, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		
-		blackBorder = new FlxSprite(-30,FlxG.height + 40).makeGraphic((Std.int(versionShit.width + 900)),Std.int(versionShit.height + 600),FlxColor.BLACK);
+		blackBorder = new FlxSprite(versionShit.x-10,versionShit.y - 3 ).makeGraphic(FlxG.width+10,100,FlxColor.BLACK);
 		blackBorder.alpha = 0.5;
 
 		add(blackBorder);
 
 		add(versionShit);
 		addTitleText();
-		FlxTween.tween(versionShit,{y: FlxG.height - 18},2,{ease: FlxEase.elasticInOut});
-		FlxTween.tween(blackBorder,{y: FlxG.height - 18},2, {ease: FlxEase.elasticInOut});
+		// FlxTween.tween(versionShit,{y: FlxG.height - 37},2,{ease: FlxEase.elasticInOut});
+		// FlxTween.tween(blackBorder,{y: FlxG.height - 40},2, {ease: FlxEase.elasticInOut});
 
 		super.create();
 		changeSelection(0);
@@ -431,10 +433,10 @@ class OptionsMenu extends MusicBeatState
 	function updateOffsetText(){
 		// versionShit.color = FlxColor.WHITE;
 		if (isCat)
-			versionShit.text = (if(currentSelectedCat.getOptions()[curSelected].acceptValues) currentSelectedCat.getOptions()[curSelected].getValue() + " - " else "") + 
-				"Description - " + se.translation.Lang.get(currentDescription);
+			versionShit.text = (if(currentSelectedCat.getOptions()[curSelected].acceptValues) currentSelectedCat.getOptions()[curSelected].getValue() + " | " else "") + 
+				se.translation.Lang.get(currentDescription);
 		else
-			versionShit.text = "Offset (Left, Right, Shift for slow): " + HelperFunctions.truncateFloat(SESave.data.offset,2) + " - Description - " + se.translation.Lang.get(currentDescription);
+			versionShit.text = "Offset (Left, Right, Shift for slow): " + HelperFunctions.truncateFloat(SESave.data.offset,2) + " | " + se.translation.Lang.get(currentDescription);
 	}
 
 	function changeSelection(change:Int = 0) {

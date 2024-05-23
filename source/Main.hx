@@ -55,7 +55,7 @@ class Main extends Sprite
 	public static function main():Void {
 
 		// quick checks 
-
+		FuckState.hook();
 		Lib.current.addChild(new Main());
 	}
 

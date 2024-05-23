@@ -52,6 +52,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 	
 		var created = false;
 		var lastErr = "";
+		var ISMENU = true;
 		public override function errorHandle(?error:String = "",?forced:Bool = false){
 			try{
 				if(currentInterp.args[0] == this) currentInterp.args.shift();
@@ -448,7 +449,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 			}
 		}
 		@:keep public function loadScripts(?enableScripts:Bool = false,?enableCallbacks:Bool = false,?force:Bool = false){
-			if((!enableScripts && !parseMoreInterps) || (!SESave.data.menuScripts && !force)) return;
+			if((!enableScripts && !parseMoreInterps) || (!(SESave.data.menuScripts && ISMENU) && !force)) return;
 			parseMoreInterps = true;
 			if(scriptSubDirectory == "nil/") trace('Scriptable state ${Type.getClassName(cast this)} has no custom subdirectory, Using `nil/`!');
 			try{

@@ -1323,19 +1323,31 @@ class ChartingState extends ScriptMusicBeatState
 			if(vocals.playing && (vocals.time > (FlxG.sound.music.time + 10) || vocals.time < FlxG.sound.music.time - 10)){
 				vocals.time = FlxG.sound.music.time;
 			}
-			@:privateAccess {
+			#if(openfl < "9.3")
+			@:privateAccess
+			{
 				// The __backend.handle attribute is only available on native.
-				lime.media.openal.AL.sourcef(FlxG.sound.music._channel.__audioSource.__backend.handle, lime.media.openal.AL.PITCH, speed);
 				try{
 					// We need to make CERTAIN vocals exist and are non-empty
 					// before we try to play them. Otherwise the game crashes.
-					if (vocals != null && vocals.length > 0)
-						lime.media.openal.AL.sourcef(vocals._channel.__audioSource.__backend.handle, lime.media.openal.AL.PITCH, speed);
-					
-				}
-				catch (e){}
-				// Silent error, no need to log this error
+					lime.media.openal.AL.sourcef(FlxG.sound.music._channel.__source.__backend.handle, lime.media.openal.AL.PITCH, speed);
+					if (vocals != null && vocals.length > 0) 
+						lime.media.openal.AL.sourcef(vocals._channel.__source.__backend.handle, lime.media.openal.AL.PITCH, speed);
+				}catch (e) {}
 			}
+			#else
+			@:privateAccess
+			{
+				// The __backend.handle attribute is only available on native.
+				try{
+					// We need to make CERTAIN vocals exist and are non-empty
+					// before we try to play them. Otherwise the game crashes.
+					lime.media.openal.AL.sourcef(FlxG.sound.music._channel.__audioSource.__backend.handle, lime.media.openal.AL.PITCH, speed);
+					if (vocals != null && vocals.length > 0) 
+						lime.media.openal.AL.sourcef(vocals._channel.__audioSource.__backend.handle, lime.media.openal.AL.PITCH, speed);
+				}catch (e) {}
+			}
+			#end
 			
 		}
 		updateSection();

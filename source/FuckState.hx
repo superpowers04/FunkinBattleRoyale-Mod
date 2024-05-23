@@ -14,6 +14,7 @@ import lime.app.Application as LimeApp;
 import haxe.CallStack;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
+import openfl.events.UncaughtErrorEvent;
 
 import openfl.Lib;
 using StringTools;
@@ -31,6 +32,7 @@ class FuckState extends FlxUIState {
 	// This function has a lot of try statements.
 	// The game just crashed, we need as many failsafes as possible to prevent the game from closing or crash looping
 	@:keep inline public static function FUCK(e:Dynamic,?info:String = "unknown",_forced:Bool = false,_FATAL:Bool = false,_rawError:Bool=false){
+		
 		LoadingScreen.forceHide();
 		LoadingScreen.loadingText = 'ERROR!';
 		if(forced && !_forced && !_FATAL) return;
@@ -61,15 +63,19 @@ class FuckState extends FlxUIState {
 			try{
 
 				exception = 'Message:${e.message}\nStack:${e.stack}\nDetails: ${e.details()}';
-			}catch(e){
+			}catch(_e){
 
 				try{
 					exception = '${e.details()}';
-				}catch(e){
+				}catch(_e){
 					try{
 						exception = '${e.message}\n${e.stack}';
-					}catch(e){
-						exception = 'I tried to grab the exception but got another exception, ${e}';
+					}catch(_e){
+						try{
+							exception = '${e}';
+						}catch(e){
+							exception = 'I tried to grab the exception but got another exception, ${e}';
+						}
 					}
 				}
 			}
@@ -125,7 +131,8 @@ class FuckState extends FlxUIState {
 						'time to go to stack overflow for a solution',
 						'you\'re mother',
 						'sex pt 2: electric boobaloo',
-						'sex pt 3: gone wrong'
+						'sex pt 3: gone wrong',
+						'the stalemate button was boobytrapped'
 						
 					];
 					funnyQuip = jokes[Std.int(Math.random() * jokes.length - 1) ]; // I know, this isn't FlxG.random but fuck you the game just crashed
@@ -231,6 +238,18 @@ class FuckState extends FlxUIState {
 
 		// try{LoadingScreen.hide();}catch(e){}
 		Main.game.forceStateSwitch(new FuckState(exception,info,saved));
+	}
+	public static function FUCK_OPENFL(E:UncaughtErrorEvent){
+		FUCK(E);
+	}
+	public static function hook(){
+		trace('Enabling standard uncaught error handler...');
+		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, FUCK_OPENFL);
+
+		#if cpp
+		trace('Enabling C++ critical error handler...');
+		untyped __global__.__hxcpp_set_critical_error_handler(FUCK);
+		#end
 	}
 	var saved:Bool = false;
 	override function new(e:String,info:String,saved:Bool = false){

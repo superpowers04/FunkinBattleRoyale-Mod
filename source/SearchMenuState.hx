@@ -381,7 +381,7 @@ class SearchMenuState extends ScriptMusicBeatState {
 	}
 	function changeSelection(change:Int = 0)
 	{try{
-		if (change != 0) FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
+		if (change != 0) SELoader.playSound('assets/sounds/scrollMenu.ogg',true);
 		callInterp('changeSelection',[change]);
 		if(cancelCurrentFunction) return;
 		curSelected += change;

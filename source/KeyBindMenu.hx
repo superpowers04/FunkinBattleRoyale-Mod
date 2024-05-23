@@ -149,35 +149,36 @@ class KeyBindMenu extends FlxSubState
 
 			case "select":
 				if (FlxG.keys.justPressed.W || FlxG.keys.justPressed.UP){
-					FlxG.sound.play(Paths.sound('scrollMenu'));
+					SELoader.playSound('assets/sounds/scrollMenu.ogg',true);
 					changeItem(-1);
 				}else if (FlxG.keys.justPressed.S || FlxG.keys.justPressed.DOWN){
-					FlxG.sound.play(Paths.sound('scrollMenu'));
+					SELoader.playSound('assets/sounds/scrollMenu.ogg',true);
 					changeItem(1);
 				}
 				#if !mobile
 				else if (FlxG.keys.justPressed.A || FlxG.keys.justPressed.LEFT){
 					lastLength = -1;
 					if(keyText[keyMode - 1] == null){
-						FlxG.sound.play(Paths.sound('cancelMenu'));
+						
+						SELoader.playSound('assets/sounds/cancelMenu.ogg',true);
 					}else{
 						keyMode--;
-						FlxG.sound.play(Paths.sound('scrollMenu'));
+						SELoader.playSound('assets/sounds/scrollMenu.ogg',true);
 					}
 					
 				}else if (FlxG.keys.justPressed.D || FlxG.keys.justPressed.RIGHT){
 					lastLength = -1;
 					if(keyText[keyMode + 1] == null){
-						FlxG.sound.play(Paths.sound('cancelMenu'));
+						SELoader.playSound('assets/sounds/cancelMenu.ogg',true);
 					}else{
 						keyMode++;
-						FlxG.sound.play(Paths.sound('scrollMenu'));
+						SELoader.playSound('assets/sounds/scrollMenu.ogg',true);
 					}
 				}
 				#end
 
 				if (FlxG.keys.justPressed.ENTER){
-					FlxG.sound.play(Paths.sound('scrollMenu'));
+					SELoader.playSound('assets/sounds/scrollMenu.ogg',true);
 					state = "input";
 				}else if(FlxG.keys.justPressed.ESCAPE || FlxG.keys.justPressed.BACKSPACE #if(mobile) || FlxG.mouse.justReleased #end){
 					quit();

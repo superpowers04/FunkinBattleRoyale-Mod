@@ -388,9 +388,6 @@ class CharAnimController extends FlxAnimationController{
 
 	function loadJSONChar(charProperties:CharacterJson){
 		
-		// Check if the XML has BF's animations, if so, add them
-
-
 
 
 		// healthIcon = charProperties.healthicon;
@@ -441,6 +438,7 @@ class CharAnimController extends FlxAnimationController{
 					if (anima.noreplaywhencalled == true && !amPreview){ //
 						replayAnims.push(anima.anim);
 					}
+					if(anima.offsets != null) animOffsets[anima.name] = cast anima.offsets;
 					if(anima.loopStart != null && anima.loopStart != 0 ) loopAnimFrames[anima.anim] = anima.loopStart;
 					
 					if(anima.playAfter != null && anima.playAfter != '' ) loopAnimTo[anima.anim] = anima.playAfter;
@@ -625,7 +623,10 @@ class CharAnimController extends FlxAnimationController{
 
 			if (charProperties == null) {
 				try{
-					charProperties = Json.parse(CoolUtil.cleanJSON(charPropJson = SELoader.loadText(charInfo.jsonLocation)));
+					var file = SELoader.exists(charInfo.jsonLocation+"-SE") ? charInfo.jsonLocation+"-SE" : charInfo.jsonLocation;
+					charProperties= Json.parse(CoolUtil.cleanJSON(charPropJson = SELoader.loadText(file)));
+					if(amPreview && !file.endsWith('-SE')) loadedFrom=file;
+					else loadedFrom=file;
 				}catch(e){
 					throw('Character ${curCharacter} has a missing config.json! ${e.message}');
 					return;
@@ -674,8 +675,11 @@ class CharAnimController extends FlxAnimationController{
 					}
 					if (tex == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's texture can't be loaded
 				}
-				charProperties.char_pos = charProperties.position;
-				charProperties.char_pos[2] = -charProperties.char_pos[2];
+				animOffsets['all'] = charProperties.position;
+				charProperties.cam_pos= charProperties.camera_position;
+				// charProperties.char_pos = charProperties.position;
+				// charProperties.char_pos[2] = -charProperties.char_pos[2];
+				// charProperties.cam_pos1[2] = -charProperties.char_pos[2];
 			}
 		}else{
 
@@ -894,16 +898,19 @@ class CharAnimController extends FlxAnimationController{
 			flipX = !flipX;
 
 				// var animArray
-			var oldRight = animation.getByName('singRIGHT').frames;
-			animation.getByName('singRIGHT').frames = animation.getByName('singLEFT').frames;
-			animation.getByName('singLEFT').frames = oldRight;
+			if(!charInfo.psychChar){ // Psych Characters aren't side dependant, SE characters use the same definitions for left and right
 
-			// IF THEY HAVE MISS ANIMATIONS??
-			var oldMissAnim = animation.getByName('singRIGHTmiss');
-			if (oldMissAnim != null) {
-				var oldMiss = oldMissAnim.frames;
-				animation.getByName('singRIGHTmiss').frames = animation.getByName('singLEFTmiss').frames;
-				animation.getByName('singLEFTmiss').frames = oldMiss;
+				var oldRight = animation.getByName('singRIGHT').frames;
+				animation.getByName('singRIGHT').frames = animation.getByName('singLEFT').frames;
+				animation.getByName('singLEFT').frames = oldRight;
+
+				// IF THEY HAVE MISS ANIMATIONS??
+				var oldMissAnim = animation.getByName('singRIGHTmiss');
+				if (oldMissAnim != null) {
+					var oldMiss = oldMissAnim.frames;
+					animation.getByName('singRIGHTmiss').frames = animation.getByName('singLEFTmiss').frames;
+					animation.getByName('singLEFTmiss').frames = oldMiss;
+				}
 			}
 		}
 		dance();

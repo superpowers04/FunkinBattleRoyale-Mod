@@ -192,27 +192,25 @@ class SelectScriptableState extends SearchMenuState{
 	{try{
 		searchList = [];
 		retAfter = false;
-		if(SELoader.exists('mods/scripts'))
-			{
-				for (directory in orderList(SELoader.readDirectory('mods/scripts/')))
+		if(SELoader.exists('mods/scripts')) {
+			for (directory in orderList(SELoader.readDirectory('mods/scripts/'))) {
+				var _dir:Bool = SELoader.isDirectory("mods/scripts/"+directory);
+				if (_dir && SELoader.exists("mods/scripts/"+directory+"/state/state.hscript"))
 				{
-					var _dir:Bool = SELoader.isDirectory("mods/scripts/"+directory);
-					if (_dir && SELoader.exists("mods/scripts/"+directory+"/state/state.hscript"))
-					{
-						unusableList[searchList.length] = false;
-						searchList.push(directory);
-						if (SELoader.exists("mods/scripts/"+directory+"/description.txt")){
-							descriptions[directory] = SELoader.loadText('mods/scripts/${directory}/description.txt');
-						}
+					unusableList[searchList.length] = false;
+					searchList.push(directory);
+					if (SELoader.exists("mods/scripts/"+directory+"/description.txt")){
+						descriptions[directory] = SELoader.loadText('mods/scripts/${directory}/description.txt');
 					}
-					// else if (_dir){
-					// 	unusableList[searchList.length] = true;
-					// 	searchList.push(directory);
-					// 	if (FileSystem.exists("mods/scripts/"+directory+"/description.txt")){
-					// 		descriptions[directory] = "This script has no state.hscript and cannot be run!";
-					// 	}
-					// }
 				}
+				// else if (_dir){
+				// 	unusableList[searchList.length] = true;
+				// 	searchList.push(directory);
+				// 	if (FileSystem.exists("mods/scripts/"+directory+"/description.txt")){
+				// 		descriptions[directory] = "This script has no state.hscript and cannot be run!";
+				// 	}
+				// }
+			}
 		}
 		if (searchList[0] == null){searchList = ['No scripts found!'];trace('No scripts found!');}
 		// searchList = TitleState.choosableStages;
@@ -242,40 +240,40 @@ class SelectScriptableState extends SearchMenuState{
 		}
 	}
 	public static function selectState(scriptName){
-			var stateType = "musicbeatstate";
-			if(SELoader.exists("mods/scripts/" + scriptName + "/statetype.txt")){
-				stateType = SELoader.getContent("mods/scripts/" + scriptName + "/statetype.txt");
-			}
-			var state:Class<FlxState> = null;
-			switch(stateType.toLowerCase()){
-				case "searchmenustate":
-					state = ScriptableSearchMenuState;
-				// case "sickmenustate":
-					// state = SickMenuState;
-				case "musicbeatstate":
-					state = ScriptableMusicBeatState;
-				// case "quickoptionssubstate":
-				// 	state = QuickOptionsSubState;
-				// case "playstate":
-				// 	state = PlayState;
-			}
-			if(state == null){MusicBeatState.instance.showTempmessage('Script is trying to use class "${stateType}" but that isn\'t a valid state!',FlxColor.RED); return;}
+		var stateType = "musicbeatstate";
+		if(SELoader.exists("mods/scripts/" + scriptName + "/statetype.txt")){
+			stateType = SELoader.getContent("mods/scripts/" + scriptName + "/statetype.txt");
+		}
+		var state:Class<FlxState> = null;
+		switch(stateType.toLowerCase()){
+			case "searchmenustate":
+				state = ScriptableSearchMenuState;
+			// case "sickmenustate":
+				// state = SickMenuState;
+			case "musicbeatstate":
+				state = ScriptableMusicBeatState;
+			// case "quickoptionssubstate":
+			// 	state = QuickOptionsSubState;
+			// case "playstate":
+			// 	state = PlayState;
+		}
+		if(state == null){MusicBeatState.instance.showTempmessage('Script is trying to use class "${stateType}" but that isn\'t a valid state!',FlxColor.RED); return;}
 
-			var _interp = parseHS(SELoader.loadText("mods/scripts/" + scriptName + "/state/state.hscript"), new HSBrTools("mods/scripts/" + scriptName),"main");
-			if(_interp == null){
-				// showTempmessage("");
-				return;
-			}
-			var _state = ScriptableStateManager.init(_interp,state);
-			if(_state == null) return ScriptableStateManager.die();
-			ScriptableStateManager.lastState = scriptName;
-			FlxG.switchState(_state);
-			// FlxG.switchState(new state(_interp,state));
-			// switch(stateType.toLowerCase()){
-			// 	default:
-			// 		// FlxG.switchState(new ScriptableMusicBeatState(_interp));
-			// }
-			// reloadList();
+		var _interp = parseHS(SELoader.loadText("mods/scripts/" + scriptName + "/state/state.hscript"), new HSBrTools("mods/scripts/" + scriptName),"main");
+		if(_interp == null){
+			// showTempmessage("");
+			return;
+		}
+		var _state = ScriptableStateManager.init(_interp,state);
+		if(_state == null) return ScriptableStateManager.die();
+		ScriptableStateManager.lastState = scriptName;
+		FlxG.switchState(_state);
+		// FlxG.switchState(new state(_interp,state));
+		// switch(stateType.toLowerCase()){
+		// 	default:
+		// 		// FlxG.switchState(new ScriptableMusicBeatState(_interp));
+		// }
+		// reloadList();
 	}
 }
 

@@ -90,10 +90,15 @@ class PauseSubState extends MusicBeatSubstate {
 		FlxG.sound.music.onComplete = null;
 		FlxG.sound.music.looped = true;
 		// FlxG.sound.list.add(pauseMusic);
-		var bit=new BitmapData(FlxG.width,FlxG.height,true,);
-		bit.draw(FlxG.stage);
-		bg = new FlxSprite().loadGraphic(FlxGraphic.fromBitmapData(bit));
-		bg.alpha = 1;
+		if(SESave.data.transparentPause){
+			bg = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+			bg.alpha = 0;
+		}else{
+			var bit=new BitmapData(FlxG.width,FlxG.height,true,);
+			bit.draw(FlxG.stage);
+			bg = new FlxSprite().loadGraphic(FlxGraphic.fromBitmapData(bit));
+			bg.alpha = 1;
+		}
 		bg.scrollFactor.set();
 		add(bg);
 
@@ -150,7 +155,7 @@ class PauseSubState extends MusicBeatSubstate {
 			FlxTween.tween(songText,{x : sX},0.9,{ease:FlxEase.cubeInOut});
 		}
 		changeSelection();
-		FlxG.state.persistentDraw = false;
+		if(!SESave.data.transparentPause) FlxG.state.persistentDraw = false;
 		quitHeldBG = new FlxSprite(0, 10).loadGraphic(Paths.image('healthBar','shared'));
 		quitHeldBG.screenCenter(X);
 		quitHeldBG.scrollFactor.set();
@@ -414,7 +419,7 @@ class PauseSubState extends MusicBeatSubstate {
 		Conductor.songPosition = FlxG.sound.music.time = time;
 		disappearMenu(0.4);
 		callInterp("pauseResume",[]);
-		// FlxTween.tween(bg,{alpha:0},2.5,{ease:FlxEase.quartOut});
+		if(SESave.data.transparentPause) FlxTween.tween(bg,{alpha:0},2.5,{ease:FlxEase.quartOut});
 
 
 		var spr = new FlxSprite();

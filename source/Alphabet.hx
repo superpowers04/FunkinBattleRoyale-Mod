@@ -183,6 +183,7 @@ class Alphabet extends FlxSpriteGroup
 	}
 
 	var xPos:Float = 0;
+	var yPos:Float = 0;
 	public function addText(bounce:Bool = false,?finalText:String = "")
 	{
 		if(border != null){
@@ -233,9 +234,14 @@ class Alphabet extends FlxSpriteGroup
 		},length);
 	}
 	function addLetter(character:String,bounce:Bool = false){
-		if (character == " " || removeDashes && ( character == "-" || character == "_"))
-		{ 
+		if (character == " " || removeDashes && ( character == "-" || character == "_")){ 
 			lastWasSpace = true;
+			return;
+		}
+		if(character=="\n"){
+			lastWasSpace=false;
+			yPos+=70 * scale.x;
+			lastSprite = null;
 			return;
 		}
 
@@ -250,13 +256,12 @@ class Alphabet extends FlxSpriteGroup
 		}
 
 		// var letter:AlphaCharacter = new AlphaCharacter(30 * loopNum, 0);
-		var letter:AlphaCharacter = new AlphaCharacter(xPos, 0,removeDashes);
-		listOAlphabets.add(letter);
+		var letter:AlphaCharacter = new AlphaCharacter(xPos, yPos,removeDashes);
+		listOAlphabets.add(lastSprite = letter);
+		add(letter);
 		if (!useAlphabet) letter.useFLXTEXT(isBold ? character.toUpperCase() : character,isBold)
 		else if (isBold) letter.createBold(character.toUpperCase());
 		else letter.createLetter(character);
-		add(letter);
-		lastSprite = letter;
 		if(bounce) {
 			letter.scale.x = letter.scale.y = 1.1;
 			FlxTween.tween(letter.scale,{x:1,y:1},0.5,{ease:FlxEase.quadInOut});

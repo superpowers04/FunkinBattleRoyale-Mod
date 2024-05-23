@@ -107,6 +107,7 @@ typedef YourMother = Dynamic;
 	}
 	var discordDRP:Bool = true;
 	var doCoolLoading:Bool = false;
+	var transparentPause:Bool = true;
 	var fullscreen:Bool = false;
 	var persistBF:Bool = false;
 	var persistGF:Bool = false;
@@ -156,6 +157,8 @@ typedef YourMother = Dynamic;
 
 	var useSystemCursor:Bool = false;
 	var lang:String = "english";
+	var HDDMode:Bool = false;
+	var PECharSeperate:Bool = false;
 
 	public function new(){}
 }

@@ -4,6 +4,7 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.FlxObject;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.addons.transition.FlxTransitionSprite;
 import flixel.addons.transition.FlxTransitionableState;
@@ -35,6 +36,7 @@ import openfl.media.Sound;
 import flixel.FlxCamera;
 import sys.thread.Thread;
 import Alphabet;
+import SELoader.SEDirectory;
 
 #if discord_rpc
 	import Discord.DiscordClient;
@@ -110,7 +112,7 @@ class TitleState extends MusicBeatState
 	var credGroup:FlxGroup;
 	var credTextShit:Alphabet;
 	var textGroup:FlxTypedGroup<FlxSprite>;
-	var ngSpr:FlxSprite;
+	var superLogo:FlxSprite;
 	public static var p2canplay = true;
 	// public static var choosableStages:Array<String> = ["default","stage","nothing"];
 	// public static var choosableStagesLower:Map<String,String> = [];
@@ -215,10 +217,10 @@ class TitleState extends MusicBeatState
 	}
 	public static function findInvalidChar(char:String):CharInfo{
 		char = char.replace('INVALID|',"");
-		if(Std.parseInt(char) != null && !Math.isNaN(Std.parseInt(char))){
-			var e = Std.parseInt(char);
-			if(invalidCharacters[e] != null){
-				return invalidCharacters[e];
+		var ID=Std.parseInt(char);
+		if(ID != null && !Math.isNaN(ID)){
+			if(invalidCharacters[ID] != null){
+				return invalidCharacters[ID];
 			}else{
 				return null;
 			}
@@ -318,7 +320,7 @@ class TitleState extends MusicBeatState
 	}
 	@:keep inline public static function retCharPath(char:String):String{
 		var path = findChar(char,false);
-		return (if(path == null || path.path == null) "" else path.path);
+		return (path == null || path.path == null) ? "" : path.path;
 	}
 	@:keep inline public static function checkCharacters(){
 		LoadingScreen.loadingText = 'Updating character list';
@@ -336,15 +338,16 @@ class TitleState extends MusicBeatState
 
 
 		if (SELoader.exists("assets/characters/")){
-			var dir = "assets/characters";
+			var dir = new SEDirectory("assets/characters");
 			trace('Checking ${dir} for characters');
-			for (char in SELoader.readDirectory(dir)) {
-				if (!SELoader.isDirectory(dir+"/"+char)){continue;}
-				if (SELoader.exists(dir+"/"+char+"/config.json")) {
+			for (char in dir.readDirectory()) {
+				if (!dir.isDirectory(char)) continue;
+				var charPath = dir.newDirectory(char);
+				if (charPath.exists("/config.json")) {
 					customCharacters.push(char);
 					var desc = 'Assets character';
-					if (FileSystem.exists('${dir}/${char}/description.txt'))
-						desc += ";" + SELoader.getContent('${dir}/${char}/description.txt');
+					if (charPath.exists('description.txt'))
+						desc += ";" + charPath.getContent('description.txt');
 					characters.push({
 						id:char.replace(' ','-').replace('_','-').toLowerCase(),
 						folderName:char,
@@ -353,25 +356,27 @@ class TitleState extends MusicBeatState
 						description:desc
 					});
 
-				}else if (SELoader.exists(dir+"/"+char+"/character.png") && (SELoader.exists(dir+"/"+char+"/character.xml") || SELoader.exists(dir+"/"+char+"/character.json"))){
+				}else if (charPath.exists("character.png") && (charPath.exists("character.xml") || charPath.exists("character.json"))){
 					// invalidCharacters.push([char,dir]);
 					invalidCharacters.push({
 						id:char.replace(' ','-').replace('_','-').toLowerCase(),
 						folderName:char,
 						nameSpace:"SEAssetsFolder",
-						path:dir
+						path:'$dir'
 					});
 				}
 			}
 		}
 
 		if (SELoader.exists("mods/characters/")){
-			for (directory in SELoader.readDirectory("mods/characters/")) {
-				if (!SELoader.isDirectory("mods/characters/"+directory)){continue;}
-				if (SELoader.exists("mods/characters/"+directory+"/config.json")) {
+			var path = new SEDirectory("mods/characters/");
+			for (directory in path.readDirectory()) {
+				if (!path.isDirectory(directory)){continue;}
+				var charPath=path.newDirectory(directory);
+				if (charPath.exists("config.json")) {
 					var desc = null;
-					if (SELoader.exists("mods/characters/"+directory+"/description.txt"))
-						desc = SELoader.getContent('mods/characters/${directory}/description.txt');
+					if (charPath.exists("/description.txt"))
+						desc = SELoader.getContent('${charPath}/description.txt');
 
 					characters.push({
 						id:directory.replace(' ','-').replace('_','-').toLowerCase(),
@@ -379,10 +384,8 @@ class TitleState extends MusicBeatState
 						nameSpace:"SECharactersFolder",
 						description:desc
 					});
-				}else if (SELoader.exists("mods/characters/"+directory+"/script.hscript")) {
-					var desc = null;
-					if (SELoader.exists("mods/characters/"+directory+"/description.txt"))
-						desc = SELoader.getContent('mods/characters/${directory}/description.txt');
+				}else if (charPath.exists("script.hscript")) {
+					var desc = charPath.exists("description.txt") ? charPath.getContent('${charPath}/description.txt') : null;
 
 					characters.push({
 						id:directory.replace(' ','-').replace('_','-').toLowerCase(),
@@ -391,7 +394,7 @@ class TitleState extends MusicBeatState
 						nameSpace:"SECharactersFolder",
 						type:1
 					});
-				}else if (SELoader.exists("mods/characters/"+directory+"/character.png") && (SELoader.exists("mods/characters/"+directory+"/character.xml") || SELoader.exists("mods/characters/"+directory+"/character.json"))){
+				}else if (charPath.exists("character.png") && (charPath.exists("character.xml") || charPath.exists("character.json"))){
 					// invalidCharacters.push([directory,'mods/characters']);
 					invalidCharacters.push({
 						id:directory.replace(' ','-').replace('_','-').toLowerCase(),
@@ -404,75 +407,68 @@ class TitleState extends MusicBeatState
 		}
 
 		
-
+		var ADDPE=SESave.data.PECharSeperate;
 		for (ID => dataDir in ['mods/weeks/','mods/packs/']) {
-			
-			if (SELoader.exists(dataDir))
-			{
-			  for (_dir in SELoader.readDirectory(dataDir))
-			  {
-				if (!SELoader.isDirectory(dataDir + _dir)){continue;}
-				// trace(_dir);
-				if (SELoader.exists(dataDir + _dir + "/characters/"))
-				{
-					var dir = dataDir + _dir + "/characters/";
-					// trace('Checking ${dir} for characters');
-					for (char in FileSystem.readDirectory(dir)) {
+			var e = new SEDirectory(dataDir);
+			if (SELoader.exists(dataDir)) {
+			  for (nameSpace in SELoader.readDirectory(dataDir)) {
+				var _dir=e.newDirectory(nameSpace);
+				if(!_dir.exists("characters/")) continue;
+				_dir = _dir.newDirectory('characters/');
+				// trace('Checking ${dir} for characters');
+				for (char in _dir.readDirectory()) {
 
-						if (!SELoader.isDirectory(dir+"/"+char)){
-							if (char.substring(char.length-5) == ".json"){ // Psych characters
-								characters.push({
-									id:char.substring(0,char.length-5).replace(' ',"-").replace('_',"-").toLowerCase()+'-pe',
-									folderName:char,
-									description:'Psych Engine character',
-									jsonLocation:'$dataDir$_dir/characters/$char',
-									psychChar:true,
-									path:dir,
-									nameSpaceType:ID,
-									nameSpace:_dir
-								});
-							}
-							continue;
-						}
-						if (SELoader.exists(dir+"/"+char+"/config.json")) {
-							var desc = "";
-							if (SELoader.exists('${dir}/${char}/description.txt'))
-								desc += ";" +SELoader.getContent('${dir}/${char}/description.txt');
+					if (!_dir.isDirectory(char)){
+						if (char.substring(char.length-5) == ".json"){ // Psych characters
 							characters.push({
-								id:char.replace(' ',"-").replace('_',"-").toLowerCase(),
+								id:char.substring(0,char.length-5).replace(' ',"-").replace('_',"-").toLowerCase()+(ADDPE?"-pe":""),
 								folderName:char,
-								description:desc,
-								path:dir,
+								description:'Psych Engine character',
+								jsonLocation:'$_dir/$char',
+								psychChar:true,
+								path:'$_dir',
 								nameSpaceType:ID,
-								nameSpace:_dir
-							});
-
-						}else if (SELoader.exists(dir+"/"+char+"/script.hscript"))
-						{
-							var desc = "";
-							if (SELoader.exists('${dir}/${char}/description.txt'))
-								desc += ";" +SELoader.getContent('${dir}/${char}/description.txt');
-							characters.push({
-								id:char.replace(' ',"-").replace('_',"-").toLowerCase(),
-								folderName:char,
-								description:desc,
-								path:dir,
-								nameSpaceType:ID,
-								type:1,
-								nameSpace:_dir
-							});
-
-						}else if (SELoader.exists(dir+"/"+char+"/character.png") && (SELoader.exists(dir+"/"+char+"/character.xml") || SELoader.exists(dir+"/"+char+"/character.json"))){
-							invalidCharacters.push({
-								id:char.replace(' ',"-").replace('_',"-").toLowerCase(),
-								folderName:char,
-								path:dir,
-								nameSpaceType:ID,
-								nameSpace:_dir
+								nameSpace:nameSpace
 							});
 						}
+						continue;
 					}
-				}		
+					var charPath = _dir.newDirectory(char);
+					if (charPath.exists(char+"/config.json")) {
+						var desc = null;
+						if (charPath.exists('description.txt')) desc = ";" +SELoader.getContent('${charPath}/description.txt');
+						characters.push({
+							id:char.replace(' ',"-").replace('_',"-").toLowerCase(),
+							folderName:char,
+							description:desc,
+							path:'${_dir}',
+							nameSpaceType:ID,
+							nameSpace:nameSpace
+						});
+
+					}else if (charPath.exists("script.hscript")) {
+						var desc = null;
+						if (charPath.exists('description.txt')) desc = ";" +SELoader.getContent('${charPath}/description.txt');
+						characters.push({
+							id:char.replace(' ',"-").replace('_',"-").toLowerCase(),
+							folderName:char,
+							description:desc,
+							path:'${_dir}',
+							nameSpaceType:ID,
+							type:1,
+							nameSpace:nameSpace
+						});
+
+					}else if (charPath.exists("character.png") && (charPath.exists("character.xml") || charPath.exists("character.json"))){
+						invalidCharacters.push({
+							id:char.replace(' ',"-").replace('_',"-").toLowerCase(),
+							folderName:char,
+							path:'${_dir}',
+							nameSpaceType:ID,
+							nameSpace:nameSpace
+						});
+					}
+				}
 			  }
 			}
 		}
@@ -533,14 +529,14 @@ class TitleState extends MusicBeatState
 			if(retStage) return stages[1];
 			return null;
 		}
-		if(Std.parseInt(char) != null && !Math.isNaN(Std.parseInt(char))){
-			var e = Std.parseInt(char);
-			if(stages[e] != null){
+		var CHARID:Null<Int>=Std.parseInt(char);
+		if(CHARID != null && !Math.isNaN(CHARID)){
+			if(stages[CHARID] != null){
 
 				// trace('Found char with ID of $e');
-				return stages[e];
+				return stages[CHARID];
 			}else{
-				trace('Invalid ID $e, out of range 0-${stages.length}');
+				trace('Invalid ID $CHARID, out of range 0-${stages.length}');
 				if(retStage) return stages[1];
 				return null;
 			}
@@ -902,8 +898,7 @@ class TitleState extends MusicBeatState
 		// bg.updateHitbox();
 		add(bg);
 
-		logoBl = new FlxSprite(-150, -100);
-		logoBl.loadGraphic(Paths.image('logoBumpin'));
+		logoBl = SELoader.loadFlxSprite(-150,-100,'assets/images/logoBumpin.png');
 		// Paths.image('logoBumpin')
 		logoBl.antialiasing = true;
 
@@ -944,20 +939,23 @@ class TitleState extends MusicBeatState
 		blackScreen = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		credGroup.add(blackScreen);
 
-		credTextShit = new Alphabet(0, 0, "ninjamuffin99\nPhantomArcade\nkawaisprite\nevilsk8er", true);
+		credTextShit = new Alphabet(0, 0, "women", true);
 		credTextShit.screenCenter();
 
 		// credTextShit.alignment = CENTER;
 
 		credTextShit.visible = false;
-
-		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
-		add(ngSpr);
-		ngSpr.visible = false;
-		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
-		ngSpr.updateHitbox();
-		ngSpr.screenCenter(X);
-		ngSpr.antialiasing = true;
+		if(SELoader.exists('assets/images/super_logo.png')){
+			superLogo = SELoader.loadFlxSprite(0, FlxG.height * 0.52,'assets/images/super_logo.png');
+			superLogo.setGraphicSize(Std.int(superLogo.width * 0.8));
+			superLogo.updateHitbox();
+			superLogo.antialiasing = true;
+		}else{
+			superLogo = new FlxSprite(0,FlxG.height*0.52);
+		}
+		add(superLogo);
+		superLogo.visible = false;
+		superLogo.screenCenter(X);
 
 		FlxTween.tween(credTextShit, {y: credTextShit.y + 20}, 2.9, {ease: FlxEase.quadInOut, type: PINGPONG});
 
@@ -1005,7 +1003,7 @@ class TitleState extends MusicBeatState
 			4 => [["Happy Birthday","PhantomArcade"]],
 		],
 		4 => [
-			11 => [["Hey look","an idiot was born"],['its supers birthday?','whos that?']],
+			12 => [["Hey look","an idiot was born"],['its supers birthday?','whos that?'],['what fucking idiot would set','the wrong date for their birthday','Super :skull:']],
 		],
 		5 =>[
 			-1 => [
@@ -1020,7 +1018,7 @@ class TitleState extends MusicBeatState
 				["you're talkin mad valid",'for someone in','cuddling distance'],
 				['women','based'],
 				['men','based'],
-				['embies','based'],
+				['enbies','based'],
 				['person','based'],
 				['skirt go speeen','still cis though'],
 				['i want to wear a dress and makeup','still cis though'],
@@ -1196,8 +1194,11 @@ class TitleState extends MusicBeatState
 		super.update(elapsed);
 	}
 	inline function MainMenu(){
-		ngSpr.graphic.destroy();
-		FlxTween.tween(FlxG.camera.scroll,{y:-300},4,{ease:FlxEase.cubeOut});
+		// if(superLogo != null && superLogo is FlxSprite)(cast superLogo).graphic.destroy();
+		if(superLogo != null) superLogo.destroy();
+		// FlxTween.tween(FlxG.camera.scroll,{y:-300},4,{ease:FlxEase.cubeOut});
+		FlxTween.tween(logoBl,{y:-300},4,{ease:FlxEase.cubeOut});
+		FlxTween.tween(titleText,{y:740},4,{ease:FlxEase.cubeOut});
 		FlxG.switchState(if(FlxG.keys.pressed.SHIFT) new OptionsMenu() else new MainMenuState());
 	}
 
@@ -1274,39 +1275,43 @@ class TitleState extends MusicBeatState
 				
 			// 	destHaxe();
 			case 1:
-				
-				createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er'], 0);
+				addMoreText('Friday Night Funkin\' by');
+				credTextShit.y -= 200;
 
 				// addMoreText('ninjamuffin99').startTyping(0.015,Conductor.crochetSecs);
 				// addMoreText('phantomArcade').startTyping(0.015,Conductor.crochetSecs);
 				// addMoreText('kawaisprite').startTyping(0.02,Conductor.crochetSecs);
 				// addMoreText('evilsk8er').startTyping(0.022,Conductor.crochetSecs);
-				credTextShit.x -= 130;
 			case 2:
-				addMoreText('do not present');
+				addMoreText('ninjamuffin99');
+				addMoreText('phantomArcade');
+				addMoreText('kawaisprite');
+				addMoreText('evilsk8er');
+				credTextShit.x -= 130;
+				
 			case 7:
+				credTextShit.y += 200;
 				deleteCoolText();
 			case 10:
 				// if (Main.watermarks)  You're not more important than fucking newgrounds
-				// 	createCoolText(['Kade Engine', 'by']);
-				// else
-					// createCoolText(['In Partnership']);
+				// me when im a hypocrite, but to be fair, i got a funny icon :3
+
 				
 				deleteCoolText();
-				addMoreText('not partnered with').startTyping(0,Conductor.crochetSecs * 2);
+				addMoreText('Developed by').startTyping(0,Conductor.crochetSecs);
 			case 11:
 				// if (Main.watermarks)  You're not more important than fucking newgrounds
 				// 	createCoolText(['Kade Engine', 'by']);
 				// else
 			case 12:
-				addMoreText('Newgrounds');
-				ngSpr.scale.x = ngSpr.scale.y = 1.1;
-				FlxTween.tween(ngSpr.scale,{x:1,y:1},0.2);
-				ngSpr.visible = true;
+				addMoreText('superpowers04');
+				superLogo.scale.x = superLogo.scale.y = 1.1;
+				FlxTween.tween(superLogo.scale,{x:1,y:1},0.2);
+				superLogo.visible = true;
 			case 16:
 				deleteCoolText();
 				credTextShit.y += 130;
-				ngSpr.visible = false;
+				superLogo.destroy();
 
 
 
@@ -1326,12 +1331,14 @@ class TitleState extends MusicBeatState
 			// credTextShit.screenCenter();
 			case 26:
 				addMoreText('Friday Night Funkin\'');
-			// credTextShit.visible = true;
 			case 28:
 				addMoreText('Super');
-			// credTextShit.text += '\nNight';
 			case 30:
-				addMoreText('Engine'); // credTextShit.text += '\nFunkin';
+				var the = textGroup.members[1];
+				credGroup.remove(the, true);
+				textGroup.remove(the, true);
+				// addMoreText('Friday Night Funkin\'');
+				addMoreText('Super Engine');
 
 			case 32:
 				skipIntro();
@@ -1348,35 +1355,34 @@ class TitleState extends MusicBeatState
 	var skippedIntro:Bool = false;
 
 	function skipIntro():Void {
-		if (!skippedIntro)
-		{
-			destHaxe();
-			if(!FlxG.sound.music.playing){
-				FlxG.sound.music.play();
-				FlxG.sound.music.fadeIn(0.1,SESave.data.instVol);
-			}
-			remove(ngSpr);
-			destHaxe();
-			FlxG.camera.flash(FlxColor.WHITE, 2);
-			remove(credGroup);
-			skippedIntro = true;
-			FlxG.camera.scroll.x += 100;
-			FlxG.camera.scroll.y += 100;
-			logoBl.screenCenter();
-			logoBl.y -= 100;
-			if(Date.now().getHours() == 3){
-				logoBl.angle = FlxG.random.int(0,360);
-				logoBl.x = FlxG.random.int(-100,1280);
-				logoBl.y = FlxG.random.int(-50,720);
-			}
-			if(Date.now().getHours() == 3){
-				titleText.color=0xffff0000;
-			}else if(Date.now().getMonth() == 9){
-				titleText.color=0xffff8b0f;
-			}
-
-			FlxTween.tween(FlxG.camera.scroll,{x: 0,y:0},1,{ease:FlxEase.cubeOut});
+		if (skippedIntro) return;
+		destHaxe();
+		if(!FlxG.sound.music.playing){
+			FlxG.sound.music.play();
+			FlxG.sound.music.fadeIn(0.1,SESave.data.instVol);
 		}
+		remove(superLogo);
+		destHaxe();
+		FlxG.camera.flash(FlxColor.WHITE, 2);
+		remove(credGroup);
+		skippedIntro = true;
+		FlxG.camera.scroll.x += 100;
+		FlxG.camera.scroll.y += 100;
+		logoBl.screenCenter();
+		logoBl.y -= 100;
+		if(Date.now().getHours() == 3){
+			logoBl.angle = FlxG.random.int(0,360);
+			logoBl.x = FlxG.random.int(-100,1280);
+			logoBl.y = FlxG.random.int(-50,720);
+		}
+		if(Date.now().getHours() == 3){
+			titleText.color=0xffff0000;
+		}else if(Date.now().getMonth() == 9){
+			titleText.color=0xffff8b0f;
+		}
+
+		FlxTween.tween(FlxG.camera.scroll,{x: 0,y:0},1,{ease:FlxEase.cubeOut});
+		
 	}
 	override function stepHit(){
 		super.stepHit();

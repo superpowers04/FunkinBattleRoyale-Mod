@@ -289,7 +289,7 @@ class FreeplayState extends MusicBeatState
 		#end
 
 		// NGio.logEvent('Fresh');
-		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+		SELoader.playSound('assets/sounds/scrollMenu');
 
 		curSelected += change;
 

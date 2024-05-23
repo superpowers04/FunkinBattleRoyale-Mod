@@ -6,8 +6,7 @@ import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
 import flixel.graphics.FlxGraphic;
 import flash.display.BitmapData;
-
-class Paths
+@:deprecated("PATHS IS DEPRECATED, PLEASE USE SELOADER INSTEAD") class Paths
 {
 	inline public static var SOUND_EXT = "ogg";
 

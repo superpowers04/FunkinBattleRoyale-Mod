@@ -742,17 +742,23 @@ class HCBoolOption extends Option{
 		description = desc;
 
 	}
-	override function getValue():String return '${Reflect.getProperty(SESave.data,id)}';
+	override function getValue():String return '${Reflect.getProperty(SESave.data,id) == true}';
 	public override function press():Bool{
-		Reflect.setProperty(SESave.data,id,!Reflect.getProperty(SESave.data,id));
+		try{
+
+		Reflect.setProperty(SESave.data,id,Reflect.getProperty(SESave.data,id) != true);
 		display = updateDisplay();
 		if(callback!=null)callback();
 		return true;
+		}catch(e){
+			FuckState.FUCK(e,'options.press');
+			return true;
+		}
 	}
 
 	override function updateDisplay():String
 	{
-		var ret:Bool = cast(Reflect.getProperty(SESave.data,id),Bool);
+		var ret:Bool = Reflect.getProperty(SESave.data,id) == true;
 		if(trueText == "" || falseText == ""){
 			return '$name: $ret';
 		}

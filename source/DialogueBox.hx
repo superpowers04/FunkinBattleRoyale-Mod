@@ -200,20 +200,11 @@ class DialogueBox extends FlxSpriteGroup
 	var requestedSkip:Bool = false;
 	override function update(elapsed:Float)
 	{
-		// HARD CODING CUZ IM STUPDI
-		if (PlayState.SONG.song.toLowerCase() == 'roses')
-			portraitLeft.visible = false;
-		if (PlayState.SONG.song.toLowerCase() == 'thorns')
-		{
-			portraitLeft.color = FlxColor.BLACK;
-			swagDialogue.color = FlxColor.WHITE;
-			dropText.color = FlxColor.BLACK;
-		}
+
 
 		dropText.text = swagDialogue.text;
 
-		if (box.animation.curAnim != null && box.animation.curAnim.name == 'normalOpen' && box.animation.curAnim.finished)
-		{
+		if (box.animation.curAnim != null && box.animation.curAnim.name == 'normalOpen' && box.animation.curAnim.finished) {
 			box.animation.play('normal');
 			dialogueOpened = true;
 			dialogueStarted = true;
@@ -225,11 +216,10 @@ class DialogueBox extends FlxSpriteGroup
 		// 	startDialogue();
 		// }
 
-		if (FlxG.keys.justPressed.ANY  && dialogueStarted == true)
-		{
+		if (FlxG.keys.justPressed.ANY  && dialogueStarted == true) {
 			if(swagDialogue.text.length < dialogueList[0].length && !requestedSkip && !FlxG.keys.justPressed.ESCAPE){
 				swagDialogue.skip();
-				FlxG.sound.play(Paths.sound('pixelText'), 0.8);
+				FlxG.sound.play(SELoader.cache.loadSound('pixelText'), 0.8);
 				requestedSkip = true; // Forces it to skip to the next line if it for some reason gets stuck
 			}else{
 				requestedSkip = false;
