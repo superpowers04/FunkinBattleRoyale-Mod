@@ -791,18 +791,29 @@ class AnimationDebug extends MusicBeatState
 		}
 		return meow;
 	}
-	function editAnimation(Anim:String,charAnim:CharJsonAnimation,?unbind:Bool = false,?overide:Bool = true){
+	function editAnimation(Anim:String,charAnim:CharJsonAnimation,?overide:Bool = true){
 		var existingAnim:Array<Dynamic> = findAnimation(Anim);
-		var anim = existingAnim[1];
-		if (unbind || overide){
-			if (anim != null) charJson.animations[anim] = null;
-			if (!overide)return;
-			// anim = null;
-		}
-		if (anim != null){
-			charJson.animations[anim] = charAnim;
-			// showTempmessage('Replaced existing animation!');
+		// var anim = existingAnim[1];
+		var id = existingAnim[0];
+		// if (unbind || overide){
+		// 	if (anim != null) {
+		// 		charJson.animations[id]=charAnim;
+		// 		return;
+		// 	}
+		// 	if (!overide)return;
+		// 	// anim = null;
+		// }
+		// if (anim != null){
+		// 	charJson.animations[id]=charAnim;
+		// 	// showTempmessage('Replaced existing animation!');
+		// 	return;
+		// }
+		if(id != null){
+			if(overide) charJson.animations[id] = charAnim;
 			return;
+
+
+
 		}
 		charJson.animations.push(charAnim);
 	}
@@ -951,22 +962,18 @@ class AnimationDebug extends MusicBeatState
 			try{
 
 				var Anim = uiMap["animSel"].text;
-				if((animUICurName == "**Unbind")) {
-					editAnimation(Anim,null,true);
-				}else{
-
-					editAnimation(Anim,{
-						anim: Anim,
-						name: animUICurName,
-						loop: uiMap["loop"].checked,
-						flipx:uiMap["flipanim"].checked,
-						noreplaywhencalled:!uiMap["restplay"].checked,
-						fps: Std.int(uiMap["animFPS"].value),
-						loopStart:Std.int(uiMap["loopStart"].value),
-						indices: [],
-						priority:Std.int(uiMap["priorityText"].value)
-					},false);
-				}
+				editAnimation(Anim, (animUICurName == "**Unbind") ? null : {
+					anim: Anim,
+					name: animUICurName,
+					loop: uiMap["loop"].checked,
+					flipx:uiMap["flipanim"].checked,
+					noreplaywhencalled:!uiMap["restplay"].checked,
+					fps: Std.int(uiMap["animFPS"].value),
+					loopStart:Std.int(uiMap["loopStart"].value),
+					indices: [],
+					priority:Std.int(uiMap["priorityText"].value)
+				});
+				
 				spawnChar(true,false,charJson);
 			}catch(e){
 				showTempmessage('Error while adding animation: ${e.message}',FlxColor.RED);
@@ -1024,7 +1031,7 @@ class AnimationDebug extends MusicBeatState
 						loopStart:Std.int(uiMap["loopStart"].value),
 						indices: [],
 						priority:-1
-					},false,overide);
+					},overide);
 					count++;
 					
 				}
