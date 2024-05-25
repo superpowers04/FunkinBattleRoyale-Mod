@@ -1,4 +1,6 @@
 24.05.25.0241;
-* Multimenu Favourites
-* An option to have the note ratings come from the notes instead of the side of the strumline
-* A bunch of optimizations(I hope)
+* Some fixes
+* New graphics for some things
+* Togglable PE character support(Experimental)
+* Alphabet now has a bunch of characters that were missing
+* SELoader can now load assets from mods/assets folder and packs
