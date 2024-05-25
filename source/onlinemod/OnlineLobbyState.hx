@@ -82,7 +82,7 @@ class OnlineLobbyState extends ScriptMusicBeatState {
 		FlxG.sound.music.looped = true;
 		FlxG.sound.music.onComplete = null;
 	  	if(!FlxG.sound.music.playing) FlxG.sound.music.play();
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('onlinemod/online_bg0'));
+		var bg:FlxSprite = SELoader.loadFlxSprite('assets/images/onlinemod/online_bg0.png',true);
 		add(bg);
 
 
@@ -154,7 +154,7 @@ class OnlineLobbyState extends ScriptMusicBeatState {
 		optionsButton.resize(160, 70);
 		add(optionsButton);
 
-		quitHeldBG = new FlxSprite(0, 10).loadGraphic(Paths.image('healthBar','shared'));
+		quitHeldBG = SELoader.loadFlxSprite('assets/shared/images/healthBar.png',true);
 		quitHeldBG.screenCenter(X);
 		quitHeldBG.scrollFactor.set();
 		add(quitHeldBG);
@@ -244,7 +244,7 @@ class OnlineLobbyState extends ScriptMusicBeatState {
 		}catch(e){
 			Chat.OutputChatMessage("[Client] You had an error when receiving packet '" + '$packetId' + "':");
 			Chat.OutputChatMessage(e.message);
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			SELoader.playSound('assets/sounds/cancelMenu',true);
 			FlxG.switchState(new OnlineLobbyState(true));
 		}
 		return true;

@@ -42,7 +42,7 @@ class OnlineHostMenu extends ScriptMusicBeatState
 		SEServer.shutdownServer();
 	}
 	override function create() {
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
+		var bg:FlxSprite = SELoader.loadFlxSprite('assets/images/menuDesat.png',true);
 		bg.color = 0xFFea71fd;
 		add(bg);
 

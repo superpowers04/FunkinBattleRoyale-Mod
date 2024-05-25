@@ -197,7 +197,9 @@ class TitleState extends MusicBeatState
 			var probableChar:CharInfo = null;
 			for (i in characters){
 				if(i.id == char){
-					return i;
+					if(!i.psychChar) return i;
+					probableChar = i;
+
 				}else if(splitCharMap.exists(i.id)){
 					curProbability = splitCharMap[i.id];
 					probableChar = i;
@@ -209,7 +211,15 @@ class TitleState extends MusicBeatState
 			}
 
 		}else{
-			for (i in characters) if(i.id == char) return i;
+			var probableChar:CharInfo = null;
+			for (i in characters){
+				if(i.id == char) {
+					if(!i.psychChar) return i;
+					probableChar = i;
+				}
+
+			}
+			if(probableChar != null) return probableChar;
 		}
 		trace('Unable to find $char!');
 		if(retBF) return defaultChar;
@@ -394,7 +404,7 @@ class TitleState extends MusicBeatState
 						nameSpace:"SECharactersFolder",
 						type:1
 					});
-				}else if (charPath.exists("character.png") && (charPath.exists("character.xml") || charPath.exists("character.json"))){
+				}else if (charPath.exists("character.png") && (charPath.exists("character.xml") || charPath.exists("config.json"))){
 					// invalidCharacters.push([directory,'mods/characters']);
 					invalidCharacters.push({
 						id:directory.replace(' ','-').replace('_','-').toLowerCase(),
@@ -408,6 +418,7 @@ class TitleState extends MusicBeatState
 
 		
 		var ADDPE=SESave.data.PECharSeperate;
+		var LOADPE=SESave.data.PECharLoading;
 		for (ID => dataDir in ['mods/weeks/','mods/packs/']) {
 			var e = new SEDirectory(dataDir);
 			if (SELoader.exists(dataDir)) {
@@ -418,7 +429,7 @@ class TitleState extends MusicBeatState
 				// trace('Checking ${dir} for characters');
 				for (char in _dir.readDirectory()) {
 
-					if (!_dir.isDirectory(char)){
+					if (!_dir.isDirectory(char) && LOADPE){
 						if (char.substring(char.length-5) == ".json"){ // Psych characters
 							characters.push({
 								id:char.substring(0,char.length-5).replace(' ',"-").replace('_',"-").toLowerCase()+(ADDPE?"-pe":""),
@@ -434,7 +445,7 @@ class TitleState extends MusicBeatState
 						continue;
 					}
 					var charPath = _dir.newDirectory(char);
-					if (charPath.exists(char+"/config.json")) {
+					if (charPath.exists("config.json")) {
 						var desc = null;
 						if (charPath.exists('description.txt')) desc = ";" +SELoader.getContent('${charPath}/description.txt');
 						characters.push({
@@ -459,7 +470,7 @@ class TitleState extends MusicBeatState
 							nameSpace:nameSpace
 						});
 
-					}else if (charPath.exists("character.png") && (charPath.exists("character.xml") || charPath.exists("character.json"))){
+					}else if (charPath.exists("character.png") && (charPath.exists("character.xml") || charPath.exists("config.json"))){
 						invalidCharacters.push({
 							id:char.replace(' ',"-").replace('_',"-").toLowerCase(),
 							folderName:char,
@@ -541,9 +552,9 @@ class TitleState extends MusicBeatState
 				return null;
 			}
 		}
-		char = char.replace(' ',"-").replace('_',"-").toLowerCase();
+		char = char.toLowerCase().replace(' ',"-").replace('_',"-");
 		for (i in stages){
-			if(i.id == char.toLowerCase()){
+			if(i.id == char){
 				return i;
 			}
 		}
@@ -1119,7 +1130,7 @@ class TitleState extends MusicBeatState
 			}
 
 			// FlxG.camera.flash(FlxColor.WHITE, 1);
-			FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
+			SELoader.playSound("assets/sounds/confirmMenu.ogg");
 
 			transitioning = true;
 			// FlxG.sound.music.stop();
@@ -1298,7 +1309,8 @@ class TitleState extends MusicBeatState
 
 				
 				deleteCoolText();
-				addMoreText('Developed by').startTyping(0,Conductor.crochetSecs);
+				addMoreText('Developed by');
+				// .startTyping(0,Conductor.crochetSecs);
 			case 11:
 				// if (Main.watermarks)  You're not more important than fucking newgrounds
 				// 	createCoolText(['Kade Engine', 'by']);

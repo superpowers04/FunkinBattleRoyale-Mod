@@ -63,6 +63,7 @@ class SELoader {
 
 	static public var cache:InternalCache = new InternalCache();
 	public static var AssetPathCache:Map<String,String>=[];
+	public static var aliases:Map<String,String>=[];
 	
 	public static var PATH(default,set):String = '';
 	public static function set_PATH(_path:String):String{
@@ -92,6 +93,7 @@ class SELoader {
 			rawMode = defaultRawMode;
 			return path.replace('//','/');
 		}
+		if(aliases[path] != null) return getRawPath(aliases[path]);
 		// Allow custom assets
 		if(path.substring(0,7) == "assets:" || (allowModded && path.substring(0,7) == "assets/")){
 			return getAssetPath(path);

@@ -39,7 +39,7 @@ class OnlineSongMenuState extends MultiMenuState {
 	}
 	override function selSong(sel:Int = 0,charting:Bool = false){
 		if (grpSongs.members[sel].menuValue == null){ // Actually check if the song is a song, if not then error
-			FlxG.sound.play(Paths.sound("cancelMenu"));
+			SELoader.playSound('assets/images/cancelMenu.ogg');
 			showTempmessage("Invalid song!",0xFFFF0000);
 			return;
 		}
@@ -51,7 +51,7 @@ class OnlineSongMenuState extends MultiMenuState {
 		}
 		var songLoc = songInfo.path;
 		if (songInfo.charts[selMode] == "No charts for this song!"){ // Actually check if the song has no charts when loading, if so then error
-			FlxG.sound.play(Paths.sound("cancelMenu"));
+			SELoader.playSound('assets/images/cancelMenu.ogg');
 			showTempmessage("Invalid song!",0xFFFF0000);
 			return;
 		}

@@ -57,7 +57,7 @@ class OnlinePlayMenuState extends ScriptMusicBeatState {
 	override function create()
 	{
 		TitleState.supported = false;
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
+		var bg:FlxSprite = SELoader.loadFlxSprite('assets/images/menuDesat.png',true);
 		bg.color = 0xFFFF6E6E;
 		add(bg);
 

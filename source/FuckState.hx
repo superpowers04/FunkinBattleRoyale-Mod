@@ -279,7 +279,7 @@ class FuckState extends FlxUIState {
 		// kadeLogo.y -= 180;
 		// kadeLogo.alpha = 0.8;
 		// add(kadeLogo);
-		var outdatedLMAO:FlxText = new FlxText(0, FlxG.height * 0.05, 0,(if(FATAL) 'F' else 'Potentially f') + 'atal error caught' , 32);
+		var outdatedLMAO:FlxText = new FlxText(0, FlxG.height * 0.05, 0,(if(FATAL) 'Fatal' else 'Potentially recoverable') + ' error caught' , 32);
 		outdatedLMAO.setFormat(CoolUtil.font, 32, FlxColor.RED, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		outdatedLMAO.scrollFactor.set();
 		outdatedLMAO.screenCenter(flixel.util.FlxAxes.X);

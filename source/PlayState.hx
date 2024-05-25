@@ -644,15 +644,17 @@ class PlayState extends ScriptMusicBeatState
 		curStage = 'stage';
 		stageTags = ["inside","stage"];
 		if(simple) {
-			stageTags.push('performance');stageTags.push('simple');
+			stageTags.push('performance');
+			stageTags.push('simple');
 		}else {
-			var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(SELoader.loadGraphic('assets/shared/images/stageback.png'),true);
+
+			var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('stageback'));
 			bg.antialiasing = true;
 			bg.scrollFactor.set(0.9, 0.9);
 			bg.active = false;
 			add(bg);
 		}
-		var stageFront:FlxSprite = new FlxSprite(-650, 600).loadGraphic(SELoader.loadGraphic('assets/shared/images/stagefront.png'),true);
+		var stageFront:FlxSprite = new FlxSprite(-650, 600).loadGraphic(Paths.image('stagefront'));
 		stageFront.setGraphicSize(Std.int(stageFront.width * 1.1));
 		stageFront.updateHitbox();
 		stageFront.antialiasing = true;
@@ -660,7 +662,7 @@ class PlayState extends ScriptMusicBeatState
 		stageFront.active = false;
 		add(stageFront);
 		if(!simple){
-			var stageCurtains:FlxSprite = new FlxSprite(-500, -300).loadGraphic(SELoader.loadGraphic('assets/shared/images/stagecurtains.png'),true);
+			var stageCurtains:FlxSprite = new FlxSprite(-500, -300).loadGraphic(Paths.image('stagecurtains'));
 			stageCurtains.setGraphicSize(Std.int(stageCurtains.width * 0.9));
 			stageCurtains.updateHitbox();
 			stageCurtains.antialiasing = true;
@@ -737,7 +739,7 @@ class PlayState extends ScriptMusicBeatState
 		var bfPos:Array<Float> = [0,0]; 
 		var gfPos:Array<Float> = [0,0]; 
 		var dadPos:Array<Float> = [0,0];
-		stageInfo =TitleState.findStageByNamespace(SESave.data.selStage,onlinemod.OfflinePlayState.nameSpace);
+		stageInfo = TitleState.findStageByNamespace(SESave.data.selStage,onlinemod.OfflinePlayState.nameSpace);
 		if(SESave.data.stageAuto || PlayState.isStoryMode || ChartingState.charting || SONG.forceCharacters || isStoryMode || SESave.data.selStage == "default")
 			stageInfo = TitleState.findStageByNamespace(SONG.stage,onlinemod.OfflinePlayState.nameSpace,null,false);
 		

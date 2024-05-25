@@ -448,7 +448,7 @@ class StoryMenuState extends ScriptMusicBeatState
 
 		if (controls.BACK && !movedBack && !selectedWeek)
 		{
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			SELoader.playSound('assets/sounds/cancelMenu.ogg');
 			movedBack = true;
 			FlxG.switchState(new MainMenuState());
 		}
@@ -463,13 +463,14 @@ class StoryMenuState extends ScriptMusicBeatState
 	function selectWeek()
 	{
 		if(weekData[curWeek][0] == null){
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			SELoader.playSound('assets/sounds/cancelMenu.ogg');
 			return;
 		}
 		if (stopspamming) return;
 
 		PlayState.resetScore();
-		FlxG.sound.play(Paths.sound('confirmMenu'));
+
+		SELoader.playSound('assets/sounds/confirmMenu.ogg');
 
 		// grpWeekText.members[curWeek].startFlashing();
 		FlxTween.tween(grpWeekText.members[curWeek],{alpha:0},0.1,{type:FlxTweenType.PINGPONG});
@@ -577,7 +578,7 @@ class StoryMenuState extends ScriptMusicBeatState
 			bullShit++;
 		}
 
-		FlxG.sound.play(Paths.sound('scrollMenu'));
+		SELoader.playSound('assets/sounds/scrollMenu.ogg');
 		isVanillaWeek = weekEmbedded[curWeek];
 		// try{
 

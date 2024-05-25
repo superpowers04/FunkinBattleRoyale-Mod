@@ -159,6 +159,7 @@ typedef YourMother = Dynamic;
 	var lang:String = "english";
 	var HDDMode:Bool = false;
 	var PECharSeperate:Bool = false;
+	var PECharLoading:Bool = false;
 
 	public function new(){}
 }

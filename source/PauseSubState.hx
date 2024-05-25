@@ -359,7 +359,7 @@ class PauseSubState extends MusicBeatSubstate {
 				PlayState.instance.generateNotes();
 				countdown();
 			case "Swap Charts":
-				if(currentChart < 0 || PlayState.songDifficulties[currentChart] == null) {FlxG.sound.play(Paths.sound('cancelMenu'));return;}
+				if(currentChart < 0 || PlayState.songDifficulties[currentChart] == null) {SELoader.playSound('assets/sounds/cancelMenu');return;}
 				ChartingState.charting = false;
 				MusicBeatState.returningFromClass = true;
 				var chart = PlayState.songDifficulties[currentChart];

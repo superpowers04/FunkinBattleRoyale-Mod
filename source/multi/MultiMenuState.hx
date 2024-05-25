@@ -481,7 +481,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 
 	function selSong(sel:Int = 0,charting:Bool = false){
 		if (grpSongs.members[sel].menuValue == null){ // Actually check if the song is a song, if not then error
-			FlxG.sound.play(Paths.sound("cancelMenu"));
+			SELoader.playSound("assets/sounds/cancelMenu.ogg");
 			showTempmessage("Invalid song!",FlxColor.RED);
 			return;
 		}
@@ -527,7 +527,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 			return;
 		}
 		if (songInfo.charts[selMode] == "No charts for this song!"){ // Actually check if the song has no charts when loading, if so then error
-			FlxG.sound.play(Paths.sound("cancelMenu"));
+			SELoader.playSound("assets/sounds/cancelMenu.ogg");
 			showTempmessage("Invalid song!",FlxColor.RED);
 			return;
 		}

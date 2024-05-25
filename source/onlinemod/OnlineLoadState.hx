@@ -67,7 +67,7 @@ class OnlineLoadState extends MusicBeatState
 
 	override function create()
 	{
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('onlinemod/online_bg2'));
+		var bg:FlxSprite = SELoader.loadFlxSprite('assets/images/onlinemod/online_bg2.png',true);
 		add(bg);
 
 
@@ -253,7 +253,7 @@ class OnlineLoadState extends MusicBeatState
 		}catch(e){
 			Chat.OutputChatMessage("[Client] You had an error while trying to download a song:");
 			Chat.OutputChatMessage(e.message);
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			SELoader.playSound('assets/sounds/cancelMenu',true);
 			FlxG.switchState(new OnlineLobbyState(true));
 		}
 		return true;

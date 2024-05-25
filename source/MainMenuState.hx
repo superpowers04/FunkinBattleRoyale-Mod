@@ -95,6 +95,7 @@ class MainMenuState extends SickMenuState {
 	// }
 	var important:Bool = false;
 	override public function new(important:Bool = false){
+		FlxG.sound.volume = SESave.data.masterVol;
 		this.important = important;
 		multi.MultiMenuState.importedSong = false;
 		super();
@@ -137,7 +138,6 @@ class MainMenuState extends SickMenuState {
 				outdatedLMAO.scrollFactor.set();
 	 			outdatedLMAO.screenCenter(FlxAxes.X);
 				add(outdatedLMAO);
-
 			}else if (TitleState.outdated){
 
 				var outdatedLMAO:FlxText = new FlxText(0, FlxG.height * 0.05, 0,(if(nightly == "") 'SE is outdated, Latest: ${TitleState.updatedVer}, Check Changelog for more info' else 'Latest nightly: ${TitleState.updatedVer}. You are on ${ver}'), 32);
@@ -183,12 +183,12 @@ class MainMenuState extends SickMenuState {
 			// 	hasWarnedInvalid = true;
 			// } 
 			if (!hasWarnedNightly) {
-				errorMessage += "This is a nightly build for " + ver.substring(0,ver.length - (1 + nightly.length) ) +", expect bugs and things changing without warning!\nBasing a fork off of this is not advised!";
+				errorMessage += "This is a nightly build, expect bugs and things changing without warning!\nPlease report any bugs you encounter!";
 				// ver+=nightly;
 				hasWarnedNightly = true;
 			} 
 
-			var versionShit:FlxText = new FlxText(5, FlxG.height - 50, 0, 'FNF 0.2.7.1/Kade 1.5.2/${if(TitleState.easterEgg == 0x1) "Lesbian" else "Super"}-Engine ${ver} ${buildType} ${compileType}', 12);
+			var versionShit:FlxText = new FlxText(5, FlxG.height - 50, 0, '${(TitleState.easterEgg == 0x1) ? "Lesbian" : "Super"}-Engine ${ver} ${buildType} ${compileType}', 12);
 			versionShit.setFormat(CoolUtil.font, 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			versionShit.borderSize = 2;
 			versionShit.scrollFactor.set();
@@ -205,6 +205,7 @@ class MainMenuState extends SickMenuState {
 			}
 			SELoader.gc();
 			eventColors(Date.now());
+			
 
 			lastError = "";
 			#if !mobile
@@ -237,16 +238,13 @@ class MainMenuState extends SickMenuState {
 		#if !mobile
 		if (otherMenu) {mmSwitch(true);FlxG.sound.play(Paths.sound('cancelMenu'));return;} else
 		#end
-		{
-	
 			selected = false;
-		}
 		// FlxG.switchState(new TitleState());
 		// do nothing
 	}
 
 	override function update(elapsed:Float) {
-		if (FlxG.sound.music.volume < 0.8) FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
+		// if (FlxG.sound.music.volume < 0.8) FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 		// if(char != null){
 		// 	if(controls.LEFT){
 		// 		char.playAnim("singLEFT",true);

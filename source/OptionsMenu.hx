@@ -158,6 +158,7 @@ class OptionsMenu extends MusicBeatState
 		new OptionCategory("Compatibility", [
 			new HCBoolOption("Legacy hurt notes","Load legacy Tricky mod format notes","useHurtArrows"),
 			new HCBoolOption("Seperate PE chars from SE Chars","Add -pe to Psych character ID's to prevent conflicts","PECharSeperate"),
+			new HCBoolOption("Add Psych Engine Characters","(Requires a reload of character list) Allows Psych characters to load. Psych Characters are not properly implemented yet","PECharLoading"),
 		],'Toggle compatibility with specific features from mods/engines'),
 		new OptionCategory("Performance", [
 			new FPSCapOption("Cap your Frames Per Second, This controls how fast the game will update your screen"),

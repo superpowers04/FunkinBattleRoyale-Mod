@@ -632,6 +632,7 @@
 	<SubTexture name="~0001" x="745" y="831" width="43" height="21"/>
 	<SubTexture name="~0002" x="790" y="831" width="43" height="21"/>
 	<SubTexture name="~0003" x="790" y="831" width="43" height="21"/>
+	<SubTexture name="0 bold0001" x="347" y="797" width="43" height="66" />
 	<SubTexture name="1 bold0001"  x="4" y="873" width="36" height="61" />
 	<SubTexture name="2 bold0001"  x="80" y="872" width="45" height="61" />
 	<SubTexture name="3 bold0001"  x="172" y="872" width="41" height="63" />
@@ -640,13 +641,7 @@
 	<SubTexture name="6 bold0001"  x="6" y="936" width="46" height="62" />
 	<SubTexture name="7 bold0001"  x="103" y="941" width="47" height="63" />
 	<SubTexture name="8 bold0001"  x="205" y="943" width="35" height="67" />
-	<SubTexture name="8 bold0002"  x="205" y="943" width="35" height="67" />
-	<SubTexture name="8 bold0003"  x="246" y="943" width="36" height="66" />
-	<SubTexture name="8 bold0004"  x="246" y="943" width="36" height="66" />
 	<SubTexture name="9 bold0001"  x="290" y="943" width="38" height="63" />
-	<SubTexture name="9 bold0002"  x="290" y="943" width="38" height="63" />
-	<SubTexture name="9 bold0003"  x="329" y="945" width="40" height="64" />
-	<SubTexture name="9 bold0004"  x="329" y="945" width="40" height="64" />
 	<SubTexture name="^ bold0001"  x="459" y="934" width="47" height="32" />
 	<SubTexture name="/ bold0001"  x="560" y="940" width="45" height="65" />
 	<SubTexture name="\\ bold0001" x="369" y="940" width="44" height="65" />
@@ -661,55 +656,7 @@
 	<SubTexture name="< bold0001" x="844" y="937" width="50" height="64" />
 	<SubTexture name="@ bold0001" x="703" y="934" width="61" height="64" />
 	<SubTexture name="> bold0001" x="657" y="937" width="45" height="64" />
-	<SubTexture name="0 bold0001" x="347" y="797" width="43" height="66" />
-<!-- 	<SubTexture name="0 bold0001"  x="345" y="798" width="47" height="63" />
-	<SubTexture name="0 bold0002"  x="345" y="798" width="47" height="63" />
-	<SubTexture name="0 bold0003"  x="398" y="798" width="50" height="65" />
-	<SubTexture name="0 bold0004"  x="398" y="798" width="50" height="65" />
-	<SubTexture name="1 bold0001"  x="4" y="873" width="36" height="61" />
-	<SubTexture name="1 bold0002"  x="4" y="873" width="36" height="61" />
-	<SubTexture name="1 bold0003"  x="41" y="873" width="35" height="61" />
-	<SubTexture name="1 bold0004"  x="41" y="873" width="35" height="61" />
-	<SubTexture name="2 bold0001"  x="80" y="872" width="45" height="61" />
-	<SubTexture name="2 bold0002"  x="80" y="872" width="45" height="61" />
-	<SubTexture name="2 bold0003"  x="126" y="872" width="45" height="61" />
-	<SubTexture name="2 bold0004"  x="126" y="872" width="45" height="61" />
-	<SubTexture name="3 bold0001"  x="172" y="872" width="41" height="63" />
-	<SubTexture name="3 bold0002"  x="172" y="872" width="41" height="63" />
-	<SubTexture name="3 bold0003"  x="214" y="872" width="41" height="63" />
-	<SubTexture name="3 bold0004"  x="214" y="872" width="41" height="63" />
-	<SubTexture name="4 bold0001"  x="261" y="872" width="37" height="55" />
-	<SubTexture name="4 bold0002"  x="261" y="872" width="37" height="55" />
-	<SubTexture name="4 bold0003"  x="299" y="871" width="42" height="57" />
-	<SubTexture name="4 bold0004"  x="299" y="871" width="42" height="57" />
-	<SubTexture name="5 bold0001"  x="343" y="871" width="45" height="58" />
-	<SubTexture name="5 bold0002"  x="343" y="871" width="45" height="58" />
-	<SubTexture name="5 bold0003"  x="390" y="868" width="45" height="57" />
-	<SubTexture name="5 bold0004"  x="390" y="868" width="45" height="57" />
-	<SubTexture name="6 bold0001"  x="6" y="936" width="46" height="62" />
-	<SubTexture name="6 bold0002"  x="6" y="936" width="46" height="62" />
-	<SubTexture name="6 bold0003"  x="53" y="936" width="47" height="63" />
-	<SubTexture name="6 bold0004"  x="53" y="936" width="47" height="63" />
-	<SubTexture name="7 bold0001"  x="103" y="941" width="47" height="63" />
-	<SubTexture name="7 bold0002"  x="103" y="941" width="47" height="63" />
-	<SubTexture name="7 bold0003"  x="153" y="942" width="48" height="65" />
-	<SubTexture name="7 bold0004"  x="153" y="942" width="48" height="65" />
-	<SubTexture name="8 bold0001"  x="205" y="943" width="35" height="67" />
-	<SubTexture name="8 bold0002"  x="205" y="943" width="35" height="67" />
-	<SubTexture name="8 bold0003"  x="246" y="943" width="36" height="66" />
-	<SubTexture name="8 bold0004"  x="246" y="943" width="36" height="66" />
-	<SubTexture name="9 bold0001"  x="290" y="943" width="38" height="63" />
-	<SubTexture name="9 bold0002"  x="290" y="943" width="38" height="63" />
-	<SubTexture name="9 bold0003"  x="329" y="945" width="40" height="64" />
-	<SubTexture name="9 bold0004"  x="329" y="945" width="40" height="64" /> -->
-<!-- 	<SubTexture name="^ bold0002"  x="459" y="934" width="47" height="32" />
-	<SubTexture name="^ bold0003"  x="509" y="935" width="48" height="33" />
-	<SubTexture name="^ bold0004"  x="509" y="935" width="48" height="33" /> -->
-<!-- 	<SubTexture name="/ bold0002"  x="560" y="940" width="45" height="65" />
-	<SubTexture name="/ bold0003"  x="605" y="940" width="45" height="66" />
-	<SubTexture name="/ bold0004"  x="605" y="940" width="45" height="66" /> -->
+	<SubTexture name="? bold0001" x="898" y="940" width="37" height="64" />
+	<SubTexture name="! bold0001" x="940" y="940" width="26" height="64" />
 
-<!-- 	<SubTexture name="\\ bold0002" x="369" y="940" width="44" height="65" />
-	<SubTexture name="\\ bold0003" x="413" y="941" width="45" height="64" />
-	<SubTexture name="\\ bold0004" x="413" y="941" width="45" height="64" /> -->
 </TextureAtlas>

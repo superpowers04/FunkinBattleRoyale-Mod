@@ -120,27 +120,21 @@ class SickMenuState extends ScriptMusicBeatState
 					if(isMainMenu && _bg != null){
 						MainMenuState.bgcolor = switchToColor;
 					}
-					FlxTween.tween(FlxG.sound.music,{volume:0},1);
+					// FlxTween.tween(FlxG.sound.music,{volume:0},1);
 					if((isMainMenu || recolor) && _bg != null){
 						FlxTween.color(_bg,1,_bg.color,switchToColor);
 					}
-					new FlxTimer().start(1, function(tmr:FlxTimer)
-					{
-						SickMenuState.curSongTime = FlxG.sound.music.time;
-						FlxG.sound.music.stop();
+					// new FlxTimer().start(1, function(tmr:FlxTimer) {
+					SickMenuState.curSongTime = FlxG.sound.music.time;
+					// 	FlxG.sound.music.stop();
 						
-						musicHandle(isMainMenu,_bg);
-					});
+					// 	musicHandle(isMainMenu,_bg);
+					// });
+					// return;
 				}
 				SickMenuState.musicFileLoc = mt.file;
 				if(mt.file.contains(" or ")){
-					SickMenuState.musicFileLoc = "assets/music/freakyMenu.ogg"; // Safety net to prevent a null song or something
-					for (file in mt.file.split(" or ")) {
-						if(SELoader.exists(file)){
-							SickMenuState.musicFileLoc = file;
-							break;
-						}
-					}
+					SickMenuState.musicFileLoc = SELoader.anyExists(mt.file.split(" or ")) ?? "assets/music/freakyMenu.ogg"; // Safety net to prevent a null song or something
 				}
 				SickMenuState.fading = false;
 				
@@ -150,14 +144,18 @@ class SickMenuState extends ScriptMusicBeatState
 
 			// if (_bg != null){ }
 
-			FlxG.sound.playMusic(SickMenuState.menuMusic,SESave.data.instVol);
+				FlxG.sound.playMusic(SickMenuState.menuMusic,SESave.data.instVol);
 			// if (!MainMenuState.firstStart) FlxG.sound.music.time = FlxMath.wrap(Math.floor(SickMenuState.curSongTime),0,Math.floor(FlxG.sound.music.length));
-			}else if (!FlxG.sound.music.playing) {FlxG.sound.playMusic(SickMenuState.menuMusic,SESave.data.instVol);Conductor.changeBPM(mt.bpm);}
+			}else if (!FlxG.sound.music.playing) {
+				FlxG.sound.playMusic(SickMenuState.menuMusic,SESave.data.instVol);
+				Conductor.changeBPM(mt.bpm);
+			}
 			if(!isMainMenu && !recolor && _bg != null){
 				_bg.color = FlxColor.interpolate(_bg.color,FlxColor.fromString(SickMenuState.musicList[musicTime].color),0.2);
 			}else if(recolor && _bg != null){
 				_bg.color = FlxColor.fromString(mt.color);
 			}
+			if (FlxG.sound.music.volume < SESave.data.instVol) FlxG.sound.music.volume = SESave.data.instVol;
 		}catch(e){
 			MusicBeatState.instance.showTempmessage('Unable to handle music ${e.message}');
 			trace('${e.stack}');
@@ -223,8 +221,7 @@ class SickMenuState extends ScriptMusicBeatState
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		if (FlxG.sound.music != null)
-			Conductor.songPosition = FlxG.sound.music.time;
+		if (FlxG.sound.music != null) Conductor.songPosition = FlxG.sound.music.time;
 		callInterp('handleInput',[]);
 		if(cancelCurrentFunction) return;
 		if (controls.BACK) goBack();
@@ -293,9 +290,7 @@ class SickMenuState extends ScriptMusicBeatState
 			}
 		}
 	}
-	function select(sel:Int){
-		trace("Why wasn't this replaced?");
-	}
+	function select(sel:Int){ trace("Why wasn't this replaced?"); }
 	function changeSelection(change:Int = 0)
 	{
 		callInterp('changeSelection',[change]);
@@ -319,11 +314,12 @@ class SickMenuState extends ScriptMusicBeatState
 			item.targetY = bullShit - curSelected;
 			bullShit++;
 
-			item.alpha = 0.6;
-			item.color = 0xdddddd;
 			if (item.targetY == 0) {
 				item.alpha = 1;
 				item.color = 0xffffff;
+			}else{
+				item.alpha = 0.6;
+				item.color = 0xdddddd;
 			}
 		}
 		callInterp('changeSelectionAfter',[change]);

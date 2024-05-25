@@ -133,7 +133,7 @@ class Credits extends SearchMenuState
 	}
 
 	override function select(sel:Int = 0){
-		FlxG.sound.play(Paths.sound('cancelMenu'));
+		SELoader.playSound('assets/sounds/cancelMenu.ogg');
 		return;
 	}
 

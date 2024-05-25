@@ -18,7 +18,7 @@ class OnlineNickState extends MusicBeatState
 
   override function create()
   {
-	var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
+	var bg:FlxSprite = SELoader.loadFlxSprite('assets/images/menuDesat.png',true);
 	bg.color = 0xFFFF6E6E;
 		add(bg);
 

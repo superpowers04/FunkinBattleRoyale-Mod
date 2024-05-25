@@ -248,10 +248,11 @@ class CharSelection extends SearchMenuState
 		updateInfoText(text);
 		updateName((if(char == null || char[0] == null) "Unknown?!?!?" else char[0]));
 		if(!SESave.data.performance){
-			uiIcon.changeSprite(formatChar(chars[curSelected]),'face',false,(if(char == null || char[4] == null )null else chars[curSelected][4].path));
+			uiIcon.changeSprite(formatChar(chars[curSelected]),'face',false,((char == null || char[4] == null ) ? null : chars[curSelected][4].path));
 			uiIcon.x = infoTextBorder.x + (infoTextBorder.width * 0.5) - (uiIcon.width * 0.5);
 			uiIcon.y = infoTextBorder.y + 50;
 			uiIcon.centerOffsets();
+			uiIcon.updateAnim((char[1] == 1) ? 0 : 100);
 		}
 
 	}
