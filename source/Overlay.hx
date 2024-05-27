@@ -648,13 +648,21 @@ class ConsoleInput extends TextField{
 
 			// 		Console.print('PlayState:${cpp.Stdlib.sizeof(PlayState)}');
 				// }
+			case 'trace' :
+				// Console.print(haxe.CallStack.exceptionStack(true));
+				text = text.substring(text.indexOf(' '));
+				trace(text);
+				return text;
+			case 'stack' :
+				// Console.print(haxe.CallStack.exceptionStack(true));
+				return haxe.CallStack.exceptionStack(true);
 			case 'quit' | 'exit':
 				Sys.exit(0);
 				return null;
 			case 'close' | 'exitconsole' | 'hide':
 				Console.showConsole = false;
 				return null;
-			case 'echo' | "print" | 'trace':
+			case 'echo' | "print":
 				text = text.substring(text.indexOf(' '));
 				Console.print(text);
 				return text;

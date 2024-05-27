@@ -137,7 +137,7 @@ class CoolUtil {
 	}
 	@:keep inline public static function multiInt(?int:Int = 0) return (int==1?'':'s');
 
-	public static function cleanJSON(input:String):String{ // Haxe doesn't filter out comments?
+	@:keep inline public static function cleanJSON(input:String):String{ // Haxe doesn't filter out comments?
 		return (~/\/\*[\s\S]*?\*\/|\/\/.*/g).replace(input.trim(),'');
 	}
 }

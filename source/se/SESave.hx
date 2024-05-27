@@ -160,6 +160,8 @@ typedef YourMother = Dynamic;
 	var HDDMode:Bool = false;
 	var PECharSeperate:Bool = false;
 	var PECharLoading:Bool = false;
+	var QuickReloading:Bool = false;
+	var loadPsychEvents:Bool = false;
 
 	public function new(){}
 }

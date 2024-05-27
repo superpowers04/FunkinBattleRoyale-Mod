@@ -40,6 +40,7 @@ import flixel.addons.ui.FlxUITooltip.FlxUITooltipStyle;
 import flixel.ui.FlxButton;
 import flixel.ui.FlxSpriteButton;
 import flixel.addons.ui.FlxUIDropDownMenu;
+import TitleState.StageInfo;
 
 import StageJson;
 
@@ -132,9 +133,9 @@ class StageEditor extends MusicBeatState{
 	}
 	// Don't enable this, I'm just too lazy to comment out code
 	#if STAGEEDITOR
-	var curStage = "";
-	public override function new(stage:String = ""){
-		curStage = stage;
+	var curStage:StageInfo;
+	public override function new(stage:String = "stage"){
+		curStage = TitleState.findStage(stage);
 		super();
 	}
 	public var objects:Array<Dynamic> = [];
@@ -172,6 +173,7 @@ class StageEditor extends MusicBeatState{
 		FlxG.sound.music.play(); // Music go brrr
 
 
+
 		var out:StageOutput = loadStage(this,curStage);
 
 
@@ -179,7 +181,9 @@ class StageEditor extends MusicBeatState{
 
 
 	}
+	override public function onFileDrop(file):Null<Bool>{
 
+	}
 
 	#end
 }

@@ -8,7 +8,7 @@ import flixel.graphics.FlxGraphic;
 import flash.display.BitmapData;
 @:deprecated("PATHS IS DEPRECATED, PLEASE USE SELOADER INSTEAD") class Paths
 {
-	inline public static var SOUND_EXT = "ogg";
+	inline public static final SOUND_EXT = "ogg";
 
 	static var currentLevel:String;
 

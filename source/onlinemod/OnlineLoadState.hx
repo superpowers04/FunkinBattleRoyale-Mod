@@ -263,7 +263,8 @@ class OnlineLoadState extends MusicBeatState
 	{
 		loadingText.text = "Loading Voices...";
 
-		voices = new FlxSound().loadEmbedded(Sound.fromFile(path));
+		voices = SELoader.loadFlxSound(path);
+		// new FlxSound().loadEmbedded(Sound.fromFile(path));
 
 		loadedVoices = true;
 		checkComplete();
@@ -278,7 +279,7 @@ class OnlineLoadState extends MusicBeatState
 	{
 		loadingText.text = "Loading Instrumental...";
 
-		inst = Sound.fromFile(path);
+		inst = SELoader.loadSound(path);
 
 		loadedInst = true;
 		checkComplete();

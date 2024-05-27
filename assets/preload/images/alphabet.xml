@@ -58,14 +58,14 @@
 	<SubTexture name=". bold0001" x="2" y="149" width="31" height="35"/>
 	<SubTexture name=". bold0002" x="35" y="149" width="31" height="35"/>
 	<SubTexture name=". bold0003" x="35" y="149" width="31" height="35"/> -->
-	<SubTexture name="-dash- bold0000" x="68" y="149" width="49" height="25"/>
-	<SubTexture name="-dash- bold0001" x="68" y="149" width="49" height="25"/>
-	<SubTexture name="-dash- bold0002" x="119" y="149" width="49" height="25"/>
-	<SubTexture name="-dash- bold0003" x="119" y="149" width="49" height="25"/>
-	<SubTexture name="- bold0000" x="68" y="149" width="49" height="25"/>
-	<SubTexture name="- bold0001" x="68" y="149" width="49" height="25"/>
-	<SubTexture name="- bold0002" x="119" y="149" width="49" height="25"/>
-	<SubTexture name="- bold0003" x="119" y="149" width="49" height="25"/>
+	<SubTexture name="-dash- bold0000" x="68" y="149" width="49" height="60"/>
+	<SubTexture name="-dash- bold0001" x="68" y="149" width="49" height="60"/>
+	<SubTexture name="-dash- bold0002" x="119" y="149" width="49" height="60"/>
+	<SubTexture name="-dash- bold0003" x="119" y="149" width="49" height="60"/>
+	<SubTexture name="- bold0000" x="68" y="149" width="49" height="60"/>
+	<SubTexture name="- bold0001" x="68" y="149" width="49" height="60"/>
+	<SubTexture name="- bold0002" x="119" y="149" width="49" height="60"/>
+	<SubTexture name="- bold0003" x="119" y="149" width="49" height="60"/>
 <!-- 	<SubTexture name="-down arrow- bold0000" x="170" y="149" width="39" height="44"/>
 	<SubTexture name="-down arrow- bold0001" x="170" y="149" width="39" height="44"/>
 	<SubTexture name="-down arrow- bold0002" x="211" y="149" width="39" height="44"/>

@@ -243,11 +243,11 @@ class FuckState extends FlxUIState {
 		FUCK(E);
 	}
 	public static function hook(){
-		trace('Enabling standard uncaught error handler...');
+		// trace('Enabling standard uncaught error handler...');
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, FUCK_OPENFL);
 
 		#if cpp
-		trace('Enabling C++ critical error handler...');
+		// trace('Enabling C++ critical error handler...');
 		untyped __global__.__hxcpp_set_critical_error_handler(FUCK);
 		#end
 	}

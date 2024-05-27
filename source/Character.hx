@@ -36,7 +36,6 @@ import hscriptfork.InterpSE;
 
 
 using StringTools;
-
 class CharAnimController extends FlxAnimationController{
 	#if(flixel > "5.3.0")
 	override function findByPrefix(AnimFrames:Array<FlxFrame>, Prefix:String,logError:Bool = true):Void
@@ -610,12 +609,15 @@ class CharAnimController extends FlxAnimationController{
 		isCustom = true;
 		var charPropJson:String = "";
 		if(charInfo.internal){
-			charXml = Paths.xml(charInfo.internalAtlas);
-			if(frames == null) frames=tex=Paths.getSparrowAtlas(charInfo.internalAtlas);
-			charPropJson = charInfo.internalJSON;
 			try{
-				charProperties = Json.parse(CoolUtil.cleanJSON(charPropJson));
+				var p = SELoader.getRawPath("assets/shared/images/")+charInfo.internalAtlas; // This is to prevent loading custom bf for internal bf
+				charXml = SELoader.loadXML(p+".xml",true);
+				// trace('$charXml $p');
+				if(frames == null) frames=tex=FlxAtlasFrames.fromSparrow(SELoader.loadGraphic('$p.png',true),charXml);
+				// trace('$frames');
+				charProperties = Json.parse(charPropJson = charInfo.internalJSON);
 			}catch(e){
+				thrownError++;
 				MainMenuState.handleError(e,'Character ${curCharacter} is a hardcoded character and caused an error, Something went terribly wrong! ${e.message}');
 				return;
 			}
@@ -699,6 +701,7 @@ class CharAnimController extends FlxAnimationController{
 					animOffsets['all'] = [0.0,0.0];
 				}else{
 					if(curCharacter == "bf" || curCharacter == "gf"){
+						thrownError++;
 						MainMenuState.handleError('Character ${curCharacter} has no character json and is a hardcoded character, Something went terribly wrong!');
 						return;
 					}
@@ -780,7 +783,10 @@ class CharAnimController extends FlxAnimationController{
 
 
 		loadJSONChar(charProperties);
-		if(charInfo.internal){return trace('Finished loading hardcoded character: $curCharacter.');}
+		if(charInfo.internal){
+			trace('Finished loading hardcoded character: $curCharacter.');
+			return;
+		}
 		// Custom misses
 		if (charType == 0 && !amPreview && !debugMode){
 			switch(charProperties.custom_misses){
@@ -819,13 +825,16 @@ class CharAnimController extends FlxAnimationController{
 		e.hscriptGen = true;
 		return e;
 	}
-	var thrownError:Bool = false;
+	var thrownError:Int = 0;
 	var loaded:Bool=false;
-	public function handleError(error:String){
-		if(thrownError) return;
+	public function handleError(error:String,?pos:haxe.PosInfos){
+		thrownError++;
+		if(thrownError>1){
+			trace('$curCharacter Error $thrownError:$error');
+			return;
+		}
 		trace('$curCharacter:$error');
 		interp = null;
-		thrownError = true;
 		// if(!loaded){
 		// 	try{
 		// 		loaded=true;
@@ -839,7 +848,7 @@ class CharAnimController extends FlxAnimationController{
 		// 	PlayState.instance.errorHandle(error);
 		// 	// throw error;
 		// }else{
-			MainMenuState.handleError(error);
+		MainMenuState.handleError(error,pos);
 		// }
 	}
 
@@ -850,6 +859,7 @@ class CharAnimController extends FlxAnimationController{
 
 
 	public function new(?x:Float = 0, ?y:Float = 0, ?character:String = "", ?isPlayer:Bool = false,?charType:Int = 0,?preview:Bool = false,?exitex:FlxAtlasFrames = null,?charJson:CharacterJson = null,?useHscript:Bool = true,?charPath:String = "",?charInfo:Null<CharInfo> = null) { // CharTypes: 0=BF 1=Dad 2=GF 
+		var part = "super call";
 		#if !debug 
 		try{
 		#end
@@ -871,7 +881,7 @@ class CharAnimController extends FlxAnimationController{
 		if(charPath != "") charLoc = charPath;
 
 
-		if(curCharacter == "automatic" || curCharacter == "" || curCharacter == "bfHC" ) curCharacter = "bf";
+		if(curCharacter == "automatic" || curCharacter == "" || curCharacter == "bfHC" ) curCharacter = "INTERNAL|bf";
 
 		animation = new CharAnimController(this);
 
@@ -880,11 +890,12 @@ class CharAnimController extends FlxAnimationController{
 		definingColor = (preview ? definingColor : (charType == 1 ? FlxColor.RED : FlxColor.GREEN));
 		
 		antialiasing = true;
+		part = "Loading Character";
 		loadChar();
-		
-		dance();
+		if(frames == null){throw('$curCharacter is missing frames?');}
 		// var alloffset = animOffsets.get("all");
 
+		part = "Fake miss generation";
 		for (i in ['RIGHT','UP','LEFT','DOWN']) { // Add main animations over miss if miss isn't present
 			var miss = 'sing${i}miss';
 			if (animation.getByName(miss) == null){
@@ -894,29 +905,37 @@ class CharAnimController extends FlxAnimationController{
 		}
 		this.y += charY;
 		this.x += charX;
-		if (isPlayer && animation.getByName('singRIGHT') != null && flip && flipNotes) {
+		part = "Flipping sing animations";
+		if (isPlayer && flip && flipNotes) {
 			flipX = !flipX;
 
-				// var animArray
-			if(!charInfo.psychChar){ // Psych Characters aren't side dependant, SE characters use the same definitions for left and right
+			if(!(charInfo?.psychChar) 
+				&& animation.getByName('singRIGHT') != null 
+				&& animation.getByName('singLEFT') != null){ // Psych Characters don't use the same animation definitions for both sides, SE characters do
 
 				var oldRight = animation.getByName('singRIGHT').frames;
-				animation.getByName('singRIGHT').frames = animation.getByName('singLEFT').frames;
-				animation.getByName('singLEFT').frames = oldRight;
+				var oldLeft = animation.getByName('singLEFT').frames;
+				if(oldRight != null && oldLeft != null){
+					animation.getByName('singRIGHT').frames = oldLeft;
+					animation.getByName('singLEFT').frames = oldRight;
 
-				// IF THEY HAVE MISS ANIMATIONS??
-				var oldMissAnim = animation.getByName('singRIGHTmiss');
-				if (oldMissAnim != null) {
-					var oldMiss = oldMissAnim.frames;
-					animation.getByName('singRIGHTmiss').frames = animation.getByName('singLEFTmiss').frames;
-					animation.getByName('singLEFTmiss').frames = oldMiss;
+					// IF THEY HAVE MISS ANIMATIONS??
+					var oldMissRight = animation.getByName('singRIGHTmiss').frames;
+					var oldMissLeft = animation.getByName('singLEFTmiss').frames;
+					if (oldMissRight != null && oldMissLeft != null) {
+						animation.getByName('singRIGHTmiss').frames = oldMissLeft;
+						animation.getByName('singLEFTmiss').frames = oldMissRight;
+					}
 				}
 			}
 		}
+		part = "Dance";
 		dance();
+		part = "Calling interpeter New";
 
 		callInterp("new",[]);
 		if (animation.curAnim != null) setOffsets(animName); // Ensures that offsets are properly applied
+		part = "Animation callbacks";
 		animation.finishCallback = function(name:String){
 			animHasFinished = true;
 			callInterp("animFinish",[animation.curAnim]);
@@ -924,16 +943,19 @@ class CharAnimController extends FlxAnimationController{
 		animation.callback = function(name:String,frameNumber:Int,frameIndex:Int){
 			callInterp("animFrame",[animation.curAnim,frameNumber,frameIndex]);
 		};
+
 		if(animation.curAnim == null && !lonely && !amPreview){throw('$curCharacter is missing an idle/dance animation!');}
+		part = "Finishing up";
 		if(animation.getByName('songStart') != null && !lonely && !amPreview) playAnim('songStart',true);
 		if(!charProperties.editableSprite){
 			// graphic.canBeDumped = true;
 			graphic.dump();
 		}
 		#if !debug
-		}catch(e){
+		}catch(e){ 
+
 			trace(e.details());
-			return handleError('Error with $curCharacter: ${e}');
+			return handleError('Error with $curCharacter at $part: ${e.details()}');
 			
 		}
 		#end
@@ -1255,7 +1277,7 @@ class CharAnimController extends FlxAnimationController{
 		return (TitleState.retChar(char) != "");
 	}
 
-	public static var BFJSON(default,null):String = '{
+	public static var BFJSON(default,null):String = CoolUtil.cleanJSON('{
 	"embedded": true,
 	"path": "characters/BOYFRIEND",
 	"animations_offsets": [
@@ -1523,9 +1545,10 @@ class CharAnimController extends FlxAnimationController{
 			"flipx": false,
 			"indices": []
 		}
-	]
-}';
-	public static var GFJSON(default,null) = '{
+	],
+	"editableSprite":true
+}');
+	public static var GFJSON(default,null) = CoolUtil.cleanJSON('{
 	"animations_offsets": [
 		{
 			"player1": [0, 0],
@@ -1685,10 +1708,11 @@ class CharAnimController extends FlxAnimationController{
 		}
 	],
 	"embedded": true,
+	"editableSprite":true,
 	"path": "characters/GF_assets",
 	"color": "#A5004D",
 	"cam_pos3": [0, 0]
-}';
+}');
 
 
 }

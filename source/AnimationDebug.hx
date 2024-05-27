@@ -230,6 +230,8 @@ class AnimationDebug extends MusicBeatState
 		}
 		try{
 			updateTxt();
+
+			super.create();
 			camGame = new FlxCamera();
 			camHUD = new FlxCamera();
 			camHUD.bgColor.alpha = 0;
@@ -265,7 +267,7 @@ class AnimationDebug extends MusicBeatState
 				stageFront.cameras = [camGame];
 				add(stageFront);
 
-				gf = new Character(400, 100, "gf",false,2,true);
+				gf = new Character(400, 100, "INTERNAL|gf",false,2,true);
 				gf.scrollFactor.set(0.90, 0.90);
 				gf.animation.finishCallback = function(name:String) gf.idleEnd(true);
 				gf.dance();
@@ -276,7 +278,7 @@ class AnimationDebug extends MusicBeatState
 					gf.alpha = 0.5;
 					gf.color = 0xA5004D;
 				}else{
-					bf = new Character((if(charType == 1) 100 else 790), 100, "bf",(charType == 0),charType,true);
+					bf = new Character((charType == 1 ? 100 : 790), 100, "INTERNAL|bf",(charType == 0),charType,true);
 					bf.scrollFactor.set(0.95, 0.95);
 					bf.dance();
 					bf.cameras = [camGame];
@@ -322,8 +324,8 @@ class AnimationDebug extends MusicBeatState
 
 			camGame.follow(camFollow);
 			updateTxt();
-			updateTxt();
 			spawnChar();
+			updateTxt();
 			if(chara == null)throw("Player object is null!");
 			if(charJson.clone != "" && charJson.clone != null){
 				showTempmessage('Older character loaded. Config has been reset!',FlxColor.RED);
@@ -357,7 +359,7 @@ class AnimationDebug extends MusicBeatState
 			add(offsetTopText);
 			add(contText);
 
-			quitHeldBG = new FlxSprite(0, 10).loadGraphic(Paths.image('healthBar','shared'));
+			quitHeldBG = new FlxSprite(0, 10).loadGraphic(SELoader.loadGraphic('assets/shared/images/healthBar.png',true));
 			quitHeldBG.screenCenter(X);
 			quitHeldBG.scrollFactor.set();
 			add(quitHeldBG);
@@ -369,7 +371,6 @@ class AnimationDebug extends MusicBeatState
 			quitHeldBar.createFilledBar(FlxColor.GRAY, FlxColor.LIME);
 			quitHeldBar.cameras = quitHeldBG.cameras = [camHUD];
 			add(quitHeldBar);
-			super.create();
 			updateTxt();
 			if(dragdrop)showTempmessage('Imported character $daAnim');
 		}catch(e) {MainMenuState.handleError('Error occurred, while loading Animation Debug. Current phase:${phases[phase]}; ${e.message}');}

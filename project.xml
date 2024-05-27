@@ -126,7 +126,7 @@
 
 	<!-- Expects https://github.com/superpowers04/linc_luajit, Nebula's fork will not work!-->
 	<haxelib name="linc_luajit" if="cpp" />
-	<!-- <haxelib name="discord_rpc" if="desktop cpp" /> -->
+	<haxelib name="discord_rpc" if="desktop cpp" />
 
 	<haxelib name="extension-androidtools" if="android" /> <!-- I am not reimplementing this shit myself -->
 

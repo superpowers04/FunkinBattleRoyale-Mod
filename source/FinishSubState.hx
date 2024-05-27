@@ -170,15 +170,15 @@ class FinishSubState extends MusicBeatSubstate
 				cam = new FlxCamera();
 				FlxG.cameras.add(cam);
 				FlxG.cameras.setDefaultDrawTarget(cam,true);
-				add(PlayState.instance.remove(PlayState.bf));
+				add(PlayState.instance.remove(boyfriend));
 				FlxG.state.persistentUpdate = FlxG.state.persistentDraw = !pauseGame;
 
 				cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]]; 
 					// ready = true;
-				PlayState.bf.cameras=cameras;
-				PlayState.bf.scrollFactor.set(0,0);
-				PlayState.bf.x = 700;
-				PlayState.bf.y = 0;
+				boyfriend.cameras=cameras;
+				boyfriend.scrollFactor.set(0,0);
+				boyfriend.x = 700;
+				boyfriend.y = 0;
 				forceBFAnim = false;
 			}
 		}
@@ -542,7 +542,15 @@ class FinishSubState extends MusicBeatSubstate
 			#end
 
 			if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.S){saveScore(true);}
-			if (FlxG.keys.justPressed.R){if(win){FlxG.resetState();}else{restart();}}
+			if (FlxG.keys.justPressed.R){
+				// if(SESave.data.QuickReloading && !isError){
+				// 	PlayState.instance.restartSong();
+				// 	PlayState.instance.add(remove(PlayState.playerCharacter));
+				// 	close();
+				// 	return;
+				// }
+				if(win){FlxG.resetState();}else{restart();}
+			}
 			if (isError && FlxG.keys.justPressed.I){
 				PlayState.PSignoreScripts = true;
 				PlayState.scripts = [];

@@ -124,8 +124,7 @@ class TitleState extends MusicBeatState
 
 	public static var easterEgg(default,set):Int = 0x00;
 	public static function set_easterEgg(val:Int){
-		if(SESave.data.easterEggs) return easterEgg = val;
-		return 0x00;
+		return (SESave.data.easterEggs) ? easterEgg = val : 0x00;
 	}
 
 	public static var invalidCharacters:Array<CharInfo> = []; // This is a seperate array because the character doesn't need metadata beyond it being invalid
@@ -138,7 +137,7 @@ class TitleState extends MusicBeatState
 	public static var checkedUpdate:Bool = false;
 	public static var updatedVer:String = "";
 	public static var songScores:Scorekillme;
-	public static var pauseMenuMusic:Sound;
+	// public static var pauseMenuMusic:Sound;
 
 
 
@@ -501,10 +500,7 @@ class TitleState extends MusicBeatState
 		// 	MainMenuState.errorMessage = 'An error occurred when trying to parse Character Metadata:\n ${e.message}.\n You can reload this using Reload Char/Stage List';
 		// 	if (defCharJson == null || TitleState.defCharJson.characters == null || TitleState.defCharJson.aliases == null) {defCharJson = {
 		// 		characters:[],
-		// 		aliases:[]
-		// 	};
-		// 	}
-		// }
+
 		#end
 		checkStages();
 
@@ -1069,8 +1065,12 @@ class TitleState extends MusicBeatState
 			return FlxG.random.getObject(hardcodedDays[now.getMonth()][-1]);
 		}
 		if(SESave.data.seenForcedText) SESave.data.seenForcedText = false;
-		var fullText:String = Assets.getText(Paths.txt('introText'));
-
+		var fullText:String = "missingno--missingno\nmissingno--missingno";
+		try{
+			fullText=SELoader.loadText('assets/data/introText.txt') ?? Assets.getText(Paths.txt('introText'));
+		}catch(e){
+			fullText="missingno--missingno\nmissingno--missingno";
+		}
 		var firstArray:Array<String> = fullText.split('\n');
 
 		return FlxG.random.getObject(firstArray).split('--');

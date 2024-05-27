@@ -279,20 +279,20 @@ class FlxGameEnhanced extends FlxGame{
 		try{
 
 			#if(target.threaded && !hl)
-				if(_state != _requestedState && SESave.data.doCoolLoading){
-					blockUpdate = blockEnterFrame = blockDraw = true;
-					// Main.funniSprite.removeChild(this);
-					_oldAutoPause = FlxG.autoPause;
-					FlxG.autoPause = false;
-					visible = false;
-					hasUpdated = false;
-					sys.thread.Thread.create(() -> { 
-						switchState();
-						requestAdd = true;
-						visible = true;
-					});
-					return;
-				}
+				// if(_state != _requestedState && SESave.data.doCoolLoading){
+				// 	blockUpdate = blockEnterFrame = blockDraw = true;
+				// 	// Main.funniSprite.removeChild(this);
+				// 	_oldAutoPause = FlxG.autoPause;
+				// 	FlxG.autoPause = false;
+				// 	visible = false;
+				// 	hasUpdated = false;
+				// 	sys.thread.Thread.create(() -> { 
+				// 		switchState();
+				// 		requestAdd = true;
+				// 		visible = true;
+				// 	});
+				// 	return;
+				// }
 			#end
 			if(blockUpdate) _update(); else {
 				hasUpdated = true;

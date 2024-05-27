@@ -882,7 +882,8 @@ class FlxText extends FlxSprite
 			var key:String = graphic?.key ?? FlxG.bitmap.getUniqueKey("text");
 			// @:privateAccess FlxG.bitmap.removeKey(key);
 			// if(graphic == null){
-			@:privateAccess FlxG.bitmap.removeKey(key);
+			// @:privateAccess FlxG.bitmap.removeKey(key);
+			// graphic?.bitmap.dispose();
 			frames = FlxG.bitmap.create(newWidth, newHeight, FlxColor.TRANSPARENT, true, key).imageFrame;
 			// var _old=graphic;
 			// if(_old != null)_old.destroy();
@@ -898,11 +899,13 @@ class FlxText extends FlxSprite
 
 		
 			if (_borderPixels != null) _borderPixels.dispose();
-			if (_hasBorderAlpha) _borderPixels = graphic.bitmap.clone();
+			if (_hasBorderAlpha) {
+				_borderPixels = graphic.bitmap.clone();
+			}
 
 			if (_autoHeight) textField.height = newHeight;
 			
-			frameHeight = Std.int(height);
+			frameHeight = newHeight;
 			// _textField.height = height * 1.2;
 			_flashRect.x = 0;
 			_flashRect.y = 0;

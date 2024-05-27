@@ -35,6 +35,7 @@ typedef SwagSong =
 		var ?artist:String;
 		var ?difficultyString:String;
 		var ?keyCount:Null<Int>;
+		var ?eventList:Array<Array<Dynamic>>; // SE
 
 	// Psych
 		var ?sectionBeats:Null<Float>;
@@ -202,6 +203,9 @@ class Song
 
 	}
 
+	// public static function fromVSlice(rawJson:String):SwagSong {
+
+	// }
 	public static function parseJSONshit(rawJson:String,charting:Bool = false):SwagSong
 	{
 		#if !debug

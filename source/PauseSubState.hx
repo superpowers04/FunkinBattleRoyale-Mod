@@ -70,7 +70,7 @@ class PauseSubState extends MusicBeatSubstate {
 			}else if (PlayState.songDifficulties.length > 0) menuItems.insert(2,'Swap Charts');
 			else if (multi.MultiMenuState.importedSong) menuItems.insert(2,'Import Chart');
 		#end
-
+		if(SESave.data.QuickReloading) menuItems.insert(2,'Reload Playstate');
 		openfl.system.System.gc();
 		FlxTimer.globalManager.forEach(function(tmr:FlxTimer){
 			if(tmr.active){tmr.active = false;timers.push(tmr);}
@@ -322,6 +322,18 @@ class PauseSubState extends MusicBeatSubstate {
 			case "Restart Song":
 				disappearMenu();
 				new FlxTimer().start(0.3,function(tmr:FlxTimer){
+					if(SESave.data.QuickReloading){
+						PlayState.instance.restartSong();
+						backToPlaystate();
+						return;
+					}
+					Main.game.funniLoad = true;
+					MusicBeatState.returningFromClass = true;
+					FlxG.resetState();
+				},1);
+			case "Reload Playstate":
+				disappearMenu();
+				new FlxTimer().start(0.3,function(tmr:FlxTimer){
 					Main.game.funniLoad = true;
 					MusicBeatState.returningFromClass = true;
 					FlxG.resetState();
@@ -423,7 +435,7 @@ class PauseSubState extends MusicBeatSubstate {
 
 
 		var spr = new FlxSprite();
-		var tween:FlxTween;
+		var tween:FlxTween = null;
 		startTimer = new FlxTimer().start(0.5, function(tmr:FlxTimer) {
 
 			var introAssets:Map<String, Array<String>> = new Map<String, Array<String>>();
@@ -477,19 +489,7 @@ class PauseSubState extends MusicBeatSubstate {
 					FlxG.sound.play(Paths.sound('introGo' + altSuffix), 0.6);
 				case 4:
 
-					PlayState.instance.callInterp("pauseExit",[]);
-					for (i in tweens) i.active = true;
-					for (i in timers) i.active = true;
-					if(_tween != null) _tween.cancel();
-					FlxG.sound.music.time = Conductor.songPosition;
-					FlxG.sound.music.volume = volume;
-					FlxTween.tween(FlxG.sound.music,{volume:volume},0.01);
-					FlxG.sound.music.onComplete = finishCallback;
-					FlxG.sound.music.pause();
-					#if discord_rpc
-						DiscordClient.updateSong();
-					#end
-					close();
+					backToPlaystate();
 
 			}
 
@@ -503,7 +503,21 @@ class PauseSubState extends MusicBeatSubstate {
 
 		super.destroy();
 	}
-
+	function backToPlaystate(){
+		PlayState.instance.callInterp("pauseExit",[]);
+		for (i in tweens) i.active = true;
+		for (i in timers) i.active = true;
+		if(_tween != null) _tween.cancel();
+		FlxG.sound.music.time = Conductor.songPosition;
+		FlxG.sound.music.volume = volume;
+		FlxTween.tween(FlxG.sound.music,{volume:volume},0.01);
+		FlxG.sound.music.onComplete = finishCallback;
+		FlxG.sound.music.pause();
+		#if discord_rpc
+			DiscordClient.updateSong();
+		#end
+		close();
+	}
 	function changeSelection(change:Int = 0):Void {
 		curSelected += change;
 

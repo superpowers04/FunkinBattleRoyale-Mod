@@ -57,23 +57,22 @@ class CharSelection extends SearchMenuState
 		controlLabel.isMenuItem = true;
 		controlLabel.targetY = i;
 		if (i != 0) controlLabel.alpha = 0.6;
-		if(!isNameSpaced){
-
-			if(char[0].toLowerCase() == curChar){
-				curCharID = i;
-				controlLabel.color = FlxColor.GREEN;
-				trace('found at $i ${char[0]}/$curChar');
-			}else if(char[4] != null && char[4].getNamespacedName().toLowerCase() == curCharNameSpaced){
+		if(char[1] == 1){
+			controlLabel.color = FlxColor.RED;
+		}else if(!isNameSpaced){
+			if(char[4] != null && char[4].getNamespacedName().toLowerCase() == curCharNameSpaced){
 				curCharID = i;
 				isNameSpaced = true;
 				controlLabel.color = FlxColor.GREEN;
 				trace('found ns at $i ${char[0]}/$curChar');
+			}else if(char[0].toLowerCase() == curChar){
+				curCharID = i;
+				controlLabel.color = FlxColor.GREEN;
+				trace('found at $i ${char[0]}/$curChar');
 			}
 		}
 
-		if(char[1] == 1){
-			controlLabel.color = FlxColor.RED;
-		}
+
 		grpSongs.add(controlLabel);
 	}
 
