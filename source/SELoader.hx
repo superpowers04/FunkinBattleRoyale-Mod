@@ -163,6 +163,7 @@ class SELoader {
 		AssetPathCache[path]="";
 
 		if(!exists(p)){ // I am honestly too lazy at the moment to add a proper mods menu
+			AssetPathCache[path]=null;
 			{
 				var e = getRawPath('assets/');
 				rawMode=defaultRawMode=true;

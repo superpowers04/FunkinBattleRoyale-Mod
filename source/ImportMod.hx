@@ -88,7 +88,7 @@ class ImportModFromFolder extends MusicBeatState
 	{
 		try{
 
-		var bg:FlxSprite = SELoader.loadFlxSprite('assets/preload/images/onlinemod/online_bg2.png');
+		var bg:FlxSprite = SELoader.loadFlxSprite('assets/images/onlinemod/online_bg2.png');
 		add(bg);
 
 

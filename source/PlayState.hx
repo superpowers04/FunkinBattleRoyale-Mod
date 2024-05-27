@@ -1490,7 +1490,7 @@ class PlayState extends ScriptMusicBeatState
 			}
 			if(!_validNote){
 				for (_ => n in unspawnNotes) {
-					if(!n.eventNote) continue;
+					if(n.eventNote) continue;
 					if(n.strumTime >= 10000){
 						_validUnspawn = n.strumTime;
 						_validNote = false;

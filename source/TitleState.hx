@@ -1287,7 +1287,7 @@ class TitleState extends MusicBeatState
 			// 	destHaxe();
 			case 1:
 				addMoreText('Friday Night Funkin\' by');
-				credTextShit.y -= 200;
+				credTextShit.y -= 600;
 
 				// addMoreText('ninjamuffin99').startTyping(0.015,Conductor.crochetSecs);
 				// addMoreText('phantomArcade').startTyping(0.015,Conductor.crochetSecs);
