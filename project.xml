@@ -180,6 +180,8 @@
 	<haxedef name="HXCPP_STACK_LINE"/>
 	<haxedef name="HXCPP_STACK_TRACE"/>
 	<haxedef name="HXCPP_GC_GENERATIONAL"/>
+	<haxedef name="HXCPP_CATCH_SEGV"/>
+	<!-- <haxedef name="HXCPP_DEBUGGER"/> -->
 	<haxedef name="NO_PRECOMPILED_HEADERS"/>
 
 	<haxedef name='no_ssl' if='hl linux'/>

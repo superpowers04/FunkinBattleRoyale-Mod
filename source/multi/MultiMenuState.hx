@@ -871,7 +871,14 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		if(path.contains('/mods/')  && attempt < 3){
 			return upToString(path,'/mods/');
 		}
-		return "";
+		var i = attempt - 3;
+		var str = path;
+		while (str.indexOf('/') > -1){
+			i--;
+			if(i <= 0) break;
+			str = str.substr(0,str.lastIndexOf('/'));
+		}
+		return str;
 	}
 	public static function fileDrop(file:String){
 		try{

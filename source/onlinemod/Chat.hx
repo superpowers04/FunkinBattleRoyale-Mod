@@ -7,12 +7,14 @@ import flixel.addons.ui.FlxUIList;
 import flixel.addons.ui.FlxUIState;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import flixel.group.FlxGroup;
 
 class Chat
 {
 	public static var chatField:FlxInputText;
 	public static var chatMessagesList:FlxUIList;
 	public static var chatSendButton:FlxUIButton;
+	public static var group:FlxGroup;
 	public static var chatMessages:Array<Array<Dynamic>>;
 	public static var chatId:Int = 0;
 
@@ -45,22 +47,26 @@ class Chat
 
 	public static function createChat(state:FlxUIState,?canHide:Bool = false){
 		Chat.created = true;
+		if(group != null && group.members.length > 0){
+			for(member in group.members){
+				state.add(member);
+			}
+			return;
+		}
+		group = new FlxGroup();
 		if(Chat.chatMessagesList == null){
 			Chat.chatMessagesList = new FlxUIList(10, FlxG.height - 120, FlxG.width, 175);
 		}else{
 			Chat.chatMessagesList.x = 10;
 			Chat.chatMessagesList.y = FlxG.height - 120;
 		}
-		state.add(Chat.chatMessagesList);
+		group.add(Chat.chatMessagesList);
 		for (chatMessage in Chat.chatMessages) Chat.OutputChatMessage(chatMessage[0], chatMessage[1], false);
 		if(Chat.chatField == null){
 			Chat.chatField = new FlxInputText(10, FlxG.height - 70, 1152, 20);
-		}else{
-			Chat.chatField.x=10;
-			Chat.chatField.y=FlxG.height - 70;
 		}
 		chatField.maxLength = 81;
-		state.add(Chat.chatField);
+		group.add(Chat.chatField);
 
 		Chat.chatSendButton = new FlxUIButton(1171, FlxG.height - 70, "Send", () -> {
 			Chat.SendChatMessage();
@@ -68,7 +74,7 @@ class Chat
 		});
 		Chat.chatSendButton.setLabelFormat(24, FlxColor.BLACK, CENTER);
 		Chat.chatSendButton.resize(100, Chat.chatField.height);
-		state.add(Chat.chatSendButton);
+		group.add(Chat.chatSendButton);
 		Chat.chatField.callback = function(_:String,cb:String){
 			if(cb == "enter") Chat.chatSendButton.onUp.callback();
 		}

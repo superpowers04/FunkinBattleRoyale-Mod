@@ -1,298 +1,299 @@
 {
-     "animations_offsets" : [
-         {
-             "player1" : [
-                 9,
-                22
-            ],
-            "player2" : [
-                 -29.1,
-                19
-            ],
-            "player3" : [
-                 0,
-                0
-            ],
-            "anim" : "singRIGHTmiss"
-        },
-        {
-             "player1" : [
-                 -17,
-                -51
-            ],
-            "player2" : [
-                 -17,
-                -50
-            ],
-            "player3" : [
-                 0,
-                0
-            ],
-            "anim" : "singDOWN"
-        },
-        {
-             "player1" : [
-                 9,
-                20
-            ],
-            "player2" : [
-                 29,
-                23
-            ],
-            "player3" : [
-                 0,
-                0
-            ],
-            "anim" : "singLEFTmiss"
-        },
-        {
-             "player1" : [
-                 -40,
-                31
-            ],
-            "player2" : [
-                 0,
-                26
-            ],
-            "player3" : [
-                 0,
-                0
-            ],
-            "anim" : "singUP"
-        },
-        {
-             "player1" : [
-                 -42,
-                -5
-            ],
-            "player2" : [
-                 -29,
-                -7
-            ],
-            "player3" : [
-                 0,
-                0
-            ],
-            "anim" : "singRIGHT"
-        },
-        {
-             "player1" : [
-                 -17,
-                -21
-            ],
-            "player2" : [
-                 -17,
-                -20
-            ],
-            "player3" : [
-                 0,
-                0
-            ],
-            "anim" : "singDOWNmiss"
-        },
-        {
-             "player1" : [
-                 7,
-                -5
-            ],
-            "player2" : [
-                 35,
-                -5
-            ],
-            "player3" : [
-                 0,
-                0
-            ],
-            "anim" : "singLEFT"
-        },
-        {
-             "player1" : [
-                 -36,
-                31
-            ],
-            "player2" : [
-                 -4,
-                26
-            ],
-            "player3" : [
-                 0,
-                0
-            ],
-            "anim" : "singUPmiss"
-        }
-    ],
-    "dance_idle" : false,
-    "voices" : "",
-    "no_antialiasing" : false,
-    "color" : [
-         49,
-        176,
-        209
-    ],
-    "cam_pos" : [
-         0,
-        0
-    ],
-    "sing_duration" : 6.1,
-    "flip_x" : true,
-    "char_pos1" : [
-         -76,
-        -311
-    ],
-    "char_pos2" : [
-         -79,
-        -299
-    ],
-    "genBy" : "FNFBR; Animation Editor",
-    "like" : "",
-    "asset_files" : [
-         {
-             "tags" : [
-                 "windy"
-            ],
-            "xml" : "skins/bfCar.xml",
-            "png" : "skins/bfCar.png"
-        },
-        {
-             "tags" : [
-                 "christmas"
-            ],
-            "xml" : "skins/bfChristmas.xml",
-            "png" : "skins/bfChristmas.png"
-        }
-    ],
-    "common_stage_offset" : [
+	 "animations_offsets" : [
+		 {
+			 "player1" : [
+				 9,
+				22
+			],
+			"player2" : [
+				 -29.1,
+				19
+			],
+			"player3" : [
+				 0,
+				0
+			],
+			"anim" : "singRIGHTmiss"
+		},
+		{
+			 "player1" : [
+				 -17,
+				-51
+			],
+			"player2" : [
+				 -17,
+				-50
+			],
+			"player3" : [
+				 0,
+				0
+			],
+			"anim" : "singDOWN"
+		},
+		{
+			 "player1" : [
+				 9,
+				20
+			],
+			"player2" : [
+				 29,
+				23
+			],
+			"player3" : [
+				 0,
+				0
+			],
+			"anim" : "singLEFTmiss"
+		},
+		{
+			 "player1" : [
+				 -40,
+				31
+			],
+			"player2" : [
+				 0,
+				26
+			],
+			"player3" : [
+				 0,
+				0
+			],
+			"anim" : "singUP"
+		},
+		{
+			 "player1" : [
+				 -42,
+				-5
+			],
+			"player2" : [
+				 -29,
+				-7
+			],
+			"player3" : [
+				 0,
+				0
+			],
+			"anim" : "singRIGHT"
+		},
+		{
+			 "player1" : [
+				 -17,
+				-21
+			],
+			"player2" : [
+				 -17,
+				-20
+			],
+			"player3" : [
+				 0,
+				0
+			],
+			"anim" : "singDOWNmiss"
+		},
+		{
+			 "player1" : [
+				 7,
+				-5
+			],
+			"player2" : [
+				 35,
+				-5
+			],
+			"player3" : [
+				 0,
+				0
+			],
+			"anim" : "singLEFT"
+		},
+		{
+			 "player1" : [
+				 -36,
+				31
+			],
+			"player2" : [
+				 -4,
+				26
+			],
+			"player3" : [
+				 0,
+				0
+			],
+			"anim" : "singUPmiss"
+		}
+	],
+	"dance_idle" : false,
+	"voices" : "",
+	"no_antialiasing" : false,
+	"color" : [
+		 49,
+		176,
+		209
+	],
+	"cam_pos" : [
+		 0,
+		0
+	],
+	"sing_duration" : 6.1,
+	"flip_x" : true,
+	"char_pos1" : [
+		 -10,
+		-356
+	],
+	"char_pos2" : [
+		 -14,
+		-357
+	],
+	"genBy" : "FNFSE 1.0.0-X24.06.01.0049; Animation Debug",
+	"like" : "",
+	"asset_files" : [
+		 {
+			 "tags" : [
+				 "windy"
+			],
+			"xml" : "skins/bfCar.xml",
+			"png" : "skins/bfCar.png"
+		},
+		{
+			 "tags" : [
+				 "christmas"
+			],
+			"xml" : "skins/bfChristmas.xml",
+			"png" : "skins/bfChristmas.png"
+		}
+	],
+	"common_stage_offset" : [
 
-    ],
-    "offset_flip" : 1,
-    "scale" : 1,
-    "char_pos" : [
+	],
+	"offset_flip" : 1,
+	"scale" : 1,
+	"char_pos" : [
 
-    ],
-    "clone" : "",
-    "cam_pos1" : [
-         -255,
-        270
-    ],
-    "cam_pos2" : [
-         0,
-        0
-    ],
-    "flip_notes" : true,
-    "animations" : [
-         {
-             "loop" : false,
-            "oneshot" : false,
-            "fps" : 24,
-            "anim" : "idle",
-            "indices" : [
+	],
+	"clone" : "",
+	"cam_pos1" : [
+		 1,
+		326
+	],
+	"cam_pos2" : [
+		 222,
+		314
+	],
+	"flip_notes" : true,
+	"animations" : [
+		 {
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "idle",
+			"indices" : [
 
-            ],
-            "name" : "BF idle dance"
-        },
-        {
-             "loop" : false,
-            "oneshot" : false,
-            "fps" : 24,
-            "anim" : "singDOWN",
-            "indices" : [
+			],
+			"name" : "BF idle dance"
+		},
+		{
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "singDOWN",
+			"indices" : [
 
-            ],
-            "name" : "BF NOTE DOWN"
-        },
-        {
-             "loopStart" : 0,
-            "indices" : [
+			],
+			"name" : "BF NOTE DOWN"
+		},
+		{
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "singLEFT",
+			"loopStart" : 0,
+			"indices" : [
 
-            ],
-            "fps" : 24,
-            "anim" : "singLEFT",
-            "loop" : false,
-            "name" : "BF NOTE RIGHT",
-            "oneshot" : false
-        },
-        {
-             "loopStart" : 0,
-            "indices" : [
+			],
+			"name" : "BF NOTE RIGHT"
+		},
+		{
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "singRIGHT",
+			"loopStart" : 0,
+			"indices" : [
 
-            ],
-            "fps" : 24,
-            "anim" : "singRIGHT",
-            "loop" : false,
-            "name" : "BF NOTE LEFT",
-            "oneshot" : false
-        },
-        {
-             "loop" : false,
-            "oneshot" : false,
-            "fps" : 24,
-            "anim" : "singUP",
-            "indices" : [
+			],
+			"name" : "BF NOTE LEFT"
+		},
+		{
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "singUP",
+			"indices" : [
 
-            ],
-            "name" : "BF NOTE UP"
-        },
-        {
-             "loop" : false,
-            "oneshot" : false,
-            "fps" : 24,
-            "anim" : "singDOWNmiss",
-            "indices" : [
+			],
+			"name" : "BF NOTE UP"
+		},
+		{
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "singDOWNmiss",
+			"indices" : [
 
-            ],
-            "name" : "BF NOTE DOWN MISS"
-        },
-        {
-             "loopStart" : 0,
-            "indices" : [
+			],
+			"name" : "BF NOTE DOWN MISS"
+		},
+		{
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "singLEFTmiss",
+			"loopStart" : 0,
+			"indices" : [
 
-            ],
-            "fps" : 24,
-            "anim" : "singLEFTmiss",
-            "loop" : false,
-            "name" : "BF NOTE LEFT MISS",
-            "oneshot" : false
-        },
-        {
-             "loop" : false,
-            "oneshot" : false,
-            "fps" : 24,
-            "anim" : "singUPmiss",
-            "indices" : [
+			],
+			"name" : "BF NOTE LEFT MISS"
+		},
+		{
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "singUPmiss",
+			"indices" : [
 
-            ],
-            "name" : "BF NOTE UP MISS"
-        },
-        {
-             "loop" : false,
-            "oneshot" : false,
-            "fps" : 24,
-            "anim" : "lose",
-            "indices" : [
+			],
+			"name" : "BF NOTE UP MISS"
+		},
+		{
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "lose",
+			"indices" : [
 
-            ],
-            "name" : "BF dies"
-        },
-        {
-             "loop" : false,
-            "oneshot" : false,
-            "fps" : 24,
-            "anim" : "dodge",
-            "indices" : [
+			],
+			"name" : "BF dies"
+		},
+		{
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "dodge",
+			"indices" : [
 
-            ],
-            "name" : "BF idle shaking"
-        },
-        {
-             "loopStart" : 0,
-            "indices" : [
+			],
+			"name" : "BF idle shaking"
+		},
+		{
+			 "loop" : false,
+			"oneshot" : false,
+			"fps" : 24,
+			"anim" : "singRIGHTmiss",
+			"loopStart" : 0,
+			"indices" : [
 
-            ],
-            "fps" : 24,
-            "anim" : "singRIGHTmiss",
-            "loop" : false,
-            "name" : "BF NOTE RIGHT MISS",
-            "oneshot" : false
-        }
-    ]
+			],
+			"name" : "BF NOTE RIGHT MISS"
+		}
+	],
+	"seVersionIdentifier" : 3
 }

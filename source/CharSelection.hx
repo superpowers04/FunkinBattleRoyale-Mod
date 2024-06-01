@@ -128,12 +128,13 @@ class CharSelection extends SearchMenuState
 		if (title != "") addTitleText(title);
 		titleText.screenCenter(X);
 		if (onlinemod.OnlinePlayMenuState.socket == null) defText = "Use shift to scroll faster;\nCharacter Editor keys: 1=bf, 2=dad, 3=gf;\n";
+		uiIcon = new HealthIcon("face",Options.PlayerOption.playerEdit == 0);
+		var uiIconPosX= infoTextBorder.x + (infoTextBorder.width * 0.5)-(uiIcon.width * 0.5);
+		var uiIconPosY=infoTextBorder.y + 50;
+		uiIcon.updateAnim(100);
+		uiIcon.x = uiIconPosX;
+		uiIcon.y = uiIconPosY;
 		if(!SESave.data.performance){
-
-			uiIcon = new HealthIcon("face",Options.PlayerOption.playerEdit == 0);
-			uiIcon.updateAnim(100);
-			uiIcon.x = infoTextBorder.x + (infoTextBorder.width * 0.5) - (uiIcon.width * 0.5);
-			uiIcon.y = infoTextBorder.y + 50;
 			uiIcon.centerOffsets();
 			overLay.add(uiIcon);
 		}
@@ -143,7 +144,7 @@ class CharSelection extends SearchMenuState
 		// exampleImage.visible = false;
 		// overLay.add(exampleImage);
 
-		charNameText = new FlxText(5, uiIcon.y + uiIcon.height + 10, 0, "yes", 20);
+		charNameText = new FlxText(5, uiIconPosY, 0, "yes", 20);
 		charNameText.wordWrap = false;
 		charNameText.scrollFactor.set();
 		charNameText.setFormat(CoolUtil.font, 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -303,6 +304,7 @@ class CharSelection extends SearchMenuState
 	var _iconTween:FlxTween;
 	override function beatHit(){
 		super.beatHit();
+		if(SESave.data.performance) return;
 		uiIcon.scale.set(1.1,1.1);
 		if(_iconTween != null)_iconTween.cancel();
 		_iconTween = FlxTween.tween(uiIcon.scale, {x: 1,y: 1}, Conductor.stepCrochet * 0.003, {ease: FlxEase.quadOut});

@@ -437,7 +437,10 @@ class CharAnimController extends FlxAnimationController{
 					if (anima.noreplaywhencalled == true && !amPreview){ //
 						replayAnims.push(anima.anim);
 					}
-					if(anima.offsets != null) animOffsets[anima.anim] = cast anima.offsets;
+					if(anima.offsets != null) {
+						animOffsets[anima.anim] = cast anima.offsets;
+						if(amPreview) anima.offsets=null;
+					}
 					if(anima.loopStart != null && anima.loopStart != 0 ) loopAnimFrames[anima.anim] = anima.loopStart;
 					
 					if(anima.playAfter != null && anima.playAfter != '' ) loopAnimTo[anima.anim] = anima.playAfter;
@@ -583,7 +586,7 @@ class CharAnimController extends FlxAnimationController{
 	}
 	public function loadCustomChar(){
 		if(charInfo == null) charInfo = TitleState.findCharByNamespace(curCharacter,namespace); // Make sure you're grabbing the right character
-		curCharacter = charInfo.id;
+		curCharacter = charInfo.folderName;
 		charLoc = charInfo.path;
 		namespace = charInfo.nameSpace;
 		SELoader.namespace = charInfo.nameSpace;
@@ -629,7 +632,8 @@ class CharAnimController extends FlxAnimationController{
 				try{
 					var file = SELoader.exists(charInfo.jsonLocation+"-SE") ? charInfo.jsonLocation+"-SE" : charInfo.jsonLocation;
 					charProperties= Json.parse(CoolUtil.cleanJSON(charPropJson = SELoader.loadText(file)));
-					if(amPreview && !file.endsWith('-SE')) loadedFrom=file;
+					if(amPreview && !file.endsWith('-SE')) 
+						loadedFrom=file+"-SE";
 					else loadedFrom=file;
 				}catch(e){
 					throw('Character ${curCharacter} has a missing config.json! ${e.message}');
@@ -643,7 +647,7 @@ class CharAnimController extends FlxAnimationController{
 			} // Boot to main menu if character's JSON can't be loaded
 			// if ((charProperties == null || charProperties.animations == null || charProperties.animations[0] == null) && amPreview){
 
-			loadedFrom = charInfo.jsonLocation;
+			
 			if(charProperties.healthicon != null) charInfo.iconLocation = SELoader.getAssetPath('assets/images/icons/'+charProperties.healthicon+'.png');
 			if(frames == null){
 				var pngName = SELoader.getAssetPath('assets:images/'+charProperties.image+".png");
@@ -687,19 +691,25 @@ class CharAnimController extends FlxAnimationController{
 			// dad = new EmptyCharacter(100, 100);
 			// boyfriend = new EmptyCharacter(400,100);
 			// gf = new EmptyCharacter(400, 100);
-				charProperties.cam_pos= charProperties.camera_position;
-				charProperties.cam_pos[0]*=-1;
-				charProperties.cam_pos[1]*=-1;
-				charProperties.offset_flip=3;
-				charProperties.char_pos = charProperties.position;
-				charProperties.char_pos[0]*=-1;
-				charProperties.char_pos[1]*=-1;
+				if(charProperties.position != null){
+
+					charProperties.cam_pos= charProperties.camera_position;
+					charProperties.cam_pos[0]*=-1;
+					charProperties.cam_pos[1]*=-1;
+					charProperties.offset_flip=3;
+					charProperties.char_pos = charProperties.position;
+					charProperties.char_pos[0]*=-1;
+					charProperties.char_pos[1]*=-1;
+				}
+				if(amPreview){
+					charProperties.camera_position = charProperties.position = null;
+				}
 				// charProperties.char_pos[2] = -charProperties.char_pos[2];
 				// charProperties.cam_pos1[2] = -charProperties.char_pos[2];
 			}
 		}else{
-
-			if(charProperties == null && !SELoader.exists('${charLoc}/$curCharacter/config.json') || (amPreview && FlxG.keys.pressed.SHIFT)){
+			loadedFrom = SELoader.getPath('${charLoc}/$curCharacter/config.json');
+			if(charProperties == null && !SELoader.exists(loadedFrom) || (amPreview && FlxG.keys.pressed.SHIFT)){
 				if(amPreview){
 					var idleName:String = "";
 					charProperties = Json.parse('{
@@ -719,8 +729,8 @@ class CharAnimController extends FlxAnimationController{
 						MainMenuState.handleError('Character ${curCharacter} has no character json and is a hardcoded character, Something went terribly wrong!');
 						return;
 					}
-					MusicBeatState.instance.showTempmessage('Character ${curCharacter} is missing a config.json!("${charLoc}/$curCharacter/config.json" is non-existant) You need to set them up in character selection. Using BF',FlxColor.RED);
-					curCharacter = "bf";
+					MainMenuState.handleError('Character ${curCharacter} is missing a config.json!("$loadedFrom" is non-existant) You need to set them up in character selection. Using BF');
+					curCharacter = "IMPORTED|bf";
 					charInfo = null;
 					loadChar();
 					return;
@@ -728,7 +738,7 @@ class CharAnimController extends FlxAnimationController{
 			}else{
 				try{
 					if (charProperties == null) {
-						charProperties = Json.parse(CoolUtil.cleanJSON(charPropJson = SELoader.loadText('${charLoc}/$curCharacter/config.json')));
+						charProperties = Json.parse(CoolUtil.cleanJSON(charPropJson = SELoader.loadText(loadedFrom)));
 					}
 				}catch(e){
 					throw('Character ${curCharacter} has a broken config.json! ${e.message}');

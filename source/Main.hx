@@ -208,7 +208,7 @@ class FlxGameEnhanced extends FlxGame{
 		try{
 			if(requestAdd){
 				requestAdd = false;
-				// Main.funniSprite.addChildAt(this,0);
+				Main.funniSprite.addChildAt(this,0);
 				blockUpdate = blockEnterFrame = blockDraw = false;
 				FlxG.autoPause = _oldAutoPause;
 				_oldAutoPause = false;
@@ -282,7 +282,7 @@ class FlxGameEnhanced extends FlxGame{
 			#if(target.threaded && !hl)
 				// if(_state != _requestedState && SESave.data.doCoolLoading){
 				// 	blockUpdate = blockEnterFrame = blockDraw = true;
-				// 	// Main.funniSprite.removeChild(this);
+				// 	Main.funniSprite.removeChild(this);
 				// 	_oldAutoPause = FlxG.autoPause;
 				// 	FlxG.autoPause = false;
 				// 	visible = false;

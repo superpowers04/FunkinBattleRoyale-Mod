@@ -48,6 +48,10 @@ class HealthIcon extends FlxSprite
 		if(char is CharInfo){
 			charInfo = cast(char);
 		}
+		if(char.namespace == "INTERNAL"){
+			changeSprite(charInfo?.getNamespacedName() ?? "face");
+			return;
+		}
 		if(charInfo == null){
 			trace('Invalid type passed, defaulting to vanilla');
 			changeSprite('INTERNAL|bf');

@@ -170,6 +170,11 @@ class TitleState extends MusicBeatState
 			var _e = char.split('|');
 			return findCharNS(_e[1],_e[0],-1,retBF,fuzzySearch);
 		}
+		if(!ignoreNSCheck && SELoader.namespace != ""){
+
+			// var _e = char.split('|');
+			return findCharNS(char,SELoader.namespace,-1,retBF,fuzzySearch);
+		}
 		if(char == "" || char == "automatic"){
 			trace('Tried to get a blank character!');
 			if(retBF) return defaultChar;
@@ -279,7 +284,7 @@ class TitleState extends MusicBeatState
 				}
 			}
 			if(currentChar == null && curProbability >= 0){
-				if(probableChar.id == "bf" || probableChar.id == "bf"){
+				if(probableChar.id == "bf"){
 					trace('Unable to find $char, returning normal bf!');
 					if(retBF) return defaultChar;
 					return null;
@@ -329,7 +334,7 @@ class TitleState extends MusicBeatState
 		trace(list);
 		while (list.length > 0){
 			var char = list.pop();
-			if(char == "" || char == "bf" || char == "null|bf"){continue;}
+			if(char == "" || char == "bf" || char == "null|bf" || char == "INTERNAL|bf"){continue;}
 			var charInfo = findCharByNamespace(char,nameSpace,false);
 			if(charInfo != null) return charInfo;
 		}
