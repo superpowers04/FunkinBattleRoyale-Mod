@@ -1,8 +1,2 @@
-24.05.26.2324;
-* Some fixes
-* New graphics for some things
-* Togglable PE character support(Experimental)
-* Alphabet now has a bunch of characters that were missing
-* SELoader can now load assets from mods/assets folder and packs
-* An option to quickly reload songs
-* Finally fix replacing animations in animation debug
+24.05.31.0407;
+* Better Psych character support(Still kinda experimental but should be more stable)

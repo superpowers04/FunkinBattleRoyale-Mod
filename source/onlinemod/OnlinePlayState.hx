@@ -203,7 +203,7 @@ class OnlinePlayState extends PlayState
 		OnlinePlayMenuState.receiver.HandleData = HandleData;
 		new FlxTimer().start(transIn.duration, (timer:FlxTimer) -> Sender.SendPacket(Packets.GAME_READY, [], OnlinePlayMenuState.socket));
 
-		waitMusic = SELoader.loadFlxSound('assets/shared/music/breakfast.ogg');
+		waitMusic = SELoader.loadFlxSound('assets/shared/music/breakfast.ogg',true);
 		waitMusic.volume = 0;
 		waitMusic.play(false, FlxG.random.int(0, Std.int(waitMusic.length / 2)));
 		waitMusic.looped = true;

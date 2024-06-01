@@ -116,7 +116,7 @@ class OptionsMenu extends MusicBeatState
 			new Judgement("Customize your Hit Timings (LEFT or RIGHT)"),
 			
 			new HCFloatOption('Scroll Speed',"Change your scroll speed (1 = Chart dependent)","scrollSpeed",0.1,10,0.1),
-			new HCFloatOption('Scroll Speed(OSU Chart)',"Change your scroll speed OSU charts","scrollOSUSpeed",0.1,10,0.1),
+			// new HCFloatOption('Scroll Speed(OSU Chart)',"Change your scroll speed OSU charts","scrollOSUSpeed",0.1,10,0.1),
 		
 			new HCBoolOption("Accurate Note Sustain","Whether note sustains/holds are more accurate. If off then they act like early kade","accurateNoteSustain"),
 			new HCBoolOption("Shitty Misses","Whether you'll get a miss from getting a shit","shittyMiss"),

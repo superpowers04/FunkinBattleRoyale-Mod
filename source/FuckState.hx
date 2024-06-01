@@ -298,7 +298,7 @@ class FuckState extends FlxUIState {
 		txt.screenCenter();
 		add(txt);
 		var txt:FlxText = new FlxText(0, 0, FlxG.width,
-			"Please take a screenshot and report this, " +(if(FATAL)"P" else "Press enter to attempt to return to the main menu or")+ "ress Escape to close the game",32);
+			"Please take a screenshot and report this, " +(if(FATAL)"P" else "Press enter to attempt to return to the main menu or P")+ "ress Escape to close the game",32);
 		
 		txt.setFormat(CoolUtil.font, 16, FlxColor.fromRGB(200, 200, 200), CENTER);
 		txt.borderColor = FlxColor.BLACK;

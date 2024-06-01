@@ -17,7 +17,23 @@ import lime.app.Application;
 	public static var isVisible = false;
 	public static var canShow:Bool = true;
 
-	public static var loadingText:String = "";
+	public static var loadingText(default,set):String = "";
+	public static function set_loadingText(text:String){
+		loadingText = text;
+		// if(LoadingScreen.object != null && LoadingScreen.object.visible && SESave.data.doCoolLoading) {
+
+		// 	LoadingScreen.object.updateText();
+		// 	// Main.instance.game.blockDraw=Main.instance.game.blockUpdate = true;
+		// 	Main.funniSprite.removeChildAt(0);
+		// 	@:privateAccess var back = lime.app.Application.current.__backend;
+		// 	// @:privateAccess back.handleRenderEvent();
+		// 	if(back.handle != null)
+		// 		@:privateAccess lime._internal.backend.native.NativeCFFI.lime_application_update(back.handle);
+		// 	// Main.instance.game.blockDraw=Main.instance.game.blockUpdate = false;
+		// 	// Main.funniSprite.addChildAt(Main.game,1);
+		// }
+		return text;
+	}
 	// var _loadingText:String = "";
 	var funni = false;
 	var textField:TextField;
@@ -188,9 +204,9 @@ import lime.app.Application;
 	var elapsed = 0;
 	override function __enterFrame(e:Int){
 		try{
-			if(textField.htmlText != loadingText){
-				updateText();
-			}
+			// if(textField.htmlText != loadingText){
+			// 	updateText();
+			// }
 			if(SESave.data.doCoolLoading){
 				if(loadingIcon != null){
 					loadingIcon.rotation += e * vel;
@@ -224,8 +240,12 @@ import lime.app.Application;
 		textField.htmlText =  '$loadingText';
 		tipTextField.text = tips[currentTip] ?? "your mother";
 		if(loadingIcon != null) vel += 0.15;
+		if(SESave.data.doCoolLoading){
+			Main.renderLockButCooler.release();
+			Main.renderLock.wait();
 		
 		// textField.x = (1280 * 0.5) - textField.width;
+		}
 	}
 	public static var tween:FlxTween;
 	public static function show(){

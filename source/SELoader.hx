@@ -74,7 +74,9 @@ class SELoader {
 	}
 	public static var rawMode = false;
 	public static var defaultRawMode = false;
+	public static var ignoreMods = false;
 	public static var id = "SELoader";
+	public static var namespace = "";
 
 	inline public static function handleError(e:String){
 		trace(e);
@@ -83,8 +85,8 @@ class SELoader {
 		
 	}
 	// Basically clenses paths and returns the base path with the requested one. Used heavily for the Android port
-	@:keep inline public static function getPath(path:String,allowModded:Bool = true):String{
-		
+	@:keep inline public static function getPath(path:String="",allowModded:Bool = true):String{
+		if(path == "") return PATH;
 		// Absolute paths should just return themselves without anything changed
 		if( rawMode ||
 			#if windows
@@ -96,7 +98,7 @@ class SELoader {
 		}
 		if(aliases[path] != null) return getRawPath(aliases[path]);
 		// Allow custom assets
-		if(path.substring(0,7) == "assets:" || (allowModded && path.substring(0,7) == "assets/")){
+		if(path.substring(0,7) == "assets:" || (!ignoreMods && allowModded && path.substring(0,7) == "assets/")){
 			return getAssetPath(path);
 		}
 		// Remove library from path
@@ -133,8 +135,10 @@ class SELoader {
 		if(path.startsWith('assets/')) path = path.substring(7);
 		var modsFolder = new SEDirectory(getRawPath('mods/'));
 		var packsFolder = modsFolder.newDirectory('packs/');
+		if(namespace=="") namespace=SELoader.namespace;
 		if(namespace!=""){ // We always want to check the namespace first, It has top priority
-			var e = packsFolder+namespace;
+			var e = (namespace == "INTERNAL" || namespace == "assets") ? getPath() : packsFolder+namespace;
+			SELoader.ignoreMods = true;
 			var the = SELoader.anyExists([
 				e+'/'+path,
 				e+'/shared/'+path,
@@ -142,6 +146,7 @@ class SELoader {
 				e+'/assets/shared/'+path,
 				e+'/assets/preload/'+path
 			]);
+			SELoader.ignoreMods = false;
 			if(the!=null) return the;
 		}
 		{ // If the path has already been found before, just use that. No need to re-scan
@@ -188,6 +193,7 @@ class SELoader {
 					if(the!=null) return AssetPathCache[path]=the;
 				}
 			}
+			trace('Unable to find "${path}"!');
 		}
 		return p;
 	}
@@ -371,6 +377,29 @@ class SELoader {
 		}
 		return defaultValue;
 	}
+	#if windows 
+		@:keep inline public static function anyExistsInsensitive(paths:Array<String>,?returnOriginal:Bool = false,?defaultValue:String = null):String{ return anyExists(paths,returnOriginal,defaultValue); }
+	#else
+
+	public static function anyExistsInsensitive(paths:Array<String>,?returnOriginal:Bool = false,?defaultValue:String = null):String{
+		for(i in paths) {
+			var path = getPath(i);
+			if(exists(path)) return returnOriginal ? i : path;
+		}
+		for(i in paths) {
+			var path = getPath(i);
+			var folder = path.substring(0,path.lastIndexOf('/'));
+			var file = path.substring(path.lastIndexOf('/')+1);
+			for(FILE in readDirectory(folder)){
+				if(FILE.toLowerCase() != file.toLowerCase()) continue;
+				return folder+"/"+FILE;
+				
+			}
+			
+		}
+		return defaultValue;
+	}
+	#end
 	public static function exists(path:String):Bool{
 		return FileSystem.exists(getPath(path));
 	}

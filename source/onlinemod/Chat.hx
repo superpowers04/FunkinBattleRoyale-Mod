@@ -82,14 +82,16 @@ class Chat
 		if (register)
 		  Chat.RegisterChatMessage(message, color,false);
 		trace(message);
-		if (!Chat.created) return;
+		if (!Chat.created || Chat.chatMessagesList == null) return;
+		try{
 
-		var text = new FlxText(0, 0, message);
-		text.setFormat(CoolUtil.font, 24, color, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		Chat.chatMessagesList.add(text);
+			var text = new FlxText(0, 0, message);
+			text.setFormat(CoolUtil.font, 24, color, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+			Chat.chatMessagesList.add(text);
 
-		if (Chat.chatMessagesList.amountNext == 0) Chat.chatMessagesList.y -= text.height + Chat.chatMessagesList.spacing;
-		else Chat.chatMessagesList.scrollIndex += Chat.chatMessagesList.amountNext;
+			if (Chat.chatMessagesList.amountNext == 0) Chat.chatMessagesList.y -= text.height + Chat.chatMessagesList.spacing;
+			else Chat.chatMessagesList.scrollIndex += Chat.chatMessagesList.amountNext;
+		}catch(e){trace('Error when trying to show chat message: $e');}
 	}
 
 	public static inline function RegisterChatMessage(message:String, ?color:FlxColor=FlxColor.WHITE,?checkSize:Bool = true){

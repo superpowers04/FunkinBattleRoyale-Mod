@@ -73,6 +73,11 @@ typedef Scorekillme = {
 		if(jsonLocation == "" || jsonLocation == null) return path+"config.json";
 		return jsonLocation;
 	}
+	public var iconLocation(get,default):String = null;
+	public function get_iconLocation(){
+		if(iconLocation == "" || iconLocation == null) return path+folderName+"/healthicon.png";
+		return iconLocation;
+	}
 	public var type:Int = 0x0; // 0: PNG/XML based, 1: Script based
 	public var hidden = false;
 
@@ -180,7 +185,6 @@ class TitleState extends MusicBeatState
 			trace('Invalid ID $charID, out of range 0-${characters.length}');
 			if(retBF) return defaultChar;
 			return null;
-			
 		}
 		char = char.replace(' ',"-").replace('_',"-").toLowerCase();
 		
@@ -275,6 +279,11 @@ class TitleState extends MusicBeatState
 				}
 			}
 			if(currentChar == null && curProbability >= 0){
+				if(probableChar.id == "bf" || probableChar.id == "bf"){
+					trace('Unable to find $char, returning normal bf!');
+					if(retBF) return defaultChar;
+					return null;
+				}
 				trace('Found character with substring ${probableChar.id}');
 				return probableChar;
 			}
@@ -346,36 +355,36 @@ class TitleState extends MusicBeatState
 		var customCharacters:Array<String> = [];
 
 
-		if (SELoader.exists("assets/characters/")){
-			var dir = new SEDirectory("assets/characters");
-			trace('Checking ${dir} for characters');
-			for (char in dir.readDirectory()) {
-				if (!dir.isDirectory(char)) continue;
-				var charPath = dir.newDirectory(char);
-				if (charPath.exists("/config.json")) {
-					customCharacters.push(char);
-					var desc = 'Assets character';
-					if (charPath.exists('description.txt'))
-						desc += ";" + charPath.getContent('description.txt');
-					characters.push({
-						id:char.replace(' ','-').replace('_','-').toLowerCase(),
-						folderName:char,
-						path:"assets/characters/",
-						nameSpace:"SEAssetsFolder",
-						description:desc
-					});
+		// if (SELoader.exists("assets/characters/")){
+		// 	var dir = new SEDirectory("assets/characters");
+		// 	trace('Checking ${dir} for characters');
+		// 	for (char in dir.readDirectory()) {
+		// 		if (!dir.isDirectory(char)) continue;
+		// 		var charPath = dir.newDirectory(char);
+		// 		if (charPath.exists("/config.json")) {
+		// 			customCharacters.push(char);
+		// 			var desc = 'Assets character';
+		// 			if (charPath.exists('description.txt'))
+		// 				desc += ";" + charPath.getContent('description.txt');
+		// 			characters.push({
+		// 				id:char.replace(' ','-').replace('_','-').toLowerCase(),
+		// 				folderName:char,
+		// 				path:"assets/characters/",
+		// 				nameSpace:"SEAssetsFolder",
+		// 				description:desc
+		// 			});
 
-				}else if (charPath.exists("character.png") && (charPath.exists("character.xml") || charPath.exists("character.json"))){
-					// invalidCharacters.push([char,dir]);
-					invalidCharacters.push({
-						id:char.replace(' ','-').replace('_','-').toLowerCase(),
-						folderName:char,
-						nameSpace:"SEAssetsFolder",
-						path:'$dir'
-					});
-				}
-			}
-		}
+		// 		}else if (charPath.exists("character.png") && (charPath.exists("character.xml") || charPath.exists("character.json"))){
+		// 			// invalidCharacters.push([char,dir]);
+		// 			invalidCharacters.push({
+		// 				id:char.replace(' ','-').replace('_','-').toLowerCase(),
+		// 				folderName:char,
+		// 				nameSpace:"SEAssetsFolder",
+		// 				path:'$dir'
+		// 			});
+		// 		}
+		// 	}
+		// }
 
 		if (SELoader.exists("mods/characters/")){
 			var path = new SEDirectory("mods/characters/");
@@ -1251,6 +1260,7 @@ class TitleState extends MusicBeatState
 	var drpcansend:Bool = false;
 	var beatAmounts:Map<Int,Float> = [0=>0.05,1=>0.05,31=>0.07,32=>0.08,64=>0.12,65=>0.05,66=>0.03,67=>0.02,68=>0.005,69=>0];
 	var beatIntensity:Float = 0.05;
+	var finishedThing:Bool =false;
 	override function beatHit() {
 		super.beatHit();
 		if(beatAmounts.exists(curBeat)) beatIntensity = beatAmounts[curBeat];
@@ -1277,7 +1287,7 @@ class TitleState extends MusicBeatState
 				shiftSkip.text = "DRP connected! - Hold shift to go to the options menu after title screen";
 			}
 		#end
-
+		if(skippedIntro) return;
 		switch (curBeat)
 		{
 			case 0:
@@ -1315,11 +1325,14 @@ class TitleState extends MusicBeatState
 				// if (Main.watermarks)  You're not more important than fucking newgrounds
 				// 	createCoolText(['Kade Engine', 'by']);
 				// else
-			case 12:
+			case 12: 
 				addMoreText('superpowers04');
-				superLogo.scale.x = superLogo.scale.y = 1.1;
-				FlxTween.tween(superLogo.scale,{x:1,y:1},0.2);
-				superLogo.visible = true;
+				if(superLogo != null){
+					superLogo.scale.x = 1.1;
+					superLogo.scale.y = 1.1;
+					FlxTween.tween(superLogo.scale,{x:1,y:1},0.2);
+					superLogo.visible = true;
+				}
 			case 16:
 				deleteCoolText();
 				credTextShit.y += 130;

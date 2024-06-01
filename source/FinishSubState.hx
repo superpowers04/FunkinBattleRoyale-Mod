@@ -138,7 +138,7 @@ class FinishSubState extends MusicBeatSubstate
 
 				FlxTween.tween(PlayState.instance.kadeEngineWatermark, {y:FlxG.height + 200},1,{ease: FlxEase.expoIn});
 				FlxTween.tween(PlayState.instance.scoreTxt, {y:if(SESave.data.downscroll) -200 else FlxG.height + 200},1,{ease: FlxEase.expoIn});
-				bfAnims = ['win','hey'];
+				bfAnims = ['win','hey','Idle','danceLeft','singUp'];
 				if (dad.curCharacter == SESave.data.gfChar) dad.playAnim('cheer',true); else {dad.playAnimAvailable(['lose'],true);}
 				PlayState.gf.playAnim('cheer',true);
 			}else{
@@ -147,7 +147,7 @@ class FinishSubState extends MusicBeatSubstate
 
 				// dad.playAnim("hey",true);
 				// dad.playAnim("win",true);
-				bfAnims = ['lose'];
+				bfAnims = ['lose','Idle','danceLeft','singDown'];
 				
 				if (dad.curCharacter == SESave.data.gfChar) dad.playAnim('sad',true); 
 				else
@@ -160,10 +160,6 @@ class FinishSubState extends MusicBeatSubstate
 				// FlxG.camera.zoom = 1;
 				// PlayState.instance.camHUD.zoom = 1;
 
-				if(boyfriend.playAnimAvailable(bfAnims,true)) 
-					boyfriend.animation.finishCallback = this.finishNew; 
-				else 
-					finishNew();
 				// if (SESave.data.camMovement){
 				PlayState.instance.followChar(0);
 				PlayState.instance.controlCamera = false;
@@ -180,6 +176,11 @@ class FinishSubState extends MusicBeatSubstate
 				boyfriend.x = 700;
 				boyfriend.y = 0;
 				forceBFAnim = false;
+
+				if(boyfriend.playAnimAvailable(bfAnims,true)) 
+					boyfriend.animation.finishCallback = this.finishNew; 
+				else 
+					finishNew();
 			}
 		}
 	}

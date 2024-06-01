@@ -102,7 +102,7 @@ typedef CharacterJson =
 
 	// Psych Character compatibility
 	var camera_position:Array<Float>;
-	var healthIcon:String;
+	var healthicon:String;
 	var image:String;
 	var position:Array<Float>;
 }

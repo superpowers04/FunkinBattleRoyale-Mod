@@ -437,7 +437,7 @@ class CharAnimController extends FlxAnimationController{
 					if (anima.noreplaywhencalled == true && !amPreview){ //
 						replayAnims.push(anima.anim);
 					}
-					if(anima.offsets != null) animOffsets[anima.name] = cast anima.offsets;
+					if(anima.offsets != null) animOffsets[anima.anim] = cast anima.offsets;
 					if(anima.loopStart != null && anima.loopStart != 0 ) loopAnimFrames[anima.anim] = anima.loopStart;
 					
 					if(anima.playAfter != null && anima.playAfter != '' ) loopAnimTo[anima.anim] = anima.playAfter;
@@ -583,9 +583,11 @@ class CharAnimController extends FlxAnimationController{
 	}
 	public function loadCustomChar(){
 		if(charInfo == null) charInfo = TitleState.findCharByNamespace(curCharacter,namespace); // Make sure you're grabbing the right character
-		curCharacter = charInfo.folderName;
+		curCharacter = charInfo.id;
 		charLoc = charInfo.path;
 		namespace = charInfo.nameSpace;
+		SELoader.namespace = charInfo.nameSpace;
+
 		if(SESave.data.doCoolLoading) LoadingScreen.loadingText = 'Loading Character "${getNamespacedName()}"';
 
 		if (!amPreview && SELoader.exists('${charLoc}/$curCharacter/script.hscript')){
@@ -641,13 +643,14 @@ class CharAnimController extends FlxAnimationController{
 			} // Boot to main menu if character's JSON can't be loaded
 			// if ((charProperties == null || charProperties.animations == null || charProperties.animations[0] == null) && amPreview){
 
-			loadedFrom = '${charLoc}/$curCharacter/config.json';
+			loadedFrom = charInfo.jsonLocation;
+			if(charProperties.healthicon != null) charInfo.iconLocation = SELoader.getAssetPath('assets/images/icons/'+charProperties.healthicon+'.png');
 			if(frames == null){
-				var pngName:String = 'assets:'+charProperties.image+".png";
-				var xmlName:String = 'assets:'+charProperties.image+".xml";
-				if(!SELoader.exists(pngName)){
-					pngName = SELoader.getAssetPath('assets:images/'+charProperties.image+".png");
-					xmlName = SELoader.getAssetPath('assets:images/'+charProperties.image+".xml");
+				var pngName = SELoader.getAssetPath('assets:images/'+charProperties.image+".png");
+				var xmlName = SELoader.getAssetPath('assets:images/'+charProperties.image+".xml");
+				if(pngName == "" || !SELoader.exists(pngName)){
+					pngName = SELoader.getAssetPath('assets:'+charProperties.image+".png");
+					xmlName = SELoader.getAssetPath('assets:'+charProperties.image+".xml");
 				}
 				if(pngName == ""){
 					throw('Unable to find image "${charProperties.image}" for $curCharacter');
@@ -677,9 +680,20 @@ class CharAnimController extends FlxAnimationController{
 					}
 					if (tex == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's texture can't be loaded
 				}
-				animOffsets['all'] = charProperties.position;
+				// animOffsets['all'] = charProperties.position;
+				// animOffsets['all'][1] *=-1;
+				// animOffsets['all'][0] *=-1;
+				// animOffsets['all'][0] *=-1;
+			// dad = new EmptyCharacter(100, 100);
+			// boyfriend = new EmptyCharacter(400,100);
+			// gf = new EmptyCharacter(400, 100);
 				charProperties.cam_pos= charProperties.camera_position;
-				// charProperties.char_pos = charProperties.position;
+				charProperties.cam_pos[0]*=-1;
+				charProperties.cam_pos[1]*=-1;
+				charProperties.offset_flip=3;
+				charProperties.char_pos = charProperties.position;
+				charProperties.char_pos[0]*=-1;
+				charProperties.char_pos[1]*=-1;
 				// charProperties.char_pos[2] = -charProperties.char_pos[2];
 				// charProperties.cam_pos1[2] = -charProperties.char_pos[2];
 			}
@@ -813,7 +827,7 @@ class CharAnimController extends FlxAnimationController{
 		}
 		callInterp("initScript",[]);
 
-		trace('Loaded $curCharacter');
+		trace('Loaded $curCharacter ${charInfo?.getNamespacedName()}');
 	}
 
 
@@ -860,6 +874,7 @@ class CharAnimController extends FlxAnimationController{
 
 	public function new(?x:Float = 0, ?y:Float = 0, ?character:String = "", ?isPlayer:Bool = false,?charType:Int = 0,?preview:Bool = false,?exitex:FlxAtlasFrames = null,?charJson:CharacterJson = null,?useHscript:Bool = true,?charPath:String = "",?charInfo:Null<CharInfo> = null) { // CharTypes: 0=BF 1=Dad 2=GF 
 		var part = "super call";
+		var CURRENTNAMESPACE = SELoader.namespace;
 		#if !debug 
 		try{
 		#end
@@ -905,23 +920,24 @@ class CharAnimController extends FlxAnimationController{
 		}
 		this.y += charY;
 		this.x += charX;
+		SELoader.namespace = CURRENTNAMESPACE;
 		part = "Flipping sing animations";
 		if (isPlayer && flip && flipNotes) {
 			flipX = !flipX;
+			part = "Flipping sing animations flipx";
+			if(!(charInfo?.psychChar)){ // Psych Characters don't use the same animation definitions for both sides, SE characters do
+				part = "Flipping sing animations normal";
 
-			if(!(charInfo?.psychChar) 
-				&& animation.getByName('singRIGHT') != null 
-				&& animation.getByName('singLEFT') != null){ // Psych Characters don't use the same animation definitions for both sides, SE characters do
-
-				var oldRight = animation.getByName('singRIGHT').frames;
-				var oldLeft = animation.getByName('singLEFT').frames;
+				var oldRight = animation.getByName('singRIGHT')?.frames;
+				var oldLeft = animation.getByName('singLEFT')?.frames;
 				if(oldRight != null && oldLeft != null){
 					animation.getByName('singRIGHT').frames = oldLeft;
 					animation.getByName('singLEFT').frames = oldRight;
 
 					// IF THEY HAVE MISS ANIMATIONS??
-					var oldMissRight = animation.getByName('singRIGHTmiss').frames;
-					var oldMissLeft = animation.getByName('singLEFTmiss').frames;
+					part = "Flipping sing animations miss";
+					var oldMissRight = animation.getByName('singRIGHTmiss')?.frames;
+					var oldMissLeft = animation.getByName('singLEFTmiss')?.frames;
 					if (oldMissRight != null && oldMissLeft != null) {
 						animation.getByName('singRIGHTmiss').frames = oldMissLeft;
 						animation.getByName('singLEFTmiss').frames = oldMissRight;
@@ -953,10 +969,10 @@ class CharAnimController extends FlxAnimationController{
 		}
 		#if !debug
 		}catch(e){ 
+			SELoader.namespace = CURRENTNAMESPACE;
 
 			trace(e.details());
 			return handleError('Error with $curCharacter at $part: ${e.details()}');
-			
 		}
 		#end
 		loaded=true;

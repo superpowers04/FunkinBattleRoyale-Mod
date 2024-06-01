@@ -158,20 +158,21 @@ class Main extends Sprite
 		FuckState.FUCK(e);
 	}
 	public static var renderLock:ToggleLock = new ToggleLock();
+	public static var renderLockButCooler:ToggleLock = new ToggleLock();
 	#if(target.threaded)
 	override function __enterFrame(_){
 		try{
 			if(game != null){
 
 				if(FlxG.keys.justPressed.F1) throw('Manual error');
-				if(game.blockDraw || game.blockUpdate){
-					renderLock.wait();
-					renderLock.lock();
+				// if(game.blockDraw || game.blockUpdate){
+				// 	renderLockButCooler.wait();
+				// 	super.__enterFrame(_);
+				// 	renderLockButCooler.lock();
+				// 	renderLock.release();
+				// }else{
 					super.__enterFrame(_);
-					renderLock.release();
-				}else{
-					super.__enterFrame(_);
-				}
+				// }
 			}else{
 				super.__enterFrame(_);
 				// trace('h');

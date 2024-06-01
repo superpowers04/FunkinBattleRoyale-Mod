@@ -395,8 +395,10 @@ class ReloadCharlist extends Option
 	}
 	public override function press():Bool
 	{
+		SELoader.AssetPathCache = [];
 		TitleState.checkCharacters();
 		TitleState.loadNoteAssets(true,true);
+
 		// SickMenuState.reloadMusic = true;
 		return true;
 	}

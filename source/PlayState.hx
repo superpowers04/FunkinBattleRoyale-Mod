@@ -1067,13 +1067,15 @@ class PlayState extends ScriptMusicBeatState
 
 		
 
-		iconP1 = new HealthIcon(bf.getNamespacedName(), true,'bf',boyfriend.charLoc);
+		iconP1 = new HealthIcon("face",true);
+		iconP1.fromCharInfo(bf.charInfo);
 		iconP1.antialiasing = bf.antialiasing;
 		iconP1.y = healthBar.y - (iconP1.height / 2);
 		iconP1.trackedSprite = healthBar;
 		add(iconP1);
 
-		iconP2 = new HealthIcon(dad.getNamespacedName(), false,'bf',dad.charLoc);
+		iconP2 = new HealthIcon("face",false);
+		iconP2.fromCharInfo(dad.charInfo);
 		iconP2.antialiasing = dad.antialiasing;
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		iconP2.trackedSprite = healthBar;
@@ -3419,6 +3421,8 @@ class PlayState extends ScriptMusicBeatState
 
 					followChar((chartIsInverted ? (sect.mustHitSection ? 1 : 0) : (sect.mustHitSection ? 0 : 1)),locked);
 				}
+				callInterp("sectionChange",[curSection]);
+
 			}
 		}
 		callInterp("stepHitAfter",[]);
