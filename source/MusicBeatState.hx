@@ -480,6 +480,7 @@ class DebugOverlay extends FlxTypedGroup<FlxSprite>{
 			songPos = FlxG.sound.music.time;
 			songLooped = FlxG.sound.music.looped;
 			FlxG.sound.music.looped = true;
+			FlxG.sound.music.onComplete=null;
 			songFinishCallback = FlxG.sound.music.onComplete;
 		}
 	}
@@ -600,6 +601,9 @@ class DebugOverlay extends FlxTypedGroup<FlxSprite>{
 			if(obj == null){
 				updateObjText('CamScrollPos:${Std.int(FlxG.camera.scroll.x * 100) * 0.01},${Std.int(FlxG.camera.scroll.y * 100) * 0.01} Zoom:${Std.int(FlxG.camera.zoom * 100) * 0.01}');
 			}
+		}
+		if(FlxG.justPressed.THREE){
+			trace(objectPosText.text);
 		}
 	}
 	@:keep inline function updateObjPosText(){

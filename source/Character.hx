@@ -198,6 +198,7 @@ class CharAnimController extends FlxAnimationController{
 		public var camY:Float = 0;
 		public var useMisses:Bool = false;
 		public var useVoices:Bool = false;
+		public var useMidpoint:Bool = true;
 		public var singDuration:Float = 4; // Singduration?
 		public var dadVar(get,set):Float; // Singduration?
 		@:keep inline public function get_dadVar() return singDuration;
@@ -696,10 +697,18 @@ class CharAnimController extends FlxAnimationController{
 					charProperties.cam_pos= charProperties.camera_position;
 					charProperties.cam_pos[0]*=-1;
 					charProperties.cam_pos[1]*=-1;
+					switch(charType) {
+						case 0:charProperties.cam_pos[1]+=200;
+						case 1:charProperties.cam_pos[1]-=300;
+						// case 2:charProperties.cam_pos[0]+=100;
+					}
+					useMidpoint = false;
+					
 					charProperties.offset_flip=3;
 					charProperties.char_pos = charProperties.position;
 					charProperties.char_pos[0]*=-1;
 					charProperties.char_pos[1]*=-1;
+
 				}
 				if(amPreview){
 					charProperties.camera_position = charProperties.position = null;

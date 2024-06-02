@@ -1,4 +1,5 @@
-24.06.01.0224;
+24.06.02.0048;
 * Better Psych character support(Still kinda experimental but should be more stable)
 * Fix some small errors
 * Fix characters not loading due to using ID instead of folderName
+* Adjust mouse input on menus so clicking above alphabet will scroll up, and below will scroll down

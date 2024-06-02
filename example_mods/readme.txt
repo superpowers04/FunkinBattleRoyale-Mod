@@ -44,10 +44,15 @@ CONTENT CREATION MODE:
 	If you press F10, you can open a console. This allows you to view the game's output, run some commands and code while the game's running.
 
 	Pressing Shift+F8 will partially pause the game and enable the debug overlay. You can use this to move around objects
-		Pressing shift while clicking will prevent the game from looping groups
-		Pressing Ctrl while clicking will reverse the grab order, you can use this to grab objects behind other objects
-		If you move the scroll wheel, you can rotate an object
-		If you hold ALT, you can get the position of an object you're hovering over
+		Left Click will grab an object
+		 - Pressing Shift while clicking will prevent the game from looping groups
+		 - Pressing Ctrl while clicking will reverse the grab order, you can use this to grab objects behind other objects
+		 - Scrolling will rotate the held object
+		 - Holding ALT will give you the position of the object you're hovering over
+		Right Click will move the camera
+		 - Scrolling will zoom in and out
+		Pressing 3 will trace the position of the last clicked object to the console
+
 
 
 ADDING EXISTING CHARTS:

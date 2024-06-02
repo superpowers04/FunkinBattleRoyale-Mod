@@ -615,17 +615,14 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 				changeDiff(if(FlxG.mouse.screenX > 640) 1 else -1);
 			}
 			else if(!FlxG.mouse.overlaps(blackBorder)){
-				var curSel = grpSongs.members[curSelected];
-				for (i in -2 ... 2) {
-					var member = grpSongs.members[curSelected + i];
-					if(member != null && FlxG.mouse.overlaps(member)){
-						if(curSel == member){
-							selSong(curSelected,FlxG.mouse.justPressedRight);
-							return;
-						}
-						changeSelection(i);
-						break;
-					}
+				var curSel= grpSongs.members[curSelected];
+				if(FlxG.mouse.y < curSel.y-20){
+					changeSelection(-1);
+				}else if(FlxG.mouse.y > curSel.y+60){
+					changeSelection(1);
+				}else if((FlxG.mouse.y > curSel.y-10 && FlxG.mouse.y < curSel.y+50)  || FlxG.mouse.overlaps(curSel)){
+					selSong(curSelected,FlxG.mouse.justPressedRight);
+					if(retAfter) ret();
 				}
 			}
 		}
@@ -832,12 +829,19 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 	override function changeSelection(change:Int = 0){
 		var looped = 0;
 		super.changeSelection(change);
-		var songInfo = grpSongs.members[curSelected]?.menuValue;
+		var songInfo:SongInfo = grpSongs.members[curSelected]?.menuValue;
 		if(songInfo == null || !songInfo.charts.contains('${songInfo.name}.json')){
 			changeDiff(0,0);
 			return;
 		}
-		changeDiff(0,songInfo.charts.indexOf('${songInfo.name}.json'));
+		var pos = 0;
+		var json = '${songInfo.name}.json';
+		for(i => chart in songInfo.charts){
+			var s = '${songInfo.path}-${chart}${(QuickOptionsSubState.getSetting("Inverted chart") ? "-inverted" : "")}';
+			if(Highscore.songScores.exists(s)) {pos = i;break;}
+			if(chart == json ) pos = i;
+		}
+		changeDiff(0,pos);
 		// if (modes[curSelected].indexOf('${songNames[curSelected]}.json') != -1) changeDiff(0,modes[curSelected].indexOf('${songNames[curSelected]}.json')); else changeDiff(0,0);
 	}
 	@:keep inline public static function findFileFromAssets(path:String,name:String,file:String):String{

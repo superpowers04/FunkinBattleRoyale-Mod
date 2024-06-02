@@ -330,17 +330,24 @@ class SearchMenuState extends ScriptMusicBeatState {
 				}
 				if(blackBorder == null || !FlxG.mouse.overlaps(blackBorder) ){
 					var curSel= grpSongs.members[curSelected];
-					for (i in -2 ... 2) {
-						var member = grpSongs.members[curSelected + i];
-						if(member != null && FlxG.mouse.overlaps(member)){
-							if(member == curSel){
-								select(curSelected);
-								if(retAfter) ret();
-							}else{
-								changeSelection(i);
-							}
-						}
+
+					if(FlxG.mouse.y < curSel.y-20){
+						changeSelection(-1);
+					}else if(FlxG.mouse.y > curSel.y+60){
+						changeSelection(1);
+					}else if((FlxG.mouse.y > curSel.y-10 && FlxG.mouse.y < curSel.y+50)  || FlxG.mouse.overlaps(curSel)){
+						select(curSelected);
+						if(retAfter) ret();
 					}
+					// for (i in -2 ... 2) {
+					// 	var member = grpSongs.members[curSelected + i];
+					// 	if(member != null && FlxG.mouse.overlaps(member)){
+					// 		if(member == curSel){
+					// 		}else{
+					// 			changeSelection(i);
+					// 		}
+					// 	}
+					// }
 				}
 			}
 			#if android

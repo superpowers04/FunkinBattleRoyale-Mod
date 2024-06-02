@@ -2361,6 +2361,7 @@ class PlayState extends ScriptMusicBeatState
 	public var additionCamPos:Array<Float> = [0,0];
 	public var focusedCharacter:Int = 0;
 	@:keep inline public function updateCharacterCamPos(){ // Resets all camera positions
+		
 		cameraPositions = [
 			[boyfriend.getMidpoint().x - 100 + boyfriend.camX,boyfriend.getMidpoint().y - 100 + boyfriend.camY],
 			[dad.getMidpoint().x + 150 + dad.camX,dad.getMidpoint().y - 100 + dad.camY],
@@ -2369,14 +2370,23 @@ class PlayState extends ScriptMusicBeatState
 		if(boyfriend.lonely || boyfriend.curCharacter == "" || boyfriend.curCharacter == "lonely"){
 			cameraPositions[0][0] = defLockedCamPos[0];
 			cameraPositions[0][1] = defLockedCamPos[1];
+		}else if(!boyfriend.useMidpoint){
+			cameraPositions[0][0] = boyfriend.x + boyfriend.camX;
+			cameraPositions[0][1] = boyfriend.y + boyfriend.camY;
 		}
 		if(dad.lonely || dad.curCharacter == "" || dad.curCharacter == "lonely"){
 			cameraPositions[1][0] = defLockedCamPos[0];
 			cameraPositions[1][1] = defLockedCamPos[1];
+		}else if(!dad.useMidpoint){
+			cameraPositions[0][0] = dad.x + dad.camX;
+			cameraPositions[0][1] = dad.y + dad.camY;
 		}
 		if(gf.lonely || gf.curCharacter == "" || gf.curCharacter == "lonely"){
 			cameraPositions[2][0] = defLockedCamPos[0];
 			cameraPositions[2][1] = defLockedCamPos[1];
+		}else if(!gf.useMidpoint){
+			cameraPositions[0][0] = gf.x + gf.camX;
+			cameraPositions[0][1] = gf.y + gf.camY;
 		}
 		if(swappedChars){
 			cameraPositions[0][0] -= 50;

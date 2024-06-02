@@ -415,6 +415,10 @@ class PauseSubState extends MusicBeatSubstate {
 	}
 	var _tween:FlxTween;
 	public function countdown(){try{
+		if(FlxG.keys.pressed.SHIFT){
+			backToPlaystate();
+			return;
+		}
 		ready = false;
 		var swagCounter:Int = 1;
 		try{

@@ -37,7 +37,7 @@ class HSBrTools {
 	public var bitmapArray:Map<String,BitmapData> = [];
 	public var xmlArray:Map<String,String> = [];
 	public var textArray:Map<String,String> = [];
-	public var soundArray:Map<String,FlxSound> = [];
+	public var soundArray:Map<String,Sound> = [];
 	// public var dumpGraphics:Bool = false; // If true, All FlxGraphics will be dumped upon creation, trades off bitmap editability for less memory usage
  
 	
@@ -179,9 +179,9 @@ class HSBrTools {
 
 
 	 public function loadSound(soundPath:String):FlxSound{
-		if(soundArray[soundPath] == null) soundArray[soundPath] = SELoader.loadFlxSound('${path}${soundPath}');
+		if(soundArray[soundPath] == null) soundArray[soundPath] = SELoader.loadSound('${path}${soundPath}');
 		@:privateAccess{
-			return new FlxSound().loadEmbedded(soundArray[soundPath]._sound);
+			return new FlxSound().loadEmbedded(soundArray[soundPath]);
 		}
 	}
 	public function loadFlxSound(soundPath:String) return loadSound(soundPath);
@@ -216,7 +216,7 @@ class HSBrTools {
 				trace('${id} : CacheSound: "${path}${soundPath}" doesn\'t exist!');
 				return;
 			}
-			soundArray[soundPath] = SELoader.loadFlxSound('${path}${soundPath}');
+			soundArray[soundPath] = SELoader.loadSound('${path}${soundPath}');
 		}
 	}
 	public function cacheGraphic(pngPath:String,?dumpGraphic:Bool = false){ // DOES NOT CHECK IF FILE IS VALID!
