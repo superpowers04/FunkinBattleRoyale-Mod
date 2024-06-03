@@ -68,6 +68,7 @@ import se.handlers.SELua;
 import CharacterJson;
 import StageJson;
 import TitleState;
+import se.objects.Stage;
 
 
 
@@ -290,6 +291,15 @@ class PlayState extends ScriptMusicBeatState
 		/* Stage Shite */
 
 			public static var stage:String = "nothing";
+			public var stageObject(default,set):Stage;
+			public function set_stageObject(v){
+				if(stageObject == null){
+					add(stageObject = v);
+					return v;
+				}
+				replace(stageObject,v);
+				return v;
+			}
 			public static var stageInfo:StageInfo = null;
 
 	/* Character shite */
@@ -640,37 +650,10 @@ class PlayState extends ScriptMusicBeatState
 		PlayState.player1 = PlayState.player2 = PlayState.player3 = "";
 	}
 	inline function loadBaseStage(?simple:Bool = false){
-		defaultCamZoom = 0.9;
-		curStage = 'stage';
-		stageTags = ["inside","stage"];
-		if(simple) {
-			stageTags.push('performance');
-			stageTags.push('simple');
-		}else {
-
-			var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('stageback'));
-			bg.antialiasing = true;
-			bg.scrollFactor.set(0.9, 0.9);
-			bg.active = false;
-			add(bg);
-		}
-		var stageFront:FlxSprite = new FlxSprite(-650, 600).loadGraphic(Paths.image('stagefront'));
-		stageFront.setGraphicSize(Std.int(stageFront.width * 1.1));
-		stageFront.updateHitbox();
-		stageFront.antialiasing = true;
-		stageFront.scrollFactor.set(0.9, 0.9);
-		stageFront.active = false;
-		add(stageFront);
-		if(!simple){
-			var stageCurtains:FlxSprite = new FlxSprite(-500, -300).loadGraphic(Paths.image('stagecurtains'));
-			stageCurtains.setGraphicSize(Std.int(stageCurtains.width * 0.9));
-			stageCurtains.updateHitbox();
-			stageCurtains.antialiasing = true;
-			stageCurtains.scrollFactor.set(1.3, 1.3);
-			stageCurtains.active = false;
-
-			add(stageCurtains);
-		}
+		stageObject = new BaseStage(simple);
+		stageTags = stageObject.tags;
+		curStage = stageObject.name;
+		stageObject.apply(this);
 	}
 	
 	override public function create(){
@@ -755,9 +738,11 @@ class PlayState extends ScriptMusicBeatState
 				} default:{
 					stage = TitleState.retStage(stage);
 					if(stage == "nothing"){
-						stageTags = ["empty"];
 						defaultCamZoom = 0.9;
-						curStage = 'nothing';
+						stageObject = new Stage();
+						stageObject.tags = ["empty"];
+						stageObject.name = curStage = 'nothing';
+
 					}else if(stage == "" || !SELoader.exists('${stageInfo.path}/${stageInfo.folderName}')){
 						trace('"${stage}" not found, using "Stage"!');
 						loadBaseStage();
@@ -765,24 +750,26 @@ class PlayState extends ScriptMusicBeatState
 						curStage = stage;
 						stageTags = [];
 						var stagePath:String = '${stageInfo.path}/${stageInfo.folderName}';
+						var stage:Stage = null;
 						if (SELoader.exists('$stagePath/config.json')){
-							var stageProperties = StageEditor.loadStage(this,'$stagePath/config.json');
-							
+							stage = StageEditor.loadStage('$stagePath/config.json');
+							stage.apply(this);
+							// add(stage);
+							stageObject=stage;
 							 // This doesn't have to be provided, doing it this way
-							bfPos = stageProperties.bfPos;
-							dadPos = stageProperties.dadPos;
-							gfPos = stageProperties.gfPos;
-							stageTags = stageProperties.tags;
-							if(gfShow) gfShow = stageProperties.showGF;
+
+							if(gfShow) gfShow = stage.showGF;
 						}
 						var brTool = getBRTools(stagePath);
 						for (i in CoolUtil.orderList(SELoader.readDirectory(stagePath))) {
 							if(i.endsWith(".hscript")){
-								parseHScript(SELoader.getContent('$stagePath/$i'),brTool,"STAGE/" + i,'$stagePath/$i');
+								var interp = parseHScript(SELoader.getContent('$stagePath/$i'),brTool,"STAGE/" + i,'$stagePath/$i');
+								if(stage != null) interp.variables.set('stage',stage);
 							}
 							#if linc_luajit
 							else if(i.endsWith(".lua")){
-								parseLua(SELoader.getContent('$stagePath/$i'),brTool,"STAGE/" + i,'$stagePath/$i');
+								var interp = parseLua(SELoader.getContent('$stagePath/$i'),brTool,"STAGE/" + i,'$stagePath/$i');
+								if(stage != null) interp.variables.set('stage',stage);
 							}
 							#end
 						}
@@ -790,6 +777,11 @@ class PlayState extends ScriptMusicBeatState
 				}
 			}
 		}
+		bfPos = stageObject.bfPos;
+		dadPos = stageObject.dadPos;
+		gfPos = stageObject.gfPos;
+		stageTags = stageObject.tags;
+		defaultCamZoom = stageObject.defaultCamZoom;
 		LoadingScreen.loadingText = "Loading scripts";
 		
 		if(QuickOptionsSubState.getSetting("Song hscripts")){
@@ -1349,7 +1341,10 @@ class PlayState extends ScriptMusicBeatState
 					return;
 				}
 				
-				if(introGraphics[swagCounter] != null && introGraphics[swagCounter] != ""){
+				if(introGraphics[swagCounter] == null || introGraphics[swagCounter] == ""){
+					introSpr.visible=false;
+				}else{
+					introSpr.visible=true;
 					var go:FlxSprite = introSpr.loadGraphic(introGraphics[swagCounter]);
 					go.scrollFactor.set();
 					go.updateHitbox();
@@ -1790,7 +1785,7 @@ class PlayState extends ScriptMusicBeatState
 				if(SESave.data.rotateScroll != 0) playerNoteCamera.angle = SESave.data.rotateScroll;
 				if(SESave.data.flipScrollX) playerNoteCamera.flashSprite.scaleX = -1;
 				if(SESave.data.flipScrollY) playerNoteCamera.flashSprite.scaleY = -1;
-
+				defaultScoreCameras=[playerNoteCamera];
 				readdCam(camHUD);
 				readdCam(camTOP);
 			}else{
@@ -1920,9 +1915,10 @@ class PlayState extends ScriptMusicBeatState
 			}else{
 				opponentNoteCamera.visible = SESave.data.oppStrumline;
 				opponentNoteCamera.x = FlxG.width * -0.25;
-				opponentNoteCamera.y = FlxG.height * -0.25;
-
-				if(middlescroll) opponentNoteCamera.x -= 100;
+				if(middlescroll){
+					opponentNoteCamera.y = FlxG.height * -0.25;
+					opponentNoteCamera.x -= 100;
+				}
 					// if(underlay != null && SESave.data.undlaSize == 0) 
 			}
 		}
@@ -2278,7 +2274,7 @@ class PlayState extends ScriptMusicBeatState
 		openSubState(new PauseSubState(boyfriend.x, boyfriend.y));
 		camFollow.x = defLockedCamPos[0];
 		camFollow.y = defLockedCamPos[1];
-		camGame.zoom = 1;
+		// camGame.zoom = 1;
 	}
 	@:keep inline function addNotes(){
 		if(unspawnNotes[0] != null && unspawnNotes[0].strumTime - Conductor.songPosition < 3500){
@@ -3623,7 +3619,7 @@ class PlayState extends ScriptMusicBeatState
 			}
 
 			if (FlxG.keys.justPressed.THREE && gf != null && !gf.lonely){
-				FlxG.switchState(new AnimationDebug(gfChar,false,2));
+				FlxG.switchState(new AnimationDebug(gf.curCharacter,false,2));
 			}
 			if (FlxG.keys.justPressed.FIVE)
 			{

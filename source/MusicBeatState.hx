@@ -495,37 +495,37 @@ class DebugOverlay extends FlxTypedGroup<FlxSprite>{
 	var objectPosBack:FlxSpriteLockScale;
 	function getTopObject():Dynamic{
 		var id = parent.members.length - 1;
+		var controlPressed = FlxG.keys.pressed.CONTROL;
 		while (id >= 0 && obj == null) {
 			try{
 				var _ob:Dynamic = parent.members[id];
 				if(_ob != null && FlxG.mouse.overlaps(_ob)){
-					if(!FlxG.keys.pressed.SHIFT && _ob.members != null){
-						var _id:Int = Std.int(_ob.members.length-1);
-						var _inob:Dynamic = null;
-						while (_id >= 0 && obj == null) {
-							try{
-								_inob = _ob.members[_id];
-								_id--;
-
-								if(_inob == null) continue;
-								if(_inob.members != null){
-									_id = Std.int(_inob.members.length-1);
-									_ob = _inob;
-									continue;
-								}
-								if(FlxG.mouse.overlaps(_inob)){
-									obj = cast (_inob,FlxSprite);
-									break;
-								}
-							
-							}catch(e){obj = null;}
-						}
-
-						if(obj != null && !FlxG.keys.pressed.CONTROL) return obj;
-					}else{
+					if(FlxG.keys.pressed.SHIFT || _ob.members == null){
 						obj = cast (_ob,FlxSprite);
-						if(obj != null && !FlxG.keys.pressed.CONTROL) return obj;
+						if(obj != null && !controlPressed) return obj;
+						continue;
 					}
+					var _id:Int = Std.int(_ob.members.length-1);
+					var _inob:Dynamic = null;
+					while (_id >= 0 && obj == null) {
+						try{
+							_inob = _ob.members[_id];
+							_id--;
+							if(_inob == null) continue;
+							if(_inob.members != null){
+								_id = Std.int(_inob.members.length-1);
+								_ob = _inob;
+								continue;
+							}
+							if(FlxG.mouse.overlaps(_inob)){
+								obj = cast (_inob,FlxSprite);
+								break;
+							}
+						
+						}catch(e){obj = null;}
+					}
+
+					if(obj != null && !controlPressed) return obj;
 					// trace('Funni click on ${obj}');
 						// break;
 				}
@@ -602,7 +602,7 @@ class DebugOverlay extends FlxTypedGroup<FlxSprite>{
 				updateObjText('CamScrollPos:${Std.int(FlxG.camera.scroll.x * 100) * 0.01},${Std.int(FlxG.camera.scroll.y * 100) * 0.01} Zoom:${Std.int(FlxG.camera.zoom * 100) * 0.01}');
 			}
 		}
-		if(FlxG.justPressed.THREE){
+		if(FlxG.keys.justPressed.THREE){
 			trace(objectPosText.text);
 		}
 	}

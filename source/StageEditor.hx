@@ -55,42 +55,31 @@ typedef StageOutput = {
 	var ?jsonFile:String;
 	var showGF:Bool;
 }
-
+typedef Stage = se.objects.Stage;
 class StageEditor extends MusicBeatState{
-	public static function loadStage(state:FlxState,json:String):StageOutput{
+	public static function loadStage(?state:FlxState,json:String):Stage{
 		var objects:Dynamic = [];
-		var bfPos:Array<Float> = [770, 100];
-		var dadPos:Array<Float> = [100,100];
-		var gfPos:Array<Float> = [400, 100];
-		var showGF = true;
-		var stageTags = [];
+		var stage = new Stage();
 		if(json == ""){
-			return {
-				objects:[],
-				bfPos:[770, 100],
-				dadPos:[100,100],
-				gfPos:[400, 100],
-				tags:[],showGF:true,
-			};
+			return stage;
 		}
 		try{
 			var stagePropJson:String = SELoader.getContent(json);
-			var stageProperties:StageJSON = cast haxe.Json.parse(CoolUtil.cleanJSON(json));
-			var stagePath = json.substr(0,json.lastIndexOf("/") + 1); 
-			if (stageProperties == null || stageProperties.layers == null || stageProperties.layers[0] == null){throw('No layers?');} // Boot to main menu if character's JSON can't be loaded
+			var stageProperties:StageJSON = cast Json.parse(CoolUtil.cleanJSON(stagePropJson));
+			if (stageProperties == null){throw('Attempted to load an empty Stage');} // Boot to main menu if character's JSON can't be loaded
+			var stagePath = SELoader.getAsDirectory(json.substr(0,json.lastIndexOf("/") + 1)); 
 			// defaultCamZoom = stageProperties.camzoom;
 			for (layer in stageProperties.layers) {
 				// if(layer.song != null && layer.song != "" && layer.song.toLowerCase() != SONG.song.toLowerCase()){continue;}
 				var curLayer:FlxSprite = new FlxSprite(0,0);
 				if(layer.animated){
-					var xml:String = SELoader.loadText('$stagePath/${layer.name}.xml');
-					if (xml == null || xml == "")throw('$stagePath/${layer.name}.xml is invalid!');
+					if (!stagePath.exists('${layer.name}.xml'))throw('$stagePath/${layer.name}.xml is invalid!');
 					curLayer.frames = SELoader.loadSparrowFrames('$stagePath/${layer.name}');
 					curLayer.animation.addByPrefix(layer.animation_name,layer.animation_name,layer.fps,false);
 					curLayer.animation.play(layer.animation_name);
 				}else{
-					var png:BitmapData = SELoader.loadBitmap('$stagePath/${layer.name}.png');
-					if (png == null) MainMenuState.handleError('$stagePath/${layer.name}.png is invalid!');
+					var png:FlxGraphic = SELoader.loadGraphic('$stagePath/${layer.name}.png');
+					// if (png == null) MainMenuState.handleError('$stagePath/${layer.name}.png is invalid!');
 					curLayer.loadGraphic(png);
 				}
 
@@ -98,38 +87,43 @@ class StageEditor extends MusicBeatState{
 				if (layer.flip_x) curLayer.flipX = true;
 				curLayer.setGraphicSize(Std.int(curLayer.width * layer.scale));
 				curLayer.updateHitbox();
-				curLayer.x += layer.pos[0];
-				curLayer.y += layer.pos[1];
+				curLayer.x = layer.pos[0];
+				curLayer.y = layer.pos[1];
 				curLayer.antialiasing = layer.antialiasing;
 				curLayer.alpha = layer.alpha;
 				curLayer.active = false;
 				curLayer.scrollFactor.set(layer.scroll_factor[0],layer.scroll_factor[1]);
-				state.add(curLayer);
+				stage.add(curLayer);
 			}
-			bfPos = stageProperties.bf_pos;
-			dadPos = stageProperties.dad_pos;
-			gfPos = stageProperties.gf_pos;
-			showGF = !stageProperties.no_gf;
-			stageTags = stageProperties.tags;
+			stage.bfPos = stageProperties.bf_pos;
+			stage.dadPos = stageProperties.dad_pos;
+			stage.gfPos = stageProperties.gf_pos;
+			stage.showGF = !stageProperties.no_gf;
+			stage.tags = stageProperties.tags;
+			stage.defaultCamZoom = stageProperties.camzoom;
+			if(state != null){
+				state.add(stage);
+			}
 		}catch(e){
-			MusicBeatState.instance.showTempmessage('Invalid, broken or empty stage! ${e.message}',FlxColor.RED);
-			return {
-				objects:[],
-				bfPos:[770, 100],
-				dadPos:[100,100],
-				gfPos:[400, 100],
-				tags:[],
-				showGF:true,
-			};
+			// MusicBeatState.instance.showTempmessage('Invalid, broken or empty stage! ${e.message}',FlxColor.RED);
+			MainMenuState.handleError('Invalid, broken or empty stage! ${e.message} ${e.details()}');
+			return new Stage();
 		}
-		return {
-			objects:objects,
-			bfPos:bfPos,
-			dadPos:dadPos,
-			gfPos:gfPos,
-			tags:stageTags,
-			showGF:showGF,
-		}
+		// stage.objects = objects,
+		// stage.bfPos = bfPos,
+		// stage.dadPos = dadPos,
+		// stage.gfPos = gfPos,
+		// stage.tags = stageTags,
+		// stage.showGF = showGF,
+		return stage;
+		// {
+		// 	objects:objects,
+		// 	bfPos:bfPos,
+		// 	dadPos:dadPos,
+		// 	gfPos:gfPos,
+		// 	tags:stageTags,
+		// 	showGF:showGF,
+		// }
 	}
 	// Don't enable this, I'm just too lazy to comment out code
 	#if STAGEEDITOR

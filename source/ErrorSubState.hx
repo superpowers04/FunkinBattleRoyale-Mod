@@ -56,7 +56,7 @@ class ErrorSubState extends MusicBeatSubstate {
 		FlxG.state.persistentUpdate = false;
 		cam = new FlxCamera();
 		FlxG.cameras.add(cam);
-		FlxG.cameras.setDefaultDrawTarget(cam,true);
+		// FlxG.cameras.setDefaultDrawTarget(cam,true);
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]]; 
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.alpha = 0;
@@ -83,7 +83,7 @@ class ErrorSubState extends MusicBeatSubstate {
 		#if android
 			'Tap the left of the screen to return to the main menu or the right of the screen to reload'
 		#else
-			'Press ENTER to return to the main menu, R to reload the state or O to open your options.'
+			'Press ENTER to return to the main menu,\n R to reload the state or O to open your options.'
 		#end );
 		contText.size = 24;
 		// contText.x -= contText.width * 0.5;

@@ -15,6 +15,7 @@ import flixel.tweens.FlxEase;
 import flixel.graphics.FlxGraphic;
 import flixel.tweens.FlxTween;
 import openfl.display.BitmapData;
+import flixel.FlxCamera;
 // import flixel.tweens.FlxTweenManager;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
@@ -55,7 +56,8 @@ class PauseSubState extends MusicBeatSubstate {
 	var tweens:Array<FlxTween> = [];
 	var jumpToTime:Float = 0;
 	var bg:FlxSprite;
-	
+	var cam:FlxCamera;
+	var fuckYouZoom:Float=0; // This is to force the zoom level of camGame, for some reason, camGame's zoom is being forced to 1
 	var currentChart = -1;
 	public function new(x:Float, y:Float){
 		if(FlxG.sound.music != null ) songLengthTxt = FlxStringUtil.formatTime(Math.floor((FlxG.sound.music.length) / 1000), false);
@@ -84,6 +86,12 @@ class PauseSubState extends MusicBeatSubstate {
 		#if discord_rpc
 			DiscordClient.updateSong(true);
 		#end
+		cam = new FlxCamera();
+		fuckYouZoom=FlxG.cameras.list[0].zoom;
+		FlxG.cameras.add(cam,false);
+		cam.bgColor=0x00000000;
+		// FlxG.cameras.setDefaultDrawTarget(cam,true);
+		cameras = [cam];
 
 		finishCallback = FlxG.sound.music.onComplete;
 
@@ -94,7 +102,7 @@ class PauseSubState extends MusicBeatSubstate {
 			bg = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 			bg.alpha = 0;
 		}else{
-			var bit=new BitmapData(FlxG.width,FlxG.height,true,);
+			var bit=new BitmapData(FlxG.width,FlxG.height,true);
 			bit.draw(FlxG.stage);
 			bg = new FlxSprite().loadGraphic(FlxGraphic.fromBitmapData(bit));
 			bg.alpha = 1;
@@ -169,7 +177,6 @@ class PauseSubState extends MusicBeatSubstate {
 		add(quitHeldBar);
 		songPath = 'assets/data/' + PlayState.SONG.song.toLowerCase() + '/';
 
-		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 		PlayState.instance.callInterp("pause",[this]);
 		volume = FlxG.sound.music.volume;
 		FlxTween.tween(FlxG.sound.music,{volume:0.2},0.5);
@@ -211,7 +218,7 @@ class PauseSubState extends MusicBeatSubstate {
 	inline function callInterp(name:String,args:Array<Dynamic>){args.unshift(this); if(PlayState.instance != null) PlayState.instance.callInterp(name,args);}
 	override function update(elapsed:Float){
 		super.update(elapsed);
-		
+		FlxG.cameras.list[0].zoom=fuckYouZoom;
 		if (quitHeldBar.visible && quitHeld <= 0){
 			quitHeldBar.visible = false;
 			quitHeldBG.visible = false;
@@ -504,7 +511,7 @@ class PauseSubState extends MusicBeatSubstate {
 	
 	override function destroy() {
 		if (pauseMusic != null){pauseMusic.destroy();}
-
+		FlxG.cameras.remove(cam);
 		super.destroy();
 	}
 	function backToPlaystate(){

@@ -214,7 +214,7 @@ class AnimationDebug extends MusicBeatState
 	var dragdrop = false;
 	override function beatHit(){
 		super.beatHit();
-		if(FlxG.keys.pressed.V && editMode != 2){chara.dance();}
+		if(FlxG.keys.pressed.V && editMode != 2){chara.dance(curBeat==2);}
 		if(gf != null) gf.dance();
 	}
 	var health:Int = 2;
@@ -547,7 +547,7 @@ class AnimationDebug extends MusicBeatState
 			var name = i;
 			text+='\n"${name}" : { "player${charType + 1}": [${v[0]}, ${v[1]}] }';
 		}
-		sys.io.File.saveContent(Sys.getCwd() + "offsets.txt",text);
+		SELoader.saveContent("offsets.txt",text);
 		showTempmessage("Saved to output.txt successfully");
 		FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
 
@@ -632,11 +632,11 @@ class AnimationDebug extends MusicBeatState
 			charJson.cam_pos = [0,0];
 
 			chara.x -= characterX;
-			if(charType == 2){
-				chara.y -= 300;
-			}else{
-				chara.y -= characterY;
-			}
+			// if(charType == 2){
+			// 	chara.y -= 300;
+			// }else{
+			chara.y -= characterY;
+			// }
 			chara.y = -chara.y;
 
 			errorStage = 5; // Position

@@ -1036,10 +1036,10 @@ class CharAnimController extends FlxAnimationController{
 	 * FOR GF DANCING SHIT
 	 */
 	public function dance(Forced:Bool = false,beatDouble:Bool = false,useDanced:Bool = true) {
-		if (amPreview){
-			playAnim((dance_idle || charType == 2 ? 'danceRight' : 'idle'));
-			return;
-		}
+		// if (amPreview){
+		// 	playAnim((dance_idle || charType == 2 ? 'danceRight' : 'idle'));
+		// 	return;
+		// }
 		if(dance_idle){
 			if (animation.curAnim != null && !animation.curAnim.name.startsWith("dance") && !animHasFinished) return;
 			if (useDanced){

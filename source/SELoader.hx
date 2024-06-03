@@ -20,6 +20,7 @@ import flixel.util.typeLimit.OneOfTwo;
 import lime.media.AudioBuffer;
 import haxe.io.Bytes;
 import se.formats.SongInfo;
+import se.formats.Song.SwagSong;
 // import vlc.VLCSound;
 using StringTools;
 
@@ -211,7 +212,12 @@ class SELoader {
 	}
 	public static function loadXML(textPath:String,?useCache:Bool = false):String{ // Automatically fixes UTF-16 encoded files
 		if(textPath.lastIndexOf('.') == -1) textPath+='.xml';
-		var text = loadText(textPath,useCache).replace("UTF-16","utf-8");
+		var text = loadText(textPath,useCache);
+		return cleanXML(text);
+	}
+	public static function cleanXML(text:String):String{ // Automatically fixes UTF-16 encoded files
+		
+		var text = text.replace("UTF-16","utf-8");
 		// final nul = String.fromCharCode(0);
 		if(text.substr(2).contains("U\x00T\x00F\x00-\x001\x006")){ // Flash CS6 outputs a UTF-16 xml even though no UTF-16 characters are usually used. This reformats the file to be UTF-8 *hopefully*
 			text = '<?' + text.substr(2).replace(String.fromCharCode(0),'').replace('UTF-16','utf-8');
@@ -278,6 +284,16 @@ class SELoader {
 		gc();
 	}
 	@:keep inline public static function getContent(textPath:String):String{return loadText(textPath,false);}
+	public static function getChart(textPath:String,?difficulty:String=""):SwagSong{
+		return Song.parseJSONshit(loadText(textPath,false));
+/*		if(difficulty != "") return Song.fromVSlice(textPath,difficulty);
+
+		var colonIndex = textPath.lastIndexOf(':');
+		if(colonIndex == -1) return Song.parseJSONshit(loadText(textPath,false));
+		textPath = textPath.substring(0,colonIndex);
+		difficulty = textPath.substring(colonIndex+1);
+		return Song.fromVSlice(textPath,difficulty);*/
+	}
 	@:keep inline public static function saveContent(textPath:String,content:String):String{return saveText(textPath,content,false);}
 	@:keep inline public static function getBytes(textPath:String):Bytes{return loadBytes(textPath,false);}
 	@:keep inline public static function gc(){
@@ -418,6 +434,9 @@ class SELoader {
 		}
 		return ret;
 	}
+	@:keep inline public static function getAsDirectory(path:String):SEDirectory{
+		return new SEDirectory(path);
+	}
 	public static function readDirectoriesAsPaths(paths:Array<String>):Array<SEDirectory>{
 		var ret = [];
 		for(path in paths){
@@ -497,7 +516,11 @@ class SELoader {
 			if(data.exists('songData')){ // Legacy psych
 				data = data.newDirectory('songData');
 			}
-			for (folder in data.readDirectory()){
+			var list = data.readDirectory();
+			// for (chart in list){
+			// 	if(chart.contains(''))
+			// }
+			for (folder in list){
 				var path = data.newDirectory('$folder');
 				if(!path.isDirectory() || !songsFolder.exists('$folder/Inst.ogg')) continue;
 				var song:SongInfo = {
@@ -563,11 +586,13 @@ class InternalCache{
 	// public var dumpGraphics:Bool = false; // If true, All FlxGraphics will be dumped upon creation, trades off bitmap editability for less memory usage
  
 	@:keep inline static function getPath(path):String{return SELoader.getPath(path);}
+
 	
 
 	var id = "Internal Cache";
-	public function new(){
-		trace('Internal cache initialised');
+	public function new(?id:String = "Internal Cache"){
+		this.id = id;
+		trace('New cache $id');
 	}
 	public function clear(){
 		for (v in spriteArray) if(v != null && v.destroy != null) v.destroy();
@@ -587,7 +612,7 @@ class InternalCache{
 	// public function getPath(?str:String = ""){
 	// 	return Sys.getCwd() + str;
 	// }
-	public function loadFlxSprite(x:Int,y:Int,pngPath:String):FlxSprite{
+	public function loadFlxSprite(x:Float,y:Float,pngPath:String):FlxSprite{
 		return new FlxSprite(x, y).loadGraphic(loadGraphic(pngPath));
 	}
 	public function loadGraphic(pngPath:String):FlxGraphic{
@@ -622,7 +647,7 @@ class InternalCache{
 
 		return FlxAtlasFrames.fromSparrow(loadGraphic(pngPath + ".png"),_txt);
 	}
-	public function loadSparrowSprite(x:Int,y:Int,pngPath:String,?anim:String = "",?loop:Bool = false,?fps:Int = 24):FlxSprite{
+	public function loadSparrowSprite(x:Float,y:Float,pngPath:String,?anim:String = "",?loop:Bool = false,?fps:Int = 24):FlxSprite{
 		var spr = new FlxSprite(x, y);
 		spr.frames= loadSparrowFrames(pngPath);
 		if (anim != ""){

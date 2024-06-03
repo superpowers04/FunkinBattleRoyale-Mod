@@ -42,7 +42,7 @@ using StringTools;
 		args = [];
 		type = "";
 		isActive = false;
-	}
+}
 }
 
 class ScriptMusicBeatState extends MusicBeatState{
@@ -300,18 +300,18 @@ class ScriptMusicBeatState extends MusicBeatState{
 
 			var interp:Interp = HscriptUtils.createSimpleInterp();
 			try{
-				var program = parser.parseString(songScript,file);
 
 				interp.variables.set("BRtools",brTools ?? getBRTools("assets/")); 
+				if(brTools != null)brTools.reset();
 				// Access current state without needing to be inside of a function with ps as an argument
 				interp.variables.set("scriptContents",songScript);
 				interp.variables.set("scriptName",id);
 				addVariablesToHScript(interp);
 				interp.variables.set("close",unloadInterp.bind(id)); // Closes a script
 
+				var program = parser.parseString(songScript,file);
 				interp.execute(program);
 				interps[id] = interp;
-				if(brTools != null)brTools.reset();
 				callInterp("initScript",[],id);
 				if(interps[id] == null) return null; // mf unloaded itself :skull:
 				interpCount++;
