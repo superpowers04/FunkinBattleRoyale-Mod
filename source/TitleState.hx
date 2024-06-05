@@ -1416,7 +1416,7 @@ class TitleState extends MusicBeatState
 	}
 	override function stepHit(){
 		super.stepHit();
-		if(Date.now().getHours() == 3 && FlxG.random.int(0,100) > 80){
+		if(Date.now().getHours() == 3 && FlxG.random.int(0,100) > 80 && titleText !=null){
 			titleText.members[FlxG.random.int(0,titleText.length)].x = FlxG.random.int(-40,1280);
 			titleText.members[FlxG.random.int(0,titleText.length)].y = FlxG.random.int(-40,770);
 		}

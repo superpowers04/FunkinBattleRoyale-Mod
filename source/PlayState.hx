@@ -751,14 +751,19 @@ class PlayState extends ScriptMusicBeatState
 						stageTags = [];
 						var stagePath:String = '${stageInfo.path}/${stageInfo.folderName}';
 						var stage:Stage = null;
+						var loadedFromConf = false;
 						if (SELoader.exists('$stagePath/config.json')){
 							stage = StageEditor.loadStage('$stagePath/config.json');
 							stage.apply(this);
 							// add(stage);
 							stageObject=stage;
+							loadedFromConf =true;
 							 // This doesn't have to be provided, doing it this way
 
 							if(gfShow) gfShow = stage.showGF;
+						}
+						if(stage == null){
+							stageObject=stage = new Stage();
 						}
 						var brTool = getBRTools(stagePath);
 						for (i in CoolUtil.orderList(SELoader.readDirectory(stagePath))) {
@@ -3464,9 +3469,9 @@ class PlayState extends ScriptMusicBeatState
 	public function restartSong(){
 		callInterp('restartSong',[]);
 
-		bf.currentAnimationPriority = 0;
-		dad.currentAnimationPriority = 0;
-		gf.currentAnimationPriority = 0;
+		bf.currentAnimationPriority = -10;
+		dad.currentAnimationPriority = -10;
+		gf.currentAnimationPriority = -10;
 		if(bf != null) bf.dance();
 		if(dad != null) dad.dance();
 		if(gf != null) gf.dance();
@@ -3495,6 +3500,7 @@ class PlayState extends ScriptMusicBeatState
 		generateSong();
 		generateNotes();
 		addNotes();
+		handleTimes = acceptInput = true;
 		FlxG.sound.music.pause();
 		vocals.pause();
 		callInterp('restartSongAfter',[]);
