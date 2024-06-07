@@ -3479,6 +3479,7 @@ class PlayState extends ScriptMusicBeatState
 		if(bf != null) bf.dance();
 		if(dad != null) dad.dance();
 		if(gf != null) gf.dance();
+		health=1;
 
 		Conductor.songPosition = -5000;
 		vocals.time = FlxG.sound.music.time = 0;
@@ -3495,11 +3496,8 @@ class PlayState extends ScriptMusicBeatState
 			v.skipNote=true;
 			add(v);
 			var X = FlxG.random.int(-160, 160);
-			var e = FlxTween.tween(v, {angle:v.angle+X*0.2,x:v.x+X,y:v.y+FlxG.random.int(140, 160)}, FlxG.random.float(0.1, 0.3), {
-				onComplete: function(tween:FlxTween) {v.destroy();},});
-			FlxTween.tween(v, {alpha: 0}, e.duration + FlxG.random.float(0.2, 0.5), {
-				onComplete: function(tween:FlxTween) {v.destroy();},
-			});
+			var e = FlxTween.tween(v, {angle:v.angle+X*0.2,x:v.x+X,y:v.y+FlxG.random.int(140, 160),alpha:0}, FlxG.random.float(0.1, 0.6), {
+				onComplete: function(tween:FlxTween) {v.destroy();}});
 		}
 		while(notes.members.pop() != null){}
 		if(inputMode == 1){
