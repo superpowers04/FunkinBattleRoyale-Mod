@@ -25,11 +25,11 @@ class MultiPlayState extends onlinemod.OfflinePlayState
   // }
 
 	override function create(){
-		try{
+		// try{
 			if(!PlayState.isStoryMode) stateType=4;
 			speed = QuickOptionsSubState.getSetting("Song Speed");
 			super.create();
 
-		}catch(e){MainMenuState.handleError(e,'Caught "create" crash: ${e.message}');}
+		// }catch(e){MainMenuState.handleError(e,'Caught "create" crash: ${e.message}');}
 	}
 }

@@ -768,12 +768,13 @@ class TitleState extends MusicBeatState
 				// }
 				var grantedPerms = Main.grantedPerms = android.Permissions.getGrantedPermissions();
 				if(!grantedPerms.contains('android.permission.WRITE_EXTERNAL_STORAGE')){
-					android.Permissions.requestPermissions(['android.permission.WRITE_EXTERNAL_STORAGE','android.permission.INTERNET'],1);
+					android.Permissions.requestPermission('android.permission.WRITE_EXTERNAL_STORAGE',1);
+					android.Permissions.requestPermission('android.permission.INTERNET',1);
 					throw('Please reload. Permissions are required for the mods folder.\nIf you do not see a dialogue asking for accessing files then please add it manually in your settings');
 				}else{
 
 					if(!grantedPerms.contains('android.permission.INTERNET')){
-						android.Permissions.requestPermissions(['android.permission.INTERNET'],1);
+						android.Permissions.requestPermission('android.permission.INTERNET',1);
 					}
 					if(!FileSystem.exists('${android.os.Environment.getExternalStorageDirectory()}/Superpowers04/SuperEngine/')){
 						try{
@@ -791,7 +792,7 @@ class TitleState extends MusicBeatState
 					}
 				}
 				SELoader.PATH = '${android.os.Environment.getExternalStorageDirectory()}/Superpowers04/SuperEngine/';
-				Sys.setCwd('${android.os.Environment.getExternalStorageDirectory()}/Superpowers04/SuperEngine/');
+				Sys.setCwd(SELoader.PATH);
 				if(!SELoader.exists('mods')){
 					try{
 						var _dir = lime.system.System.applicationStorageDirectory;

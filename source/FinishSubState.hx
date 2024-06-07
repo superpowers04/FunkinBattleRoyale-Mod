@@ -48,10 +48,6 @@ class FinishSubState extends MusicBeatSubstate
 	public var readyTimer:Float = 0;
 	public var errorMsg:String = "";
 	public var isError:Bool = false; 
-	public var healthBarBG:FlxSprite;
-	public var healthBar:FlxBar;
-	public var iconP1:HealthIcon; 
-	public var iconP2:HealthIcon;
 	public static var pauseGame:Bool = true;
 	public static var autoEnd:Bool = true;
 	public static var forceBFAnim:Bool = false;
@@ -103,12 +99,12 @@ class FinishSubState extends MusicBeatSubstate
 
 
 		// For healthbar shit
-		healthBar = PlayState.instance.healthBar;
-		healthBarBG = PlayState.instance.healthBarBG;
-		iconP1 = PlayState.instance.iconP1;
-		iconP2 = PlayState.instance.iconP2;
+		// healthBar = PlayState.instance.healthBar;
+		// healthBarBG = PlayState.instance.healthBarBG;
+		// iconP1 = PlayState.instance.iconP1;
+		// iconP2 = PlayState.instance.iconP2;
 
-
+		bfReplacement = new FlxSprite();
 		if(isError){
 			finishNew();
 		}else{
@@ -163,12 +159,13 @@ class FinishSubState extends MusicBeatSubstate
 				PlayState.instance.controlCamera = false;
 				cam = new FlxCamera();
 				FlxG.cameras.add(cam);
+				PlayState.instance.replace(boyfriend,bfReplacement);
 				add(boyfriend);
 				FlxG.state.persistentUpdate = FlxG.state.persistentDraw = !pauseGame;
 
 				cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]]; 
 					// ready = true;
-				boyfriend.cameras=cameras;
+				// boyfriend.cameras=cameras;
 				// boyfriend.scrollFactor.set(0,0);
 
 				forceBFAnim = false;
@@ -186,6 +183,7 @@ class FinishSubState extends MusicBeatSubstate
 	var optionsisyes:Bool = false;
 	var shownResults:Bool = false;
 	public var contText:FlxText;
+	public var bfReplacement:FlxSprite;
 	inline function canSaveScore(){
 		if(!win || PlayState.instance.hasDied) return "No - Lost";
 		if(ChartingState.charting) return 'No - Currently charting?';
@@ -416,7 +414,6 @@ class FinishSubState extends MusicBeatSubstate
 				add(letterText);
 				add(songText);
 				// add(chartInfoText);
-				healthBar.cameras = healthBarBG.cameras = iconP1.cameras = iconP2.cameras = [cam];
 
 				// FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut});
 				FlxTween.tween(finishedText, {y:(finishedText.y-=55) + 55},0.5,{ease: FlxEase.bounceOut});
@@ -514,9 +511,11 @@ class FinishSubState extends MusicBeatSubstate
 	}
 	function restartSong(){
 		if(SESave.data.flashing) FlxG.camera.flash(0xFFFFFF,0.1);
+		PlayState.instance.replace(bfReplacement,PlayState.playerCharacter);
 		PlayState.instance.restartSong();
-		remove(PlayState.playerCharacter);
+		remove(PlayState.playerCharacter,false);
 		FlxG.camera.zoom = 1;
+		PlayState.instance.followChar(0,true);
 
 		close();
 
@@ -549,10 +548,10 @@ class FinishSubState extends MusicBeatSubstate
 
 			if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.S){saveScore(true);}
 			if (FlxG.keys.justPressed.R){
-				// if(SESave.data.QuickReloading && !isError){
-				// 	restartSong();
-				// 	return;
-				// }
+				if(SESave.data.QuickReloading && !isError){
+					restartSong();
+					return;
+				}
 				if(win){FlxG.resetState();}else{restart();}
 			}
 			if (isError && FlxG.keys.justPressed.I){

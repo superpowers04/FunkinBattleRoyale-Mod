@@ -112,6 +112,7 @@ class Main extends Sprite
 			#if !mobile
 			addChild(console);
 			addChild(console.commandBox);
+			#end
 
 			// fpsCounter.visible = false;
 			// fpsOverlay = new Overlay(0, 0);
@@ -126,7 +127,6 @@ class Main extends Sprite
 			+ 'Should be next to the manifest or assets folder!\nError:\n${e.message}',true,true,true);
 		}
 
-		#end
 	}
 	function uncaughtErrorHandler(event:UncaughtErrorEvent):Void { // Yes this is copied from the wiki, fuck you
 		var message:String = "";

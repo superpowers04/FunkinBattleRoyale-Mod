@@ -224,6 +224,7 @@ class PlayState extends ScriptMusicBeatState
 		public static var inputEngineName:String = "Unspecified";
 		public static var scripts:Array<String> = [];
 		public static var customDiff = "";
+		public var allowQuickReload:Bool = true; // Will disallow the game from quick-reloading the song when dying or pressing restart song
 		public var stageObjects:Array<Dynamic<FlxObject>> = [];
 		public var objects:Map<String,FlxObject> = [];
 		public var eventNoteStore:Map<String,Dynamic> = [];
@@ -658,7 +659,7 @@ class PlayState extends ScriptMusicBeatState
 	
 	override public function create(){
 		#if !debug
-		try{
+		// try{
 		#end
 		scriptSubDirectory = "";
 		SELoader.gc();
@@ -1153,10 +1154,10 @@ class PlayState extends ScriptMusicBeatState
 		}
 
 	#if !debug 
-	}catch(e){
-		if(e is FakeException) return;
-		MainMenuState.handleError(e,'Caught "create" crash: ${e.message}\n ${e.stack}');
-	}
+	// }catch(e){
+	// 	if(e is FakeException) return;
+	// 	MainMenuState.handleError(e,'Caught "create" crash: ${e.message}\n ${e.stack}');
+	// }
 	#end
 	}
 	function loadDialog(){		
@@ -2032,7 +2033,7 @@ class PlayState extends ScriptMusicBeatState
 		camHUD.zoom = 1;
 		if (finished) return;
 		finished = true;
-		PlayState.dadShow = true; // Reenable this to prevent issues later
+		
 		canPause = false;
 		this.paused = true;
 		FlxG.sound.music.pause();
@@ -3467,7 +3468,10 @@ class PlayState extends ScriptMusicBeatState
 	}
 	
 	public function restartSong(){
+		if(!allowQuickReload) FlxG.resetState();
 		callInterp('restartSong',[]);
+
+		restartTimes++;
 
 		bf.currentAnimationPriority = -10;
 		dad.currentAnimationPriority = -10;
@@ -3481,6 +3485,8 @@ class PlayState extends ScriptMusicBeatState
 		startingSong=true;
 		songStarted = false;
 		startedCountdown = false;
+		handleHealth=true;
+		finished=false;
 		for (i=>v in notes.members){
 			// v.acceleration.y = FlxG.random.int(200, 300);
 			// v.velocity.y -= FlxG.random.int(140, 160);
@@ -3496,11 +3502,22 @@ class PlayState extends ScriptMusicBeatState
 			});
 		}
 		while(notes.members.pop() != null){}
+		if(inputMode == 1){
+		// 	for(key => data in SEIKeyMap){
+		// 		if(SEIKeyHeld[key]) SEIKeyRelease(key);
+		// 	}
+			// for(strum in playerStrums.members) strum.playStatic();
+			for(strum in strumLineNotes.members) strum.playStatic();
+			for(id => key in SEIKeyHeld) SEIKeyHeld[id]=false;
+		}
+
 
 		generateSong();
 		generateNotes();
 		addNotes();
 		handleTimes = acceptInput = true;
+		hasDied=false;
+		
 		FlxG.sound.music.pause();
 		vocals.pause();
 		callInterp('restartSongAfter',[]);
@@ -3662,6 +3679,7 @@ class PlayState extends ScriptMusicBeatState
 			hsBrTools.reset();
 			if(boyfriend != null && !SESave.data.persistBF) boyfriend.destroy();
 			if(gf != null && !SESave.data.persistGF) gf.destroy();
+			PlayState.dadShow = true; // Reenable this to prevent issues later
 			instance = null;
 		}catch(e){}
 		super.destroy();

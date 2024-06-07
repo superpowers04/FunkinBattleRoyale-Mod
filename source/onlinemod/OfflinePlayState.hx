@@ -156,7 +156,7 @@ class OfflinePlayState extends PlayState {
   }
 	override function create()
 	{
-	try{
+	// try{
 		instanc = this;
 		if (shouldLoadJson) loadJSON();
 
@@ -186,7 +186,7 @@ class OfflinePlayState extends PlayState {
 			QuickOptionsSubState.setSetting("Song hscripts",oldScripts);
 			FlxG.switchState(new ChartingState());
 		}
-	  }catch(e){MainMenuState.handleError(e,'Caught "create" crash: ${e.message}');}
+	  // }catch(e){MainMenuState.handleError(e,'Caught "create" crash: ${e.message}');}
 	}
 	override function startCountdown(){
 		if(shouldLoadJson) FlxG.sound.playMusic(loadedInst, 1, false);
