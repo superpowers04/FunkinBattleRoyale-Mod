@@ -61,6 +61,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		}
 	}
 	override function beatHit(){
+		super.beatHit();
 		if (voices != null && shouldVoicesPlay && (!voices.playing || (voices.time > FlxG.sound.music.time + 20 || voices.time < FlxG.sound.music.time - 20))){
 			voices.time = FlxG.sound.music.time;
 			voices.play();
@@ -72,7 +73,10 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 			}
 			beatTween = FlxTween.tween(bg.scale.set(1.01,1.01),{x:1,y:1},Conductor.stepCrochet * 0.003);
 		}
-		super.beatHit();
+		if(curBeat == 0 && voices != null){
+			voices.time = FlxG.sound.music.time;
+
+		}
 	}
 	override function findButton(){
 		super.findButton();
@@ -736,7 +740,8 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 							}else{
 								if(!voices.playing){
 									songProgressText.text = "Playing Inst and Voices";
-									voices.play(FlxG.sound.music.time);
+									voices.play();
+									voices.time = FlxG.sound.music.time;
 									voices.volume = SESave.data.voicesVol * FlxG.sound.volume;
 									voices.looped = true;
 								}else{

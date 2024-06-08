@@ -1302,7 +1302,7 @@ class TitleState extends MusicBeatState
 				
 			// 	destHaxe();
 			case 1:
-				addMoreText('Friday Night Funkin\' by');
+				addMoreText(FlxG.random.float() < 0.1 ? 'Friday Night Fucking\' by' :'Friday Night Funkin\' by');
 				credTextShit.y -= 600;
 
 				// addMoreText('ninjamuffin99').startTyping(0.015,Conductor.crochetSecs);
@@ -1332,7 +1332,7 @@ class TitleState extends MusicBeatState
 				// 	createCoolText(['Kade Engine', 'by']);
 				// else
 			case 12: 
-				addMoreText('superpowers04');
+				addMoreText(FlxG.random.float() < 0.5 ? 'super_fucking_idiot04':"superpowers04");
 				if(superLogo != null){
 					superLogo.scale.x = 1.1;
 					superLogo.scale.y = 1.1;
@@ -1589,7 +1589,7 @@ class TitleState extends MusicBeatState
 		_gfx.lineTo(-50, 50);
 		_gfx.endFill();
 		deleteCoolText();
-		createCoolText(['Powered by',(FlxG.random.bool(0.1) ? 'the bane of my existance' : 'HaxeFlixel')]);
+		createCoolText(['Powered by',(FlxG.random.bool(0.1) ? 'the bane of my existance' : (easterEgg == 0x1 ? 'LesbianFlixel' :'HaxeFlixel'))]);
 	}
 
 	function drawLightBlue():Void

@@ -74,7 +74,7 @@ class FinishSubState extends MusicBeatSubstate
 			return;
 		}
 		// PlayState.instance.camHUD.alpha = PlayState.instance.camTOP.alpha = 1;
-		PlayState.instance.followChar(if(won) 0 else 1);
+		// PlayState.instance.followChar(if(won) 0 else 1);
 		var camPos = PlayState.instance.getDefaultCamPos();
 		PlayState.instance.camFollow.setPosition(camPos[0],camPos[1]);
 		if(!isError){
@@ -158,12 +158,13 @@ class FinishSubState extends MusicBeatSubstate
 				PlayState.instance.followChar(0);
 				PlayState.instance.controlCamera = false;
 				cam = new FlxCamera();
-				FlxG.cameras.add(cam);
+				FlxG.cameras.add(cam,false);
 				PlayState.instance.replace(boyfriend,bfReplacement);
 				add(boyfriend);
 				FlxG.state.persistentUpdate = FlxG.state.persistentDraw = !pauseGame;
 
 				cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]]; 
+				// cameras[0].scroll = FlxG.camera.scroll;
 					// ready = true;
 				// boyfriend.cameras=cameras;
 				// boyfriend.scrollFactor.set(0,0);
