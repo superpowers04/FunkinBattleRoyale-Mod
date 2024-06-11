@@ -8,6 +8,7 @@ import flixel.addons.ui.FlxUIState;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
+import flixel.FlxState;
 
 class Chat
 {
@@ -45,7 +46,7 @@ class Chat
 		Chat.OutputChatMessage('You\'re muted', FlxColor.RED);
 
 
-	public static function createChat(state:FlxUIState,?canHide:Bool = false){
+	public static function createChat(state:FlxState,?canHide:Bool = false){
 		Chat.created = true;
 		if(group != null && group.members.length > 0){
 			for(member in group.members){

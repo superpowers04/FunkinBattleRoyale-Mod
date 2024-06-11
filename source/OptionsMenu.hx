@@ -17,6 +17,7 @@ import flixel.util.FlxColor;
 import lime.utils.Assets;
 import flixel.addons.ui.FlxUIState;
 import flixel.util.FlxTimer;
+import flixel.sound.FlxSound;
 
 
 import sys.FileSystem;
@@ -38,6 +39,12 @@ class OptionsMenu extends MusicBeatState
 			lastState = 0;
 			SearchMenuState.doReset = true;
 			// if(lastStateType is PlayState) 
+			if(bgMusic != null){
+				bgMusic.stop();
+				bgMusic = null;
+				// FlxG.sound.music.play();
+				SickMenuState.changeMusic = true;
+			}
 			LoadingScreen.show();
 			goToLastClass();
 		}catch(e){
@@ -151,6 +158,7 @@ class OptionsMenu extends MusicBeatState
 			#end
 			// new HCBoolOption("Allows you to use the legacy chart editor","Lecacy chart editor","legacyCharter"),
 			// new LogGameplayOption("Logs your game to a text file"),
+			new HCBoolOption("Profiler","Adds a basic profiler to the FPS display","profiler"),
 			new EraseOption("Backs up your options to SESETTINGS-BACK.json and then resets them"),
 			// new ImportOption("Import your options from SEOPTIONS.json"),
 			// new ExportOption("Export your options to SEOPTIONS.json to backup or to share with a bug report"),
@@ -208,6 +216,8 @@ class OptionsMenu extends MusicBeatState
 			new VolumeOption("se.options.volume.hit","hit"),    
 			new VolumeOption("se.options.volume.miss","miss"),       
 			new VolumeOption("se.options.volume.other","other"),  
+			new HCBoolOption("Animation debug Music","Whether to play music for animation debug or continue playing the current song","animDebugMusic"),
+			new HCBoolOption("Options Menu Music","Whether to play music for the options menu or continue playing the current song","optionsMusic"),
 			new HCBoolOption("Miss Sounds","Play a sound when you miss",'playMisses'),
 			new HCBoolOption("Hit Sounds","Play a click when you hit a note. Uses osu!'s sounds or your mods/hitsound.ogg",'hitSound'),
 			new HCBoolOption("Play Character Voices","Plays the voices a character has when you press a note.","playVoices"),
@@ -230,12 +240,17 @@ class OptionsMenu extends MusicBeatState
 	var currentSelectedCat:OptionCategory;
 	var blackBorder:FlxSprite;
 	var titleText:FlxText;
+	static public var bgMusic:FlxSound;
+	static public var lastMusic:FlxSound;
 	function addTitleText(str:String = "se.options.title"){
 		if (titleText != null) titleText.destroy();
 		titleText = new FlxText(FlxG.width * 0.5 - (str.length * 10), 20, 0, se.translation.Lang.get(str), 12);
 		titleText.scrollFactor.set();
 		titleText.setFormat(CoolUtil.font, 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(titleText);
+	}
+	override function destroy(){
+		super.destroy();
 	}
 	override function create() {
 		loading = false;
@@ -254,8 +269,13 @@ class OptionsMenu extends MusicBeatState
 				}
 			}
 		}
+		var menuBG:FlxSprite = new FlxSprite();
+		try{
+			menuBG.loadGraphic(SELoader.loadGraphic("assets/images/settingsMenu"+(FlxG.random.float(0,1)>0.9 ? "2.png" : ".png"),true));
+		}catch(e){
+			menuBG.loadGraphic(Paths.image("settingsMenu"+(FlxG.random.float(0,1)>0.9 ? "2" : "")));
 
-		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image("settingsMenu"+(FlxG.random.float(0,1)>0.9 ? "2" : "")));
+		}
 
 		menuBG.color = 0x793397;
 		// menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
@@ -268,11 +288,12 @@ class OptionsMenu extends MusicBeatState
 		add(grpControls);
 
 		for (i in 0...options.length){
-			var controlLabel:Alphabet = new Alphabet(0, (70 * i) + 730, options[i].name, true, false, false);
+			var controlLabel:Alphabet = new Alphabet(2, (70 * i) + 730, options[i].name, true, false, false);
 			controlLabel.isMenuItem = true;
 			controlLabel.targetY = i;
 			grpControls.add(controlLabel);
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
+			// you cant tell me what to do :tro:
 		}
 
 		currentDescription = "none";
@@ -441,10 +462,29 @@ class OptionsMenu extends MusicBeatState
 		else
 			versionShit.text = "Offset (Left, Right, Shift for slow): " + HelperFunctions.truncateFloat(SESave.data.offset,2) + " | " + se.translation.Lang.get(currentDescription);
 	}
+	public function new(){
+		super();
+		if(SESave.data.optionsMusic && (bgMusic == null || !bgMusic.playing) && SELoader.exists('assets/music/chartEditorLoop.ogg')){
+			if(FlxG.sound.music != null) FlxTween.tween(FlxG.sound.music,{volume:0},0.3,{onComplete:function(_){
+				FlxG.sound.music.pause();
+				lastMusic = FlxG.sound.music;
+				// if(bgMusic == null){
+				FlxG.sound.playMusic(SELoader.loadSound('assets/music/chartEditorLoop.ogg',true),SESave.data.instVol);
+				bgMusic = FlxG.sound.music;
+				// }else{
+				// 	bgMusic.play();
+				// }
+				bgMusic.persist=true;
+				Conductor.changeBPM(137);
+			}});
+			SickMenuState.changeMusic = false;
+
+		}
+	}
 
 	function changeSelection(change:Int = 0) {
 
-		if (change != 0 ) FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
+		if (change != 0 ) FlxG.sound.play(Paths.sound("scrollMenu"), 0.4); // sobbing
 
 		curSelected += change;
 

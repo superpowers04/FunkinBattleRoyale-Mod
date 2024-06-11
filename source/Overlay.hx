@@ -97,7 +97,7 @@ class Overlay extends TextField {
 			#if cpp
 			+"\nMemory Reserved/Current: " + Math.round((cpp.NativeGc.memInfo(3) / 1024) / 1000) + "MB/" + Math.round((cpp.NativeGc.memInfo(2) / 1024) / 1000) + "MB" 
 			#end
-			+ debugVar;
+			+ debugVar + SEProfiler.getString();
 		// }
 
 		cacheCount = currentCount;

@@ -208,6 +208,14 @@ class AnimationDebug extends MusicBeatState
 		this.charSel = charSel;
 		canEditJson = false;
 		instance = this;
+		if(SELoader.exists('assets/music/chartEditorLoop.ogg') && SESave.data.animDebugMusic){
+			
+			if(OptionsMenu.bgMusic != FlxG.sound.music){
+				FlxG.sound.playMusic(SELoader.loadSound('assets/music/chartEditorLoop.ogg',true),true);
+				FlxG.sound.music.volume = SESave.data.instVol;
+			}
+			Conductor.changeBPM(137);
+		}
 		trace('Animation debug with ${daAnim},${if(isPlayer) "true" else "false"},${charType}');
 
 	}
@@ -372,6 +380,7 @@ class AnimationDebug extends MusicBeatState
 			quitHeldBar.cameras = quitHeldBG.cameras = [camHUD];
 			add(quitHeldBar);
 			updateTxt();
+
 			if(dragdrop)showTempmessage('Imported character $daAnim');
 		}catch(e) {MainMenuState.handleError('Error occurred, while loading Animation Debug. Current phase:${phases[phase]}; ${e.message}');}
 	}
@@ -1387,7 +1396,7 @@ class AnimationDebug extends MusicBeatState
 				}
 				if(FlxG.keys.justPressed.ONE){resetOffsets(); updateCameraPos(false,720, 500);}// Unload character offsets
 				if(FlxG.keys.justPressed.THREE || ctrlPress && shiftPress && FlxG.keys.justPressed.S){outputChar();} // Saving
-				if(FlxG.keys.pressed.V){animToPlay = 'idle';}
+				if(FlxG.keys.pressed.V){animToPlay = 'Idle';}
 				if(FlxG.keys.pressed.LBRACKET){
 					var id:Int = animationList.indexOf(chara.animName);
 					if(id == -1){

@@ -15,6 +15,11 @@ typedef VSliceSongMeta = {
 	var timeFormat:String;
 	var timeChanges:Array<TimeChange>
 }
+typedef VSliceChart = {
+	var scrollSpeed:Map<String,Float>;
+	var events:Array<VEvent>;
+	var notes:Map<String,Array<VNote>>;
+}
 typedef VSliceChartCharacters = {
 	var bf:String;
 	var girlfriend:String;
@@ -23,4 +28,15 @@ typedef VSliceChartCharacters = {
 typedef TimeChange = {
 	var t:Float;
 	var bpm:Float;
+}
+typedef VNote = {
+	var t:Float; // Time 
+	var l:Float; // Length
+	var d:Float; // Data
+	var k:String; // Type
+}
+typedef VEvent = {
+	var e:String; // Event
+	var t:Float; // Time 
+	var v:Dynamic; // Value
 }

@@ -497,12 +497,14 @@ class PlayState extends ScriptMusicBeatState
 			if(FinishSubState.instance != null){
 				// showTempmessage('Error! ${error}',FlxColor.RED);
 				FinishSubState.instance.destroy();
+				doUpdate=false;
 				openSubState(new ErrorSubState(0,0,error,true));
 				canPause = true;
 				return;
 			}
 			// _forced
 			Main.game.blockUpdate = Main.game.blockDraw = false;
+			doUpdate=false;
 			openSubState(new FinishSubState(0,0,error,true));
 		}catch(e){
 			trace('${e.message}\n${e.stack}');MainMenuState.handleError(error);
@@ -659,11 +661,13 @@ class PlayState extends ScriptMusicBeatState
 	
 	override public function create(){
 		#if !debug
-		// try{
+		try{
 		#end
+		SEProfiler.qStart('Playstate loading');
 		scriptSubDirectory = "";
 		SELoader.gc();
 		LoadingScreen.loadingText = 'Loading playstate variables';
+		LoadingScreen.profiling=SESave.data.profiler;
 		parseMoreInterps = (QuickOptionsSubState.getSetting("Song hscripts") || isStoryMode);
 		instance?.destroy();
 		ScriptMusicBeatState.instance=cast(instance=this);
@@ -788,6 +792,7 @@ class PlayState extends ScriptMusicBeatState
 		gfPos = stageObject.gfPos;
 		stageTags = stageObject.tags;
 		defaultCamZoom = stageObject.defaultCamZoom;
+
 		LoadingScreen.loadingText = "Loading scripts";
 		
 		if(QuickOptionsSubState.getSetting("Song hscripts")){
@@ -1141,7 +1146,7 @@ class PlayState extends ScriptMusicBeatState
 		LoadingScreen.loadingText = "Finishing up";
 		super.create();
 		LoadingScreen.loadingText = "Starting countdown/dialog";
-
+		SEProfiler.qStamp('Playstate loading');
 		if((dialogue != null && dialogue[0] != null && isStoryMode)){
 			var doof:DialogueBox = new DialogueBox(false, dialogue);
 			doof.scrollFactor.set();
@@ -1154,10 +1159,10 @@ class PlayState extends ScriptMusicBeatState
 		}
 
 	#if !debug 
-	// }catch(e){
-	// 	if(e is FakeException) return;
+	}catch(e:FakeException){
+		// if(e is FakeException) return;
 	// 	MainMenuState.handleError(e,'Caught "create" crash: ${e.message}\n ${e.stack}');
-	// }
+	}
 	#end
 	}
 	function loadDialog(){		
@@ -2113,6 +2118,7 @@ class PlayState extends ScriptMusicBeatState
 		super.update(elapsed);
 		lastMusicUpdate = Sys.time() * 1000;
 		callInterp("update",[elapsed]);
+		SEProfiler.qStart('Misc');
 
 		
 		if (!SESave.data.accuracyDisplay) scoreTxt.text = "Score: " + songScore;
@@ -2218,7 +2224,9 @@ class PlayState extends ScriptMusicBeatState
 			camFollow.y = f[1] + additionCamPos[1];
 		}
 
+		SEProfiler.qStamp('Misc');
 		
+		SEProfiler.qStart('AINotes');
 		if (SESave.data.cpuStrums){
 
  			var i = cpuStrums.members.length - 1;
@@ -2230,7 +2238,6 @@ class PlayState extends ScriptMusicBeatState
 			}
 		}
 		
-		callInterp("updateAfter",[elapsed]);
 		if(!_dadShow && SONG.needsVoices){
 			var note:Note = null;
 			if(notes.length > 0){
@@ -2261,11 +2268,17 @@ class PlayState extends ScriptMusicBeatState
 				}
 			}
 		}
+		SEProfiler.qStamp('AINotes');
 
 		if (!inCutscene){
 			if(timeSinceOnscreenNote > 0) timeSinceOnscreenNote -= elapsed;
+
+			SEProfiler.qStart('Input');
 			keyShit();
+			SEProfiler.qStamp('Input');
+
 		}
+		callInterp("updateAfter",[elapsed]);
 		#if !debug
 		}catch(e){
 			handleError('Caught "update" crash: ${e.message}\n ${e.stack}');
@@ -2283,7 +2296,9 @@ class PlayState extends ScriptMusicBeatState
 		// camGame.zoom = 1;
 	}
 	@:keep inline function addNotes(){
+
 		if(unspawnNotes[0] != null && unspawnNotes[0].strumTime - Conductor.songPosition < 3500){
+			SEProfiler.qStart('Add Notes');
 			while(unspawnNotes[0] != null && unspawnNotes[0].strumTime - Conductor.songPosition < 3500){
 				var dunceNote:Note = unspawnNotes.shift();
 				callInterp('noteSpawn',[dunceNote]);
@@ -2295,6 +2310,7 @@ class PlayState extends ScriptMusicBeatState
 					updateNotePosition(dunceNote,strumNote);
 				}
 			}
+			SEProfiler.qStamp('Add Notes');
 		}
 	}
 	override function draw(){
@@ -2769,6 +2785,7 @@ class PlayState extends ScriptMusicBeatState
 
 	function SENoteShit(){
 		if (!generatedMusic) return;
+		SEProfiler.qStart('note updating');
 		var _scrollSpeed = Math.floor((SESave.data.scrollSpeed == 1 ? SONG.speed : SESave.data.scrollSpeed)*1000)*0.001; // Probably better to calculate this beforehand
 		if(currentSpeed != 1) _scrollSpeed /= currentSpeed;
 		var strumNote:FlxSprite;
@@ -2863,6 +2880,7 @@ class PlayState extends ScriptMusicBeatState
 				notes.remove(daNote, true);
 			}
 		}
+		SEProfiler.qStamp('note updating');
 	}
 	@:keep inline function updateNotePosition(daNote:Note,strumNote:FlxSprite){
 		if ((daNote.mustPress || !daNote.wasGoodHit) && daNote.lockToStrum){
@@ -2876,6 +2894,7 @@ class PlayState extends ScriptMusicBeatState
 	}
 	private function SEKeyShit():Void{ // Only used for holds, not pressing
 		if (!generatedMusic) return;
+		SEProfiler.qStart('update input');
 		playerCharacter.isPressingNote = false;
 		callInterp("holdShit",[holdArray]);
 		charCall("holdShit",[holdArray],true);
@@ -2906,6 +2925,7 @@ class PlayState extends ScriptMusicBeatState
 		if (player.currentAnimationPriority == 10 && (player.holdTimer > Conductor.stepCrochet * player.dadVar * 0.001 || player.isDonePlayingAnim()) && !player.isPressingNote) {
 			player.dance(true,curBeat % 2 == 1);
 		}
+		SEProfiler.qStamp('update input');
 
 	}
 	var SEIKeyMap:Map<Int,Int> = [];
@@ -2920,14 +2940,11 @@ class PlayState extends ScriptMusicBeatState
 			SEIKeyMap[FlxKey.fromStringMap['ANY']] = 0;
 		}else if(SONG.keyCount == 4){
 			var arr:Array<String> = cast SESave.data.keys[3];
-			SEIKeyMap[FlxKey.fromStringMap[arr[0]]] = 0;
-			SEIKeyMap[FlxKey.fromStringMap[arr[1]]] = 1;
-			SEIKeyMap[FlxKey.fromStringMap[arr[2]]] = 2;
-			SEIKeyMap[FlxKey.fromStringMap[arr[3]]] = 3;
-			SEIKeyMap[FlxKey.fromStringMap[arr[4]]] = 0;
-			SEIKeyMap[FlxKey.fromStringMap[arr[5]]] = 1;
-			SEIKeyMap[FlxKey.fromStringMap[arr[6]]] = 2;
-			SEIKeyMap[FlxKey.fromStringMap[arr[7]]] = 3;
+			SEIKeyMap[FlxKey.fromStringMap[arr[0]]] = SEIKeyMap[FlxKey.fromStringMap[arr[4]]] = 0;
+			SEIKeyMap[FlxKey.fromStringMap[arr[1]]] = SEIKeyMap[FlxKey.fromStringMap[arr[5]]] = 1;
+			SEIKeyMap[FlxKey.fromStringMap[arr[2]]] = SEIKeyMap[FlxKey.fromStringMap[arr[6]]] = 2;
+			SEIKeyMap[FlxKey.fromStringMap[arr[3]]] = SEIKeyMap[FlxKey.fromStringMap[arr[7]]] = 3;
+
 
 			
 		}else{
@@ -2957,27 +2974,24 @@ class PlayState extends ScriptMusicBeatState
 				return;
 			}
 			if(playerStrums == null || !generatedMusic || !generatedArrows) return;
+			SEProfiler.qStart('KeyPress');
 			SEIBlockInput = false;
 			for(i in 0 ... pressArray.length) pressArray[i] = false;
 			for(i in 0 ... releaseArray.length) releaseArray[i] = false;
 			callInterp('keyPress',[event.keyCode]);
-			if (SEIBlockInput || cancelCurrentFunction || !acceptInput || playerCharacter.isStunned || subState != null || paused ) return;
+			if (!SEIKeyMap.exists(event.keyCode)|| SEIBlockInput || cancelCurrentFunction || !acceptInput || playerCharacter.isStunned || subState != null || paused ) return SEProfiler.qStamp('KeyPress');
 			
-			for(key => data in SEIKeyMap){
-				if(FlxG.keys.checkStatus(key, JUST_PRESSED) && !SEIKeyHeld[key]){
-					pressArray[data] = true;
-					holdArray[data] = true;
-					var strum = playerStrums.members[data];
-					SEIKeyHeld[key] = true;
-					if(strum != null) strum.press();
-				}else if(FlxG.keys.checkStatus(key, PRESSED)){
-					SEIKeyHeld[key] = true;
-					holdArray[data] = true;
-				}
+			if(!SEIKeyHeld[event.keyCode]){
+				var data = SEIKeyMap[event.keyCode];
+				pressArray[data] = true;
+				holdArray[data] = true;
+				var strum = playerStrums.members[data];
+				SEIKeyHeld[event.keyCode] = true;
+				if(strum != null) strum.press();
 			}
 			callInterp('keyShit',[pressArray,holdArray]);
 			charCall("keyShit",[pressArray,holdArray]);
-			if(!pressArray.contains(true) || SEIBlockInput || !acceptInput) return;
+			if(!pressArray.contains(true) || SEIBlockInput || !acceptInput) return SEProfiler.qStamp('KeyPress');
 
 			playerCharacter.holdTimer = 0;
 			// var hitArray = [false,false,false,false];
@@ -3053,6 +3067,8 @@ class PlayState extends ScriptMusicBeatState
 			}
 			callInterp('keyShitAfter',[pressArray,holdArray,hitArray]);
 			charCall("keyShitAfter",[pressArray,holdArray,hitArray]);
+			SEProfiler.qStamp('KeyPress');
+
 		}catch(e){
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, SEIKeyPress);
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, SEIKeyRelease);
@@ -3067,23 +3083,27 @@ class PlayState extends ScriptMusicBeatState
 				return;
 			}
 			if(playerStrums == null) return;
-			for(i in 0 ... holdArray.length) holdArray[i]=false;
+			SEProfiler.qStart('KeyRelease');
+			// for(i in 0 ... holdArray.length) holdArray[i]=false;
 			callInterp('keyRelease',[event.keyCode]);
-			if (cancelCurrentFunction || subState != null || paused ) return;
+			if (cancelCurrentFunction || subState != null || paused ) return SEProfiler.qStamp('KeyRelease');
 
-			for(key => data in SEIKeyMap){
-				if(FlxG.keys.checkStatus(key, PRESSED) && acceptInput && !playerCharacter.isStunned){
-					holdArray[data] = true;
-				}else{
-					SEIKeyHeld[key] = false;
-				}
-			}
+			SEIKeyHeld[event.keyCode] = false;
+			holdArray[SEIKeyMap[event.keyCode]] = false;
+			// for(key => data in SEIKeyMap){
+			// 	if(FlxG.keys.checkStatus(key, PRESSED) && acceptInput && !playerCharacter.isStunned){
+			// 		holdArray[data] = true;
+			// 	}else{
+			// 		SEIKeyHeld[key] = false;
+			// 	}
+			// }
 			for(id => bool in holdArray){
 				if(bool) continue;
 				var strum = playerStrums.members[id];
 				if(strum == null) return;
 				strum.playStatic();
 			}
+			SEProfiler.qStamp('KeyRelease');
 		}catch(e){
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, SEIKeyPress);
 			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, SEIKeyRelease);
@@ -3094,6 +3114,7 @@ class PlayState extends ScriptMusicBeatState
 
 	function BotplayKeyShit(){
 		if(!botPlay) return kadeBRKeyShit();
+		SEProfiler.qStart('BotPlay');
 		// pressArray = [for(i in 0 ... pressArray.length) false];
 		for(i in 0 ... pressArray.length) pressArray[i] = holdArray[i] = releaseArray[i] = false;
 		var i = 0;
@@ -3135,10 +3156,12 @@ class PlayState extends ScriptMusicBeatState
 			if(spr == null) continue;
 			if(!holdArray[spr.ID] && spr.animation.finished) spr.playStatic();
 		}
+		SEProfiler.qStamp('BotPlay');
 	}
 
 	private function kadeBRKeyShit():Void{
 		if (!generatedMusic) return;
+		SEProfiler.qStart('BRInput');
 		// control arrays, order L D R U
 		lastPressArray = [for (i in pressArray) i];
 		holdArray = [controls.LEFT, controls.DOWN, controls.UP, controls.RIGHT];
@@ -3265,6 +3288,7 @@ class PlayState extends ScriptMusicBeatState
 			if(pressArray[spr.ID] && spr.animation.curAnim.name != 'confirm') spr.press(); 
 			else if(!holdArray[spr.ID]) spr.playStatic();
 		}
+		SEProfiler.qStamp('BRInput');
 
 	}
 
@@ -3397,6 +3421,7 @@ class PlayState extends ScriptMusicBeatState
 	}
 
 	override function stepHit(){
+		SEProfiler.qStart('StepHit');
 		super.stepHit();
 		// lastStep = curStep;
 		if (SESave.data.resyncVoices && handleTimes && (FlxG.sound.music.time > Conductor.songPosition + 5 || FlxG.sound.music.time < Conductor.songPosition - 5) && generatedMusic)
@@ -3465,6 +3490,7 @@ class PlayState extends ScriptMusicBeatState
 		}
 		callInterp("stepHitAfter",[]);
 		charCall("stepHitAfter",[curStep]);
+		SEProfiler.qStamp('StepHit');
 	}
 	
 	public function restartSong(){
@@ -3489,14 +3515,16 @@ class PlayState extends ScriptMusicBeatState
 		handleHealth=true;
 		finished=false;
 		for (i=>v in notes.members){
-			// v.acceleration.y = FlxG.random.int(200, 300);
-			// v.velocity.y -= FlxG.random.int(140, 160);
-			// v.velocity.x = FlxG.random.float(-5, 5);
+			v.acceleration.y = FlxG.random.int(200, 300);
+			v.velocity.y -= FlxG.random.int(140, 160);
+			v.velocity.x = FlxG.random.float(-5, 5);
 			v.angularVelocity = v.velocity.x*0.5;
 			v.skipNote=true;
+			v.doUpdate=true;
 			add(v);
 			var X = FlxG.random.int(-160, 160);
-			var e = FlxTween.tween(v, {angle:v.angle+X*0.2,x:v.x+X,y:v.y+FlxG.random.int(140, 160),alpha:0}, FlxG.random.float(0.1, 0.6), {
+			
+			var e = FlxTween.tween(v, {alpha:0}, FlxG.random.float(0.3, 0.6), {
 				onComplete: function(tween:FlxTween) {v.destroy();}});
 		}
 		while(notes.members.pop() != null){}
@@ -3554,6 +3582,7 @@ class PlayState extends ScriptMusicBeatState
 		Conductor.songPosition = time;
 	} */
 	override function beatHit(){
+		SEProfiler.qStart('BeatHit');
 		super.beatHit();
 		callInterp("beatHit",[]);
 		charCall("beatHit",[curBeat]);
@@ -3624,6 +3653,7 @@ class PlayState extends ScriptMusicBeatState
 		recalcSpeed();
 		callInterp("beatHitAfter",[]);
 		charCall("beatHitAfter",[curBeat]);
+		SEProfiler.qStamp('StepHit');
 	}
 
 

@@ -29,6 +29,7 @@ class FuckState extends FlxUIState {
 	public static var showingError:Bool = false;
 	public static var useOpenFL:Bool = false;
 	public static var lastERROR = "";
+	public static var allowLogWrite:Bool = true;
 	// This function has a lot of try statements.
 	// The game just crashed, we need as many failsafes as possible to prevent the game from closing or crash looping
 	@:keep inline public static function FUCK(e:Dynamic,?info:String = "unknown",_forced:Bool = false,_FATAL:Bool = false,_rawError:Bool=false){
@@ -90,7 +91,7 @@ class FuckState extends FlxUIState {
 		exception += _stack;
 
 		// Crash log 
-		if(lastERROR != exception){
+		if(lastERROR != exception && allowLogWrite){
 			lastERROR = exception;
 
 			try{
@@ -193,7 +194,7 @@ class FuckState extends FlxUIState {
 			}
 			Main.game = null;
 			// Main.instance
-			trace('OpenFL error screen');
+			// trace('OpenFL error screen');
 
 			try{
 				if(!showingError){
@@ -226,7 +227,7 @@ class FuckState extends FlxUIState {
 					tf.align = "center";
 					textFieldBot.embedFonts = textFieldTop.embedFonts = textField.embedFonts = true;
 					textFieldBot.defaultTextFormat =textFieldTop.defaultTextFormat =textField.defaultTextFormat = tf;
-					
+					allowLogWrite = false;
 				}
 
 				// Main.instance.addChild(new se.ErrorSprite('${exception}\nThis happened in ${info}',saved));

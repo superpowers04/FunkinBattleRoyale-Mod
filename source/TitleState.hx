@@ -994,6 +994,8 @@ class TitleState extends MusicBeatState
 		// CoolUtil.setUpdaterate(true);
 		FlxG.sound.volume = SESave.data.masterVol;
 		Main.instance.toggleFPS(SESave.data.fps);
+		SEProfiler.enabled = SESave.data.profiler;
+		SEProfiler.getProfiler('patience',true).start();
 
 		if(initialized)
 			skipIntro();
@@ -1137,7 +1139,8 @@ class TitleState extends MusicBeatState
 		}
 		#end
 		if (pressedEnter && !transitioning && skippedIntro){
-
+			
+			SEProfiler.getProfiler('patience').keep=false;
 
 
 			if (SESave.data.flashing){
@@ -1212,7 +1215,7 @@ class TitleState extends MusicBeatState
 				MainMenu();
 			#end
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
-		}
+		}else SEProfiler.stamp('patience');
 
 		if (pressedEnter && !skippedIntro  && (!forcedText || SESave.data.seenForcedText))
 			(initialized ? skipIntro() : __onComplete(null));

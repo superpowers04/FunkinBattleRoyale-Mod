@@ -107,76 +107,54 @@ class FinishSubState extends MusicBeatSubstate
 		bfReplacement = new FlxSprite();
 		if(isError){
 			finishNew();
-		}else{
-			var bfAnims = [];
-
-			if(win){
-				// for (g in [PlayState.instance.cpuStrums,PlayState.instance.playerStrums]) {
-					// g.forEach(function(i){
-						// FlxTween.tween(i, {y:if(SESave.data.downscroll)FlxG.height + 200 else -200},1,{ease: FlxEase.expoIn});
-					// });
-				// }
-				// if (SESave.data.songPosition)
-				// {
-					// for (i in [PlayState.songPosBar,PlayState.songPosBG,PlayState.instance.songName,PlayState.instance.songTimeTxt]) {
-						// FlxTween.tween(i, {y:if(SESave.data.downscroll)FlxG.height + 200 else -200},1,{ease: FlxEase.expoIn});
-					// }
-				// }
-
-				// FlxTween.tween(healthBar, {y:Std.int(FlxG.height * 0.10)},1,{ease: FlxEase.expoIn});
-				// FlxTween.tween(healthBarBG, {y:Std.int(FlxG.height * 0.10 - 4)},1,{ease: FlxEase.expoIn});
-				// FlxTween.tween(iconP1, {y:Std.int(FlxG.height * 0.10 - (iconP1.height * 0.5))},1,{ease: FlxEase.expoIn});
-				// FlxTween.tween(iconP2, {y:Std.int(FlxG.height * 0.10 - (iconP2.height * 0.5))},1,{ease: FlxEase.expoIn});
-
-
-
-
-				// FlxTween.tween(PlayState.instance.kadeEngineWatermark, {y:FlxG.height + 200},1,{ease: FlxEase.expoIn});
-				// FlxTween.tween(PlayState.instance.scoreTxt, {y:if(SESave.data.downscroll) -200 else FlxG.height + 200},1,{ease: FlxEase.expoIn});
-				bfAnims = ['win','hey','Idle','danceLeft','singUp'];
-				if (dad.curCharacter == SESave.data.gfChar) dad.playAnim('cheer',true); else {dad.playAnimAvailable(['lose'],true);}
-				PlayState.gf.playAnim('cheer',true);
-			}else{
-				// boyfriend.playAnim('singDOWNmiss');
-				// boyfriend.playAnim('lose');
-
-				// dad.playAnim("hey",true);
-				// dad.playAnim("win",true);
-				bfAnims = ['lose','Idle','danceLeft','singDown'];
-				
-				if (dad.curCharacter == SESave.data.gfChar) dad.playAnim('sad',true); 
-				else dad.playAnimAvailable(['win','hey'],true);
-				PlayState.gf.playAnim('sad',true);
-			}
-		
-			if(autoEnd){
-
-				// FlxG.camera.zoom = 1;
-				// PlayState.instance.camHUD.zoom = 1;
-
-				// if (SESave.data.camMovement){
-				PlayState.instance.followChar(0);
-				PlayState.instance.controlCamera = false;
-				cam = new FlxCamera();
-				FlxG.cameras.add(cam,false);
-				PlayState.instance.replace(boyfriend,bfReplacement);
-				add(boyfriend);
-				FlxG.state.persistentUpdate = FlxG.state.persistentDraw = !pauseGame;
-
-				cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]]; 
-				// cameras[0].scroll = FlxG.camera.scroll;
-					// ready = true;
-				// boyfriend.cameras=cameras;
-				// boyfriend.scrollFactor.set(0,0);
-
-				forceBFAnim = false;
-
-				if(boyfriend.playAnimAvailable(bfAnims,true)) 
-					boyfriend.animation.finishCallback = this.finishNew; 
-				else 
-					finishNew();
-			}
+			return;
 		}
+		var bfAnims = [];
+
+		if(win){
+			bfAnims = ['win','hey','Idle','danceLeft','singUp'];
+			if (dad.curCharacter == SESave.data.gfChar) dad.playAnim('cheer',true); else {dad.playAnimAvailable(['lose'],true);}
+			PlayState.gf.playAnim('cheer',true);
+		}else{
+			// boyfriend.playAnim('singDOWNmiss');
+			// boyfriend.playAnim('lose');
+
+			// dad.playAnim("hey",true);
+			// dad.playAnim("win",true);
+			bfAnims = ['lose','Idle','danceLeft','singDown'];
+			
+			if (dad.curCharacter == SESave.data.gfChar) dad.playAnim('sad',true); 
+			else dad.playAnimAvailable(['win','hey'],true);
+			PlayState.gf.playAnim('sad',true);
+		}
+	
+		if(!autoEnd) return;
+
+		// FlxG.camera.zoom = 1;
+		// PlayState.instance.camHUD.zoom = 1;
+
+		// if (SESave.data.camMovement){
+		PlayState.instance.followChar(0);
+		PlayState.instance.controlCamera = false;
+		cam = new FlxCamera();
+		FlxG.cameras.add(cam,false);
+		PlayState.instance.replace(boyfriend,bfReplacement);
+		add(boyfriend);
+		FlxG.state.persistentUpdate = FlxG.state.persistentDraw = !pauseGame;
+
+		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]]; 
+		cameras[0].scroll.x = FlxG.camera.scroll.x;
+		cameras[0].scroll.y = FlxG.camera.scroll.y;
+			// ready = true;
+		// boyfriend.cameras=cameras;
+		// boyfriend.scrollFactor.set(0,0);
+
+		forceBFAnim = false;
+
+		if(boyfriend.playAnimAvailable(bfAnims,true)) 
+			boyfriend.animation.finishCallback = this.finishNew; 
+		else finishNew();
+		
 	}
 
 	public static var endingMusic:Sound;
@@ -517,6 +495,7 @@ class FinishSubState extends MusicBeatSubstate
 		remove(PlayState.playerCharacter,false);
 		FlxG.camera.zoom = 1;
 		PlayState.instance.followChar(0,true);
+		PlayState.instance.controlCamera = true;
 
 		close();
 

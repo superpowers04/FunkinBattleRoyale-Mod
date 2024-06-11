@@ -93,7 +93,9 @@ class SickMenuState extends ScriptMusicBeatState
 	}
 
 	public static var reloadMusic = true;
+	public static var changeMusic:Bool = true;
 	public static function musicHandle(?isMainMenu:Bool = false,?_bg:FlxSprite = null,?recolor:Bool = false){
+		if(!changeMusic) return;
 		try{
 
 

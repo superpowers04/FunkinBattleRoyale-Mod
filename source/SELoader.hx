@@ -348,6 +348,7 @@ class SELoader {
 		return new FlxSound().loadEmbedded(loadSound(soundPath,useCache));
 	}
 
+
 	static public function playSound(soundPath:String,?volume:Dynamic = null,?cache:Bool = false):FlxSound{
 		if(soundPath == null || soundPath == ""){
 			try{

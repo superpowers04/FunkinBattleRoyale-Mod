@@ -10,8 +10,8 @@ class Json {
 	 * @param String - The JSON string to parse
 	 * @param String the file name to whic the JSON code belongs. Used for generating nice error messages.
 	 */
-	public static function parse(json:String, ?fileName:String="JSON Data", ?stringProcessor:String->Dynamic = null,?_class:Class<Any>):Dynamic{
-		var t = new TJSONParser(json, fileName, stringProcessor,_class);
+	public static function parse(json:String, ?fileName:String="JSON Data", ?stringProcessor:String->Dynamic = null,?_class:Class<Any>,?baseObject:Dynamic):Dynamic{
+		var t = new TJSONParser(json, fileName, stringProcessor,_class,baseObject);
 		return t.doParse();
 	}
 
@@ -42,8 +42,8 @@ class TJSON {
 	 * @param String - The JSON string to parse
 	 * @param String the file name to whic the JSON code belongs. Used for generating nice error messages.
 	 */
-	public static function parse(json:String, ?fileName:String="JSON Data", ?stringProcessor:String->Dynamic = null,?_class:Class<Any>):Dynamic{
-		var t = new TJSONParser(json, fileName, stringProcessor,_class);
+	public static function parse(json:String, ?fileName:String="JSON Data", ?stringProcessor:String->Dynamic = null,?_class:Class<Any>,?baseObject:Dynamic):Dynamic{
+		var t = new TJSONParser(json, fileName, stringProcessor,_class,baseObject);
 		return t.doParse();
 	}
 
@@ -67,33 +67,30 @@ class TJSON {
 
 }
 
-
+class JSONANONTYPE {}
 
 class TJSONParser{
-	var pos:Int;
+	var pos:Int = 0;
 	var json:String;
-	var lastSymbolQuoted:Bool; //true if the last symbol was in quotes.
+	var lastSymbolQuoted:Bool = false; //true if the last symbol was in quotes.
 	var fileName:String;
-	var currentLine:Int;
+	var currentLine:Int = 1;
 	var cache:Array<Dynamic>;
-	var floatRegex:EReg;
-	var intRegex:EReg;
+	var floatRegex:EReg = ~/^-?[0-9]*\.[0-9]+$/;
+	var intRegex:EReg = ~/^-?[0-9]+$/;
 	var strProcessor:String->Dynamic;
 	var baseClass:Class<Any>;
+	var baseObject:Dynamic;
 
-	public function new(vjson:String, ?vfileName:String="JSON Data", ?stringProcessor:String->Dynamic = null, _class:Class<Any>) {
+	public function new(vjson:String, ?vfileName:String="JSON Data", ?stringProcessor:String->Dynamic = null, _class:Class<Any>, baseObject:Dynamic) {
 		json = vjson;
 		fileName = vfileName;
-		currentLine = 1;
-		lastSymbolQuoted = false;
-		pos = 0;
-		floatRegex = ~/^-?[0-9]*\.[0-9]+$/;
-		intRegex = ~/^-?[0-9]+$/;	
-		strProcessor = (stringProcessor==null? defaultStringProcessor : stringProcessor);
+		strProcessor = stringProcessor ?? defaultStringProcessor;
 		cache = new Array();
 		if(_class != null){
 			baseClass = _class;
 		}
+		this.baseObject = baseObject;
 	}
 
 	public function doParse():Dynamic{
@@ -110,10 +107,10 @@ class TJSONParser{
 	}
 
 	private function doObject():Dynamic{
-		var o:Dynamic = (baseClass != null ? Type.createEmptyInstance(baseClass) : {});
+		var o:Dynamic =  baseObject ?? (baseClass != null && baseClass != JSONANONTYPE ? Type.createEmptyInstance(baseClass) : {});
 		var val:Dynamic ='';
 		var key:String;
-		var isClassOb:Bool = baseClass != null;
+		var isClassOb:Bool = baseClass != null && baseClass != JSONANONTYPE;
 		cache.push(o);
 		while(pos < json.length){
 			key=getNextSymbol();
@@ -145,12 +142,9 @@ class TJSONParser{
 						if(cls==null) throw "Invalid class name - "+v;
 						o = Type.createEmptyInstance(cls);
 					}
-					cache.pop();
-					cache.push(o);
-				}else{
-					cache.pop();
-					cache.push(o);
 				}
+				cache.pop();
+				cache.push(o);
 
 				isClassOb = true;
 				continue;

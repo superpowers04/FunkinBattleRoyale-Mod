@@ -466,8 +466,9 @@ class Note extends FlxSprite
 		return canBeHit = ((isSustainNote && (strumTime > comparisonTime - Conductor.safeZoneOffset && strumTime < comparisonTime + ((Conductor.safeZoneOffset * 0.5) * Conductor.timeScale)) ) ||
 				strumTime > comparisonTime - (Conductor.safeZoneOffset * Conductor.timeScale) && strumTime < comparisonTime + Conductor.safeZoneOffset  );
 	}
+	public var doUpdate:Bool = false;
 	override function update(elapsed:Float) {
-		// super.update(elapsed);
+		if(doUpdate) super.update(elapsed);
 		animation.update(elapsed);
 		if(inCharter){
 			wasGoodHit = (strumTime <= Conductor.songPosition && strumTime + 100 >= Conductor.songPosition);

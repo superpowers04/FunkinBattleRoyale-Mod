@@ -39,6 +39,7 @@ class MusicBeatState extends FlxUIState {
 	var forceQuit = true;
 	public static var lastClassList:Array<Class<Dynamic>> = [];
 	public static var returningFromClass:Bool = false;
+	private var doUpdate:Bool = true;
 
 	public function goToLastClass(?avoidType:Class<Any> = null){
 		try{
@@ -376,6 +377,7 @@ class MusicBeatState extends FlxUIState {
 		var oldZoom = FlxG.camera.zoom;
 		FlxG.camera.zoom += 1;
 		FlxTween.tween(FlxG.camera, {zoom:oldZoom},0.7,{ease: FlxEase.expoOut});
+
 		LoadingScreen.hide();
 		
 	}
@@ -383,7 +385,6 @@ class MusicBeatState extends FlxUIState {
 		// active = false;
 		
 		if(loading) LoadingScreen.show();
-		
 		
 		
 		FlxTween.tween(FlxG.camera, {x:FlxG.width},0.9,{ease: FlxEase.expoIn});
@@ -394,8 +395,7 @@ class MusicBeatState extends FlxUIState {
 
 	public var debugMode:Bool = false;
 	public var debugOverlay:DebugOverlay;
-	override function tryUpdate(elapsed:Float):Void
-	{
+	override function tryUpdate(elapsed:Float):Void {
 		if(FlxG.keys.justPressed.F1 && forceQuit){
 			Console.showConsole = false;
 			MainMenuState.handleError("Manually triggered force exit");
@@ -411,7 +411,7 @@ class MusicBeatState extends FlxUIState {
 		}
 		if(debugMode)
 			debugOverlay.update(elapsed);
-		else if ((persistentUpdate || subState == null))
+		else if ((persistentUpdate || subState == null) && doUpdate)
 			update(elapsed);
 
 		if (_requestSubStateReset)
@@ -441,6 +441,9 @@ class MusicBeatState extends FlxUIState {
 	public function consoleCommand(text:String,args:Array<String>):Dynamic{
 		return null;
 	}
+
+
+
 }
 
 

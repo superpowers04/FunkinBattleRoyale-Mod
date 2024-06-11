@@ -1,7 +1,9 @@
-24.06.07.1817;
+24.06.11.0023;
 * Better Psych character support(Still kinda experimental but should be more stable)
 * Fix some small errors
 * Fix characters not loading due to using ID instead of folderName
 * Adjust mouse input on menus so clicking above alphabet will scroll up, and below will scroll down
 * Migrate BRTools to a cache derivitave of the built-in one instead of using a custom broken one
 * Fix stages not loading
+* Options/Animation debug music
+* Remove FlxKey from being used in input

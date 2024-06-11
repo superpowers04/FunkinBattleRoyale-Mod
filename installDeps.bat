@@ -1,4 +1,4 @@
-haxelib install hxcpp
+haxelib git hxcpp https://github.com/HaxeFoundation/hxcpp
 haxelib install lime
 haxelib install openfl
 haxelib install flixel 5.6.2

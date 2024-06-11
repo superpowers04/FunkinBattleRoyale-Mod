@@ -45,6 +45,7 @@ class Alphabet extends FlxSpriteGroup
 				if(e != null) e.destroy();
 			}
 		}
+		
 		if(listOAlphabets != null && listOAlphabets.length > 0){
 			var e:FlxSprite;
 			while (listOAlphabets.length > 0){

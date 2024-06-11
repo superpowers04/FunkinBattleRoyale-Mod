@@ -18,6 +18,7 @@ import openfl.events.Event;
 import openfl.events.UncaughtErrorEvent;
 import sys.thread.*;
 import se.objects.ToggleLock;
+
 // import crashdumper.CrashDumper;
 // import crashdumper.SessionData;
 import Overlay;
@@ -56,6 +57,7 @@ class Main extends Sprite
 
 		// quick checks 
 		FuckState.hook();
+		SEProfiler.init();
 		Lib.current.addChild(new Main());
 	}
 
@@ -99,7 +101,7 @@ class Main extends Sprite
 		
 		addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 		try{
-
+			
 			funniSprite = new Sprite();
 			game = new FlxGameEnhanced(gameWidth, gameHeight, initialState, framerate, framerate, skipSplash, startFullscreen);
 			FlxG.mouse.enabled = false;
@@ -162,6 +164,7 @@ class Main extends Sprite
 	#if(target.threaded)
 	override function __enterFrame(_){
 		try{
+			SEProfiler.update();
 			if(game != null){
 
 				if(FlxG.keys.justPressed.F1) throw('Manual error');
@@ -171,7 +174,7 @@ class Main extends Sprite
 				// 	renderLockButCooler.lock();
 				// 	renderLock.release();
 				// }else{
-					super.__enterFrame(_);
+				super.__enterFrame(_);
 				// }
 			}else{
 				super.__enterFrame(_);
@@ -240,7 +243,6 @@ class FlxGameEnhanced extends FlxGame{
 		if (!_state.active || !_state.exists)
 			return;
 
-
 		#if FLX_DEBUG
 		if (FlxG.debugger.visible)
 			ticks = getTicks();
@@ -278,6 +280,7 @@ class FlxGameEnhanced extends FlxGame{
 	override function update(){
 		
 		try{
+			SEProfiler.start('update');
 
 			#if(target.threaded && !hl)
 				// if(_state != _requestedState && SESave.data.doCoolLoading){
@@ -301,6 +304,7 @@ class FlxGameEnhanced extends FlxGame{
 
 				if (FlxG.keys.justPressed.F11) SESave.data.fullscreen = (FlxG.fullscreen = !FlxG.fullscreen);
 			}
+			SEProfiler.stamp('update');
 		}catch(e){
 			FuckState.FUCK(e,"FlxGame.Update");
 		}
@@ -308,6 +312,7 @@ class FlxGameEnhanced extends FlxGame{
 	override function draw(){
 			try{
 				if (blockDraw || _state == null || !_state.visible || !_state.exists || !hasUpdated) return;
+				SEProfiler.start('draw');
 				#if FLX_DEBUG
 				if (FlxG.debugger.visible) ticks = getTicks();
 				#end
@@ -368,6 +373,7 @@ class FlxGameEnhanced extends FlxGame{
 				#if FLX_DEBUG
 				debugger.stats.flixelDraw(getTicks() - ticks);
 				#end
+				SEProfiler.stamp('draw');
 			}catch(e){
 				FuckState.FUCK(e,"FlxGame.Draw:function"); return;
 			}

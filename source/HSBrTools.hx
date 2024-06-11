@@ -46,8 +46,8 @@ class HSBrTools {
 	var hasSettings:Bool = false;
 	public function new(_path:String,?id:String = ""){
 		path = SELoader.getPath(_path);
-		cache = new InternalCache('SCRIPT-'+id);
 		if (!path.endsWith('/')) path = path + "/";
+		cache = new InternalCache('SCRIPT-'+_path);
 		if(id != "" && SELoader.exists('mods/scriptOptions/$id.json')){
 			hasSettings = true;
 			var scriptJson:Map<String,Dynamic> = OptionsMenu.loadScriptOptions('mods/scriptOptions/$id.json');

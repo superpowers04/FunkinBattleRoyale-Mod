@@ -16,9 +16,14 @@ import lime.app.Application;
 	public static var object:LoadingScreen;
 	public static var isVisible = false;
 	public static var canShow:Bool = true;
+	public static var profiling:Bool = false;
 
 	public static var loadingText(default,set):String = "";
 	public static function set_loadingText(text:String){
+		if(profiling){
+			if(loadingText != "") SEProfiler.qStamp(loadingText);
+			SEProfiler.qStart(text);
+		}
 		loadingText = text;
 		// if(LoadingScreen.object != null && LoadingScreen.object.visible && SESave.data.doCoolLoading) {
 
@@ -286,6 +291,8 @@ import lime.app.Application;
 			object.alpha = 0;
 			return;
 		}
+		if(profiling) trace(SEProfiler.getString());
+		profiling = false;
 		if(tween != null){tween.cancel();}
 		object.funni = false;
 		object.alpha = 1;

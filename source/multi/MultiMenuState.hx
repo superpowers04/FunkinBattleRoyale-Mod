@@ -54,6 +54,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 	var favButton:FlxUIButton;
 	public static var importedSong = false;
 	override function draw(){
+		
 		if(shouldDraw){
 			super.draw();
 		}else{
@@ -73,7 +74,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 			}
 			beatTween = FlxTween.tween(bg.scale.set(1.01,1.01),{x:1,y:1},Conductor.stepCrochet * 0.003);
 		}
-		if(curBeat == 0 && voices != null){
+		if(curBeat < 1 && voices != null){
 			voices.time = FlxG.sound.music.time;
 
 		}
@@ -740,8 +741,8 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 							}else{
 								if(!voices.playing){
 									songProgressText.text = "Playing Inst and Voices";
+									voices.time = FlxG.sound.music.time = Conductor.songPosition;
 									voices.play();
-									voices.time = FlxG.sound.music.time;
 									voices.volume = SESave.data.voicesVol * FlxG.sound.volume;
 									voices.looped = true;
 								}else{

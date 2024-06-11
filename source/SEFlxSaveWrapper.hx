@@ -4,6 +4,7 @@ import flixel.FlxG;
 
 import sys.io.File;
 // import flixel.util.FlxSave;
+// import tjson.Json.JSONANONTYPE;
 using StringTools;
 
 class SEFlxSaveWrapper{
@@ -18,11 +19,28 @@ class SEFlxSaveWrapper{
 		try{
 
 			var json = CoolUtil.cleanJSON(SELoader.loadText('SESETTINGS.json')).replace('"" :','" :').replace('"":','":');
-			var anon = Json.parse(json,SESave);
+			var anon = Json.parse(json,SESave,new SESave());
 			if(anon is SESave){
 				SESave.data = anon;
 				return;
 			}
+			// 
+			// for(field in Reflect.fields(Type.getInstanceFields(SESave))){
+			// 	if(field.startsWith('set_')){
+			// 		field = field.substring(4);
+			// 	}
+			// 	if(!Reflect.hasField(anon,field)){
+			// 		trace('Save field "$field" was not found in the save file');
+			// 		continue;
+			// 	}
+			// 	try{
+			// 		var stuff = Reflect.field(anon,field);
+			// 		if(stuff == null) throw("Invalid field!");
+			// 		Reflect.setProperty(SESave.data,field,stuff);
+			// 	}catch(e){
+			// 		trace('Unable to load field "$field": $e');
+			// 	}
+			// }
 			SELoader.saveContent("SESETTINGS-OLD.json",json);
 			trace('Unable to load settings from an invalid format');
 			try{
@@ -32,23 +50,7 @@ class SEFlxSaveWrapper{
 			throw('Error while parsing SESettings.json:\n${e.message}');
 		}
 		
-		// Type.getInstanceFields(SESave)
-		// for(field in Reflect.fields(anon)){
-		// 	if(field.startsWith('set_')){
-		// 		field = field.substring(4);
-		// 	}
-		// 	// if(!Reflect.hasField(anon,field)){
-		// 	// 	trace('Save field "$field" was not found in the save file');
-		// 	// 	continue;
-		// 	// }
-		// 	try{
-		// 		var stuff = Reflect.field(anon,field);
-		// 		if(stuff == null) throw("Invalid field!");
-		// 		Reflect.setProperty(SESave.data,field,stuff);
-		// 	}catch(e){
-		// 		trace('Unable to load field "$field": $e');
-		// 	}
-		// }
+
 
 			
 		

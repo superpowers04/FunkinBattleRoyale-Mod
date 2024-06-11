@@ -56,6 +56,8 @@ class OfflinePlayState extends PlayState {
 
 	function loadSongs(){
 		LoadingScreen.loadingText = "Loading music";
+
+		SEProfiler.qStart('Loading Music');
 		if(lastVoicesFile != voicesFile && loadedVoices != null){
 			loadedVoices.destroy();
 		}
@@ -120,6 +122,8 @@ class OfflinePlayState extends PlayState {
 		lastInstFile = instFile;
 		lastVoicesFile = voicesFile;
 		loadedVoices.persist = true;
+
+		SEProfiler.qStamp('Loading Music');
 	trace('Loading $voicesFile, $instFile');
 	
   }
@@ -131,6 +135,8 @@ class OfflinePlayState extends PlayState {
 	try{
 
 		LoadingScreen.loadingText = "Loading chart JSON";
+
+		SEProfiler.qStart('Parsing Chart');
 		if (!ChartingState.charting) {
 			if(chartFile.endsWith(".sm")){
 				PlayState.SONG = smTools.SMFile.loadFile(chartFile).convertToFNF();
@@ -148,6 +154,7 @@ class OfflinePlayState extends PlayState {
 				
 				// }
 		}
+		SEProfiler.qStamp('Parsing Chart');
 		// var e = chartFile.substr(0,chartFile.lastIndexOf('/') + "/SE-OVERRIDES.json";
 		// if(FileSystem.exists(e)){
 		// 	var overrides:SwagSong = 

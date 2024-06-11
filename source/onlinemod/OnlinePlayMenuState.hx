@@ -2,6 +2,7 @@ package onlinemod;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.FlxState;
 import flixel.addons.ui.FlxUIButton;
 import flixel.addons.ui.FlxUIState;
 import flixel.text.FlxText;
@@ -218,7 +219,7 @@ class OnlinePlayMenuState extends ScriptMusicBeatState {
 		}
 	}
 
-	public static function AddXieneText(state:FlxUIState)
+	public static function AddXieneText(state:FlxState)
 	{
 		var xieneText = new FlxText(0, FlxG.height - 30, "XieneDev");
 		xieneText.setFormat(CoolUtil.font, 28, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);

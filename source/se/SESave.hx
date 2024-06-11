@@ -114,6 +114,10 @@ typedef YourMother = Dynamic;
 	var menuScripts:Bool = false;
 	var easterEggs:Bool = true;
 
+	var profiler(default,set):Bool = false;
+	function set_profiler(v){
+		return profiler = SEProfiler.enabled = v;
+	}
 	var upBind:String = "W";
 	var downBind:String = "S";
 	var leftBind:String = "A";
@@ -162,6 +166,8 @@ typedef YourMother = Dynamic;
 	var PECharLoading:Bool = false;
 	var QuickReloading:Bool = false;
 	var loadPsychEvents:Bool = false;
+	var animDebugMusic:Bool=true;
+	var optionsMusic:Bool=true;
 
 	public function new(){}
 }
