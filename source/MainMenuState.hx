@@ -141,9 +141,11 @@ class MainMenuState extends SickMenuState {
 				add(outdatedLMAO);
 			}else if (TitleState.outdated){
 
-				var outdatedLMAO:FlxText = new FlxText(0, FlxG.height * 0.05, 0,(if(nightly == "") 'SE is outdated, Latest: ${TitleState.updatedVer}, Check Changelog for more info' else 'Latest nightly: ${TitleState.updatedVer}. You are on ${ver}'), 32);
-				outdatedLMAO.setFormat(CoolUtil.font, 32, if(nightly == "") FlxColor.RED else FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-				outdatedLMAO.scrollFactor.set();
+				// var outdatedLMAO:FlxText = new FlxText(0, FlxG.height * 0.05, 0,(if(nightly == "") 'SE is outdated, Latest: ${TitleState.updatedVer}, Check Changelog for more info' else 'Latest nightly: ${TitleState.updatedVer}. You are on ${ver}'), 32);
+				// outdatedLMAO.setFormat(CoolUtil.font, 32, if(nightly == "") FlxColor.RED else FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				// outdatedLMAO.scrollFactor.set();
+				var outdatedLMAO = new SEText(0, FlxG.height * 0.05,0,(nightly == "" ? 'SE is outdated, Latest update:${TitleState.updatedVer}, Check Changelog for more info' : ((TitleState.updatedVer == ver) ? 'You are on $ver; The latest nightly.' : 'Latest nightly: ${TitleState.updatedVer}. You are on ${ver}')),
+					32,(nightly==""?FlxColor.RED:FlxColor.WHITE),CENTER);
 	 			outdatedLMAO.screenCenter(FlxAxes.X);
 				add(outdatedLMAO);
 			}else 

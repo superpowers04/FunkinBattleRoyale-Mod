@@ -33,6 +33,7 @@ typedef SwagSong =
 
 		var ?modName:String;
 		var ?artist:String;
+		var ?author:String;
 		var ?difficultyString:String;
 		var ?keyCount:Null<Int>;
 		var ?eventList:Array<Array<Dynamic>>;

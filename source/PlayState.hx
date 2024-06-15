@@ -1297,7 +1297,7 @@ class PlayState extends ScriptMusicBeatState
 		inCutscene = false;
 
 		if(!songStarted){
-
+			SENotification.showSong(SONG);
 			if (!generatedArrows){
 				generateStaticArrows(0);
 				generateStaticArrows(1);
