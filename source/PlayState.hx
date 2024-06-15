@@ -3528,6 +3528,7 @@ class PlayState extends ScriptMusicBeatState
 				onComplete: function(tween:FlxTween) {v.destroy();}});
 		}
 		while(notes.members.pop() != null){}
+		while(unspawnNotes.pop() != null){}
 		if(inputMode == 1){
 		// 	for(key => data in SEIKeyMap){
 		// 		if(SEIKeyHeld[key]) SEIKeyRelease(key);

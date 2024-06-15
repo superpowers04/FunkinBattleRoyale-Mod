@@ -272,7 +272,7 @@ class FlxGameEnhanced extends FlxGame{
 	}
 	var _oldAutoPause:Bool = false;
 	var hasUpdated = false;
-	#if(flixel > "5.3.2")
+	#if(flixel > "5.5.2")
 	public var _requestedState(get,set):flixel.util.typeLimit.NextState;
 	public function set__requestedState(e:flixel.util.typeLimit.NextState) return _nextState=e;
 	public function get__requestedState() return _nextState;

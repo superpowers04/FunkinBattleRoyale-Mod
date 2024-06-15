@@ -28,7 +28,7 @@ class SEFlxSaveWrapper{
 				}
 				try{
 					var stuff:Dynamic = Reflect.field(save,field);
-					if(stuff == null) throw('how the fuck is $field null, THIS WAS LITERALLY SUPPLIED BY THE JSON');
+					if(stuff == null) throw('$field is FAKE and only present on the JSON but not the Save');
 					Reflect.setProperty(newSave,field,stuff);
 				}catch(e){
 					trace('Unable to load field "$field": $e');
