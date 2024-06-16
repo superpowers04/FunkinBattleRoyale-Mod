@@ -30,7 +30,7 @@ class SENotification extends FlxGroup{
 		var notificationStr = '${SONG.song}';
 		// if(SONG.author != null && SONG.author != "") notificationStr+='By ${SONG.author}';
 		var author:String = SONG.author ?? SONG.artist;
-		if(author != null && author != "") notificationStr+='By ${author}';
+		if(author != null && author != "") notificationStr+='\n By ${author}';
 
 		SENotification.show('Now Playing:',notificationStr);
 	}
