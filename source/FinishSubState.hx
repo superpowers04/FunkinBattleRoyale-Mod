@@ -358,6 +358,8 @@ class FinishSubState extends MusicBeatSubstate
 
 				if(savedScore || FlxG.keys.pressed.SHIFT){
 					finishedText.text += " | New Personal Best!";
+					finishedText.screenCenter(X);
+					// se.objects.SaveIcon.show();
 					FlxG.sound.play(SELoader.loadSound('assets/sounds/confirmMenu.ogg',true));
 					// letterText.scale.x = letterText.scale.y = 1.3;
 					FlxTween.tween(letterText.scale,{x:1.1,y:1.1},0.2,{ease:FlxEase.bounceOut,startDelay:0.6});

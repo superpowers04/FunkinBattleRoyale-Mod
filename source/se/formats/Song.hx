@@ -5,6 +5,7 @@ import Section.SwagSection;
 import haxe.format.JsonParser;
 import lime.utils.Assets;
 import flixel.FlxG;
+import se.formats.VSliceSongMeta;
 
 using StringTools;
 
@@ -115,8 +116,6 @@ class Song
 		return '{
 			"song": {
 				"player1": "bf",
-				"events": [
-				],
 				"gfVersion": "gf",
 				"notes": [
 					{
@@ -131,17 +130,17 @@ class Song
 						"lengthInSteps": 16,
 						"sectionNotes": [],
 						"typeOfSection": 0,
-						"mustHitSection": false,
+						"mustHitSection": true,
 						"changeBPM": false,
 						"bpm": 120
 					}
 				],
 				"player2": "bf",
-				"player3": null,
+				"player3": "gf",
 				"song": "Unset song name",
 				"stage": "stage",
 				"validScore": true,
-				"sections": 0,
+				"sections": 2,
 				"needsVoices": false,
 				"bpm": 120,
 				"speed": 2.0,
@@ -207,30 +206,52 @@ class Song
 
 	}
 
-/*	public static function fromVSlice(rawJson:String,?difficulty:String="hard"):SwagSong {
+	public static function fromVSlice(rawJson:String,?difficulty:String="hard"):SwagSong {
 		#if !debug
-		try{
+		// try{
 		#end
-			var rawJson:Dynamic = Json.parse(rawJson.substr(0, rawJson.lastIndexOf("}") + 1));
+			// trace(rawJson);
+			var rawJson:VSliceChart = Json.parse(rawJson.substr(0, rawJson.lastIndexOf("}") + 1));
+			var song:SwagSong = getEmptySong();
+			// song.bpm = 
+			var noteList = song.notes[0].sectionNotes;
+			var meow:Array<VNote> = Reflect.getProperty(rawJson.notes,difficulty);
+			if(meow == null) throw('$difficulty is an invalid difficulty!');
+			for(_ => n in meow){
+				var NOTE:Array<Dynamic> = [n.t,n.d,n.l,n.k];
+				noteList.push(NOTE);
+			}
+			var eventList:Array<Dynamic> = song.notes[1].sectionNotes;
+			eventList.push([0,-1,'controlCamera',false]);
+			for(_ => n in rawJson.events){
+				eventList.push(VSliceUtils.convertEvent(n));
+			}
+			song.keyCount=4;
+			song.chartType="VSlice Compat";
+			if(Math.isNaN(song.offset)) song.offset = 0;
+			if (song.noteMetadata == null) song.noteMetadata = Song.defNoteMetadata;
+			return song;
+
 		#if !debug
-		}catch(e){
-			MainMenuState.handleError(e,'Error parsing vslice chart: ${e.message}');
-			return getEmptySong();
-		}
+		// }catch(e){
+			// MainMenuState.handleError(e,'Error parsing vslice chart: ${e.message}');
+			// return getEmptySong();
+		// }
 		#end
-	}*/
+	}
 	public static function parseJSONshit(rawJson:String,charting:Bool = false):SwagSong
 	{
 		#if !debug
 		try{
 		#end
+			var _json = rawJson;
 			var rawJson:Dynamic = Json.parse(rawJson.substr(0, rawJson.lastIndexOf("}") + 1));
 
 			var swagShit:SwagSong = null;
 			if(rawJson == null){
 				swagShit = getEmptySong();
-/*			}else if(rawJson.version != null){
-				return fromVSlice(rawJson);*/
+			}else if(rawJson.version != null){
+				return fromVSlice(_json);
 			}else if(rawJson.song == null){
 				swagShit = getEmptySong();
 			}else if(rawJson.song is String){

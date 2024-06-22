@@ -1,4 +1,4 @@
-24.06.15.1540;
+24.06.21.2323;
 * Better Psych character support(Still kinda experimental but should be more stable)
 * Fix some small errors
 * Fix characters not loading due to using ID instead of folderName
@@ -7,3 +7,4 @@
 * Fix stages not loading
 * Options/Animation debug music
 * Remove FlxKey from being used in input
+* SaveIcon when game is saving

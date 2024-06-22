@@ -119,12 +119,9 @@ class OnlineLoadState extends MusicBeatState
 				var bytesReceived:Int = OnlinePlayMenuState.receiver.bufferedBytes - 5;
 				progress = Math.min(1, bytesReceived / fileSize);
 
-				if (fileSize > 1000000) //MB
-				{
+				if (fileSize > 1000000) { //MB
 					fileSizeText.text = Std.int(bytesReceived/10000)/100 + "/" + Std.int(fileSize/10000)/100 + "MB";
-				}
-				else //KB
-				{
+				} else {//KB
 					fileSizeText.text =  Std.int(bytesReceived/10)/100 + "/" + Std.int(fileSize/10)/100 + "KB";
 				}
 			}

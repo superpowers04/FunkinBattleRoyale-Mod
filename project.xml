@@ -116,6 +116,7 @@
 	<define name='message.no-color'/>
 	<haxedef name="message.reporting" value="pretty" />
 
+
 	<!-- <haxedef name='FLXRUNTIMESHADER' if='desktop'> -->
 
 	<!-- <haxelib name="hscript-improved" /> -->
@@ -181,8 +182,10 @@
 	<haxedef name="HXCPP_STACK_TRACE"/>
 	<haxedef name="HXCPP_GC_GENERATIONAL"/>
 	<haxedef name="HXCPP_CATCH_SEGV"/>
+	<haxedef name='HXCPP_DEBUG_LINK' if='desktop'/>
 	<!-- <haxedef name="HXCPP_DEBUGGER"/> -->
 	<haxedef name="NO_PRECOMPILED_HEADERS"/>
+
 
 	<haxedef name='no_ssl' if='hl linux'/>
 

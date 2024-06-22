@@ -20,7 +20,7 @@ class OnlineNickState extends MusicBeatState
   {
 	var bg:FlxSprite = SELoader.loadFlxSprite('assets/images/menuDesat.png',true);
 	bg.color = 0xFFFF6E6E;
-		add(bg);
+	add(bg);
 
 
 	var topText = new FlxText(0, FlxG.height * 0.25, "Insert nickname");

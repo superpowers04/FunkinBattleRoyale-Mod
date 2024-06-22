@@ -294,7 +294,11 @@ class SELoader {
 		difficulty = textPath.substring(colonIndex+1);
 		return Song.fromVSlice(textPath,difficulty);*/
 	}
-	@:keep inline public static function saveContent(textPath:String,content:String):String{return saveText(textPath,content,false);}
+	@:keep inline public static function triggerSave(textPath:String,content:String):Dynamic{
+		se.objects.SaveIcon.show();
+		return saveText(textPath,content,false);
+	}
+	@:keep inline public static function saveContent(textPath:String,content:String):Dynamic{return saveText(textPath,content,false);}
 	@:keep inline public static function getBytes(textPath:String):Bytes{return loadBytes(textPath,false);}
 	@:keep inline public static function gc(){
 		FlxG.bitmap.clearUnused();

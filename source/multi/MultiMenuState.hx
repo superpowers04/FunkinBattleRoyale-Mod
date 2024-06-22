@@ -508,7 +508,8 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 				var song = (PlayState.SONG = Song.parseJSONshit("",true));
 				song.song = songName;
 				try{
-					SELoader.saveContent(onlinemod.OfflinePlayState.chartFile,Json.stringify({song:song}));
+					var e = SELoader.triggerSave(onlinemod.OfflinePlayState.chartFile,Json.stringify({song:song}));
+					if(e != null && e != "") throw(e);
 				}catch(e){trace('Unable to save chart:$e');} // The player will be manually saving this later, this doesn't need to succeed
 			}else{
 				onlinemod.OfflinePlayState.chartFile = '${songLoc}/${chart}';
@@ -894,9 +895,10 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		try{
 			trace('Attempting to load "$file"');
 			try{
-				var json:FuckingSong = cast Json.parse(File.getContent(file));
-				var name = json.song.song;
-				if(name == null) throw("");
+				var json:Dynamic = cast Json.parse(File.getContent(file));
+				if(json == null) throw('');
+				// var name = json.song;
+				// if(name == null) throw("");
 			}catch(e){
 				trace(e);
 				MainMenuState.handleError('This chart isn\'t a FNF format chart or the chart is inaccessable!(Unable to parse and grab the song name from JSON.song.song)');
@@ -958,7 +960,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 			gotoSong(dir,
 					json,
 					name,
-					voices,
+					voices ?? "",
 					inst
 			);
 

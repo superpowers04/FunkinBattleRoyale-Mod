@@ -33,7 +33,7 @@ class FuckState extends FlxUIState {
 	// This function has a lot of try statements.
 	// The game just crashed, we need as many failsafes as possible to prevent the game from closing or crash looping
 	@:keep inline public static function FUCK(e:Dynamic,?info:String = "unknown",_forced:Bool = false,_FATAL:Bool = false,_rawError:Bool=false){
-		
+		if(e is FakeException) return;
 		LoadingScreen.forceHide();
 		LoadingScreen.loadingText = 'ERROR!';
 		if(forced && !_forced && !_FATAL) return;

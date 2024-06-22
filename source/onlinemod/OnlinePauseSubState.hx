@@ -52,7 +52,7 @@ class OnlinePauseSubState extends MusicBeatSubstate
 		var notPaused:FlxText = new FlxText(20, 47, 0, "", 48);
 		notPaused.text = "GAME IS NOT PAUSED";
 		notPaused.scrollFactor.set();
-		notPaused.setFormat(Paths.font('vcr.ttf'), 32);
+		notPaused.setFormat(CoolUtil.font, 32);
 		notPaused.screenCenter(X);
 		notPaused.updateHitbox();
 		add(notPaused);
@@ -113,10 +113,16 @@ class OnlinePauseSubState extends MusicBeatSubstate
 					}else{Sender.SendPacket(Packets.SEND_SCORE, [PlayState.songScore], OnlinePlayMenuState.socket);}
 
 					Sender.SendPacket(Packets.GAME_END, [], OnlinePlayMenuState.socket);
+					if(SEServer.instance != null){
+						SEServer.broadcastToAllClients(Packets.FORCE_GAME_END,[]);
+					}
 					
 					FlxG.switchState(new OnlineLobbyState(true,false));
 				case "Exit to menu":
 					OnlinePlayMenuState.socket.close();
+					if(SEServer.instance != null){
+						SEServer.shutdownServer();
+					}
 					FlxG.switchState(new OnlinePlayMenuState("Disconnected"));
 			}
 		}

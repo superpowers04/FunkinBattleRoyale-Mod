@@ -496,6 +496,27 @@ class DebugOverlay extends FlxTypedGroup<FlxSprite>{
 	var mouseEnabled:Bool = false;
 	var objectPosText:FlxText;
 	var objectPosBack:FlxSpriteLockScale;
+	function findObject(obj:Dynamic):FlxObject{
+		if(obj.members == null) return null;
+		var mbr = cast(obj.members,Array<Dynamic>);
+		if(mbr == null) return null;
+		for(v in mbr){
+			try{
+				if(v.members){
+					var e = findObject(v);
+					if(e != null) return e;
+					continue;
+				}
+				var member:FlxObject = cast(v,FlxObject);
+				if(member != null && FlxG.mouse.overlaps(member)){
+					return member;
+				}
+			}catch(e){}
+
+		}
+		return null;
+	}
+
 	function getTopObject():Dynamic{
 		var id = parent.members.length - 1;
 		var controlPressed = FlxG.keys.pressed.CONTROL;
@@ -508,25 +529,38 @@ class DebugOverlay extends FlxTypedGroup<FlxSprite>{
 						if(obj != null && !controlPressed) return obj;
 						continue;
 					}
-					var _id:Int = Std.int(_ob.members.length-1);
-					var _inob:Dynamic = null;
-					while (_id >= 0 && obj == null) {
-						try{
-							_inob = _ob.members[_id];
-							_id--;
-							if(_inob == null) continue;
-							if(_inob.members != null){
-								_id = Std.int(_inob.members.length-1);
-								_ob = _inob;
-								continue;
+					// var _id:Int = Std.int(_ob.members.length-1);
+
+
+					if(_ob.members != null){
+						var _obj = findObject(_ob);
+						trace(_obj);
+						if(_obj != null){
+							var meow:FlxSprite = cast(_obj,FlxSprite);
+							if(meow != null){
+								return meow;
 							}
-							if(FlxG.mouse.overlaps(_inob)){
-								obj = cast (_inob,FlxSprite);
-								break;
-							}
-						
-						}catch(e){obj = null;}
+						}
 					}
+					// if(_inObj)
+
+					// while (_id >= 0 && obj == null) {
+					// 	try{
+					// 		_inob = _ob.members[_id];
+					// 		_id--;
+					// 		if(_inob == null) continue;
+					// 		if(_inob.members != null){
+					// 			_id = Std.int(_inob.members.length-1);
+					// 			_ob = _inob;
+					// 			continue;
+					// 		}
+					// 		if(FlxG.mouse.overlaps(_inob)){
+					// 			obj = cast (_inob,FlxSprite);
+					// 			break;
+					// 		}
+						
+					// 	}catch(e){obj = null;}
+					// }
 
 					if(obj != null && !controlPressed) return obj;
 					// trace('Funni click on ${obj}');

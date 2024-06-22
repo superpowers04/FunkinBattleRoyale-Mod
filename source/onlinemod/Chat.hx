@@ -10,12 +10,18 @@ import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
 import flixel.FlxState;
 
-class Chat
-{
+class ChatGroup extends FlxGroup{
+	public var allowDestroy:Bool=false;
+	override public function destroy(){
+		if(allowDestroy) super.destroy();
+	}
+}
+
+class Chat {
 	public static var chatField:FlxInputText;
 	public static var chatMessagesList:FlxUIList;
 	public static var chatSendButton:FlxUIButton;
-	public static var group:FlxGroup;
+	public static var group:ChatGroup;
 	public static var chatMessages:Array<Array<Dynamic>>;
 	public static var chatId:Int = 0;
 
@@ -49,12 +55,13 @@ class Chat
 	public static function createChat(state:FlxState,?canHide:Bool = false){
 		Chat.created = true;
 		if(group != null && group.members.length > 0){
-			for(member in group.members){
-				state.add(member);
-			}
+			// for(member in group.members){
+			// 	state.add(member);
+			// }
+			state.add(group);
 			return;
 		}
-		group = new FlxGroup();
+		group = new ChatGroup();
 		if(Chat.chatMessagesList == null){
 			Chat.chatMessagesList = new FlxUIList(10, FlxG.height - 120, FlxG.width, 175);
 		}else{
@@ -79,6 +86,7 @@ class Chat
 		Chat.chatField.callback = function(_:String,cb:String){
 			if(cb == "enter") Chat.chatSendButton.onUp.callback();
 		}
+		state.add(group);
 	}
 
 	public static function OutputChatMessage(message:String, ?color:FlxColor=FlxColor.WHITE, ?register:Bool=true){

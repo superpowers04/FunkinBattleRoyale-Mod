@@ -126,7 +126,7 @@ class OnlineLobbyState extends ScriptMusicBeatState {
 		}
 		var dced:Array<Int> = [];
 		for (i => v in clients) if(v.disconnected) dced.push(i);
-		for (i in dced) clients.remove(i);
+		for (i in dced) clients[i]=null;
 
 		createNamesUI();
 

@@ -9,7 +9,8 @@ using StringTools;
 
 class SEFlxSaveWrapper{
 	public static function save(){
-		SELoader.saveContent('SESETTINGS.json',Json.stringify(SESave.data).replace('"" :','" :').replace('"":','":'));
+
+		SELoader.triggerSave('SESETTINGS.json',Json.stringify(SESave.data).replace('"" :','" :').replace('"":','":'));
 	}
 	public static function saveTo(path:String = "SESETTINGS-BACK.json"){
 		SELoader.saveContent(path,Json.stringify(SESave.data).replace('"" :','" :').replace('"":','":'));

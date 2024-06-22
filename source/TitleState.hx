@@ -801,8 +801,7 @@ class TitleState extends MusicBeatState
 							SELoader.createDirectory(directory);
 							for(file in FileSystem.readDirectory(_dir + "/" + directory)){
 								android.widget.Toast.makeText('Copying $file',5);
-								file = "/" + directory + "/" + file;
-								file = file.replace('//','/');
+								file = ('/$directory/$file').replace('//','/');
 								if(FileSystem.isDirectory(_dir + file)){ recurse(file); continue;}
 								SELoader.importFile(_dir + file,file);
 							}
@@ -910,6 +909,7 @@ class TitleState extends MusicBeatState
 			SELoader.saveContent('mods/packs/imported/scripts/Place_Scripts_Here',"");
 
 			SELoader.saveContent('mods/packs/imported/readme.txt','This pack is used for imported songs and characters. The game will check for this file to make sure the imported pack exists.\nYou can empty this file if you wish but deleting it will regenerate the directory structure of this folder.\nThis pack can be used as an example of how to structure your packs if you wish.');
+			se.objects.SaveIcon.show();
 		}
 		
 		#end

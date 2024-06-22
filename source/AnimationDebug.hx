@@ -48,6 +48,8 @@ import flixel.addons.ui.FlxUIDropDownMenu;
 import flixel.addons.plugin.screengrab.FlxScreenGrab;
 import ImportMod;
 
+import se.utilities.SEUIUtilities;
+
 import CharacterJson;
 
 using StringTools;
@@ -667,7 +669,7 @@ class AnimationDebug extends MusicBeatState
 			errorStage = 6; // Saving
 			var backed = false;
 			if (SELoader.exists(chara.loadedFrom)) {backed=true;SELoader.copy(chara.loadedFrom,chara.loadedFrom + "-bak.json");}
-			SELoader.saveContent(chara.loadedFrom,Json.stringify(charJson, "fancy"));
+			SELoader.triggerSave(chara.loadedFrom,Json.stringify(charJson, "fancy"));
 			showTempmessage('Saved to ${if (chara.loadedFrom.length > 20) '...' + chara.loadedFrom.substring(-20) else chara.loadedFrom} successfully.' + (if(backed) "Old json was backed up to -bak.json." else ""));
 			FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
 			spawnChar(true);
@@ -894,6 +896,7 @@ class AnimationDebug extends MusicBeatState
 
 		animDropDown.visible = false;
 		uiBox = new FlxUITabMenu(null, [{name:"Animation binder",label:"Animation binder"}], true);
+		var UIBOX = uiBox;
 		uiBox.cameras = [camHUD];
 
 		uiBox.resize(250, 330);
@@ -901,6 +904,8 @@ class AnimationDebug extends MusicBeatState
 		uiBox.y = 80;
 		uiBox.scrollFactor.set();
 		add(uiBox);
+		// var uiBox = new FlxUI(null, UIBOX);
+		uiBox.name = "Animation binder";
 		uiMap["animSel"] = new FlxInputTextUpdatable(5, 232, 100, 'idle');
 		var animDropDown2 = new PsychDropDown(5, 230, FlxUIDropDownMenu.makeStrIdLabelArray(INTERNALANIMATIONLIST, true), function(anim:String)
 		{
@@ -940,15 +945,16 @@ class AnimationDebug extends MusicBeatState
 		looped.checked = false;
 		looped.callback = function(){ updateTempAnim();};
 		uiMap["loop"] = looped;
-		uiBox.add(looped);
+		// uiBox.add(looped);
 		var restplay = new FlxUICheckBox(10, 50, null, null, "Restart Anim when played");
 		restplay.checked = true;
-		uiBox.add(uiMap["restplay"] = restplay);
+		uiMap["restplay"] = restplay;
+		// uiBox.add(uiMap["restplay"] = restplay);
 		var flipanim = new FlxUICheckBox(10, 70, null, null, "FlipX");
 		flipanim.checked = false;
 		uiMap["flipanim"] = flipanim;
 		uiMap["flipanim"].callback = function(){ updateTempAnim();};
-		uiBox.add(flipanim);
+		// uiBox.add(flipanim);
 		// var oneshot = new FlxUICheckBox(30, 40, null, null, "Oneshot/High priority");
 		// oneshot.checked = false;
 		// uiMap["oneshot"] = oneshot;
@@ -957,16 +963,16 @@ class AnimationDebug extends MusicBeatState
 		// uiMap["prtxt"] = prTxt;
 		// uiBox.add(prTxt);
 		// var priorityText = new FlxUIInputText(150, 40, 20, '-1');
-		uiBox.add(uiMap["prioritytxt"] = new FlxText(10, 90,0,"Priority(-1 for def)"));
-		uiBox.add(uiMap["priorityText"] = new FlxUINumericStepper(140, 90, 1, -1,-999,999,2));
+		uiMap["prioritytxt"] = new FlxText(10, 90,0,"Priority(-1 for def)");
+		uiMap["priorityText"] = new FlxUINumericStepper(140, 90, 1, -1,-999,999,2);
 
 
-		uiBox.add(uiMap["animtxt"] = new FlxText(10, 110,0,"Animation FPS"));
-		uiBox.add(uiMap["animFPS"] = new FlxUINumericStepper(140, 110, 1, 24));
+		uiMap["animtxt"] = new FlxText(10, 110,0,"Animation FPS");
+		uiMap["animFPS"] = new FlxUINumericStepper(140, 110, 1, 24);
+		uiMap["looptxt"] = new FlxText(10, 130,0,"Loop start frame");
+		uiMap["loopStart"] = new FlxUINumericStepper(140, 130, 1, 0,0);
+
 		uiMap["animFPS"].callback = function(value,_){ updateTempAnim();};
-
-		uiBox.add(uiMap["looptxt"] = new FlxText(10, 130,0,"Loop start frame"));
-		uiBox.add(uiMap["loopStart"] = new FlxUINumericStepper(140, 130, 1, 0,0));
 
 		uiMap["commitButton"] = new FlxUIButton(20,160,"Add animation",function(){
 			try{
@@ -989,8 +995,8 @@ class AnimationDebug extends MusicBeatState
 				showTempmessage('Error while adding animation: ${e.message}',FlxColor.RED);
 			}
 		});
-		uiBox.add(uiMap["commitButton"]);
-		uiMap["autoDetAnims"] = new FlxUIButton(160,160,"Autodetect Anims",function(){
+		// uiBox.add(uiMap["commitButton"]);
+		var autoDetAnims = new FlxUIButton(160,160,"Autodetect Anims",function(){
 			try{
 				var count = 0;
 				var flipped = uiMap['flip_x_global'].checked || charJson.flip_x;
@@ -1052,11 +1058,20 @@ class AnimationDebug extends MusicBeatState
 				showTempmessage('Error while adding animation: ${e.message}',FlxColor.RED);
 			}
 			spawnChar(true,false,charJson);
-
-				
 		});
-		uiBox.add(uiMap["autoDetAnims"]);
+		uiMap["autoDetAnims"]=autoDetAnims;
+		// uiBox.add(uiMap["autoDetAnims"]);
+		SEUIUtilities.addSpacedUI(uiBox,{y:30,objects:[
+			[uiMap["loop"],uiMap["restplay"]],
+			[uiMap["flipanim"]],
+			[uiMap["priorityText"],uiMap["prioritytxt"]],
+			[uiMap["animFPS"],uiMap["animtxt"]],
+			[uiMap["loopStart"],uiMap["looptxt"]],
+			null,
+			[autoDetAnims],
+			[uiMap["commitButton"]],
 
+		]});
 
 		// ----------------
 		// Config editor
@@ -1072,24 +1087,26 @@ class AnimationDebug extends MusicBeatState
 		uiBox2.scrollFactor.set();
 		add(uiBox2);
 		uiMap["uiBox2"] = uiBox2;
+		var UIBOX2 = uiBox2;
+		// var uiBox2 = new FlxUI(null, UIBOX2);
+		uiBox2.name = "Animation binder";
 
-		uiBox2.add(uiMap['no_antialiasing']=checkBox(10, 30,"No antialiasing","no_antialiasing"));
-		uiBox2.add(uiMap['flip_x_global']=checkBox(10, 50,"Flip X","flip_x"));
+		uiMap['no_antialiasing']=checkBox(10, 30,"No antialiasing","no_antialiasing");
+		uiMap['flip_x_global']=checkBox(10, 50,"Flip X","flip_x");
 		// var looped = checkBox(30, 80,"Spirit Trail","spirit_trail");
 		// uiBox2.add(looped);
 		// var looped = checkBox(10, 75,"Invert left/right singing for BF Clone","flip_notes");
 		// uiBox2.add(looped);
 		// var animTxt = new FlxText(30, 100,0,"Color, R/G/B");
 
-		uiBox2.add(uiMap["scaletxt"] = new FlxText(10, 100,0,"Scale"));
+		uiMap["scaletxt"] = new FlxText(10, 100,0,"Scale");
 		uiMap["scale"] = new FlxUINumericStepper(140, 100, 0.1, charJson.scale,0,10,2);
-		uiMap["scale"].callback = function(value,_){ charJson.scale = value;}
-		uiBox2.add(uiMap["scale"]);
+		uiMap["scale"].callback = function(value,_){ charJson.scale = value;};
 
-		uiBox2.add(uiMap["scaletxt"] = new FlxText(10, 120,0,"Sing Duration"));
+		uiMap["singDurTxt"] = new FlxText(10, 120,0,"Sing Duration");
 		uiMap["Sing Duration"] = new FlxUINumericStepper(140, 120, 0.1, charJson.sing_duration,0,10,2);
 		uiMap["Sing Duration"].callback = function(value,_){ charJson.sing_duration = value;}
-		uiBox2.add(uiMap["Sing Duration"]);
+
 
 		if(charJson.color != null && !Std.isOfType(charJson.color,Array)){
 			var _Col = new FlxColor(0xFFFFFF);
@@ -1103,34 +1120,31 @@ class AnimationDebug extends MusicBeatState
 			charJson.color = [255,255,255];
 		}
 		
-		uiBox2.add(uiMap["hiredtxt"] = new FlxText(10, 160,0,"Health Red"));
+		uiMap["hiredtxt"] = new FlxText(10, 160,0,"Health Red");
 		uiMap["hired"] = new FlxUINumericStepper(100, 160, 1, charJson.color[0],0,255);
 		uiMap["hired"].callback = function(value,_){
 			updateColor(value);
 		}
-		uiBox2.add(uiMap["hired"]);
 
 
-		uiBox2.add(uiMap["higreentxt"] = new FlxText(10, 180,0,"Health Green"));
+		uiMap["higreentxt"] = new FlxText(10, 180,0,"Health Green");
 		uiMap["higreen"] = new FlxUINumericStepper(100, 180, 1, charJson.color[1],0,255);
 		uiMap["higreen"].callback = function(value,_){
 			updateColor(-1,value);
 		}
-		uiBox2.add(uiMap["higreen"]);
 
 
 		uiMap["colorTxt"] = _colText = new FlxUIText(160, 180,0,"#FFFFFF",12);
 		_colText.borderSize = 2;
 		_colText.borderStyle = OUTLINE;
 		_colText.borderColor = FlxColor.BLACK;
-		uiBox2.add(_colText);
 
-		uiBox2.add(uiMap["hibluetxt"] = new FlxText(10, 200,0,"Health blue"));
+
+		uiMap["hibluetxt"] = new FlxText(10, 200,0,"Health blue");
 		uiMap["hiblue"] = new FlxUINumericStepper(100, 200, 1, charJson.color[2],0,255);
 		uiMap["hiblue"].callback = function(value,_){
 			updateColor(-1,-1,value);
 		}
-		uiBox2.add(uiMap["hiblue"]);
 
 		// uiBox2.add(new FlxText(30, 120,0,"Scale:"));
 		// uiMap["scale"] = new FlxUINumericStepper(80, 120, 0.1, charJson.scale,0,10,2);
@@ -1192,7 +1206,6 @@ class AnimationDebug extends MusicBeatState
 				trace(e.stack);
 			}
 		});
-		uiBox2.add(uiMap["colorIcon"]);
 
 
 
@@ -1207,8 +1220,21 @@ class AnimationDebug extends MusicBeatState
 			openSubState(new AnimSwitchMode());
 		});
 		modeButton.resize(120,20);
-		uiBox2.add(uiMap["switchModes"] = modeButton);
+		uiMap["switchModes"] = modeButton;
+		SEUIUtilities.addSpacedUI(uiBox2,{y:30,spacingY:2,objects:[
+			[uiMap['no_antialiasing'],uiMap['flip_x_global']],
+			null,
+			[uiMap["scale"],uiMap["scaletxt"]],
+			[uiMap["Sing Duration"],uiMap["singDurTxt"]],
+			null,
+			[uiMap["hired"],uiMap["hiredtxt"]],
+			[uiMap["higreen"],uiMap["higreentxt"],null,uiMap["colorTxt"]],
+			[uiMap["hiblue"],uiMap["hibluetxt"],uiMap["colorIcon"]],
+			[],
+			null,
+			[commitButton],[modeButton]
 
+		]});
 
 		if(chara.charType == 0){
 

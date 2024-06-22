@@ -187,8 +187,7 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 
 		if (DataList != null)
 		{
-			for (i in 0...DataList.length)
-			{
+			for (i in 0...DataList.length) {
 				var data = DataList[i];
 				list.push(makeListButton(i, data.label, data.name));
 			}
@@ -196,8 +195,7 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 		}
 		else if (ButtonList != null)
 		{
-			for (btn in ButtonList)
-			{
+			for (btn in ButtonList) {
 				list.push(btn);
 				btn.resize(header.background.width, header.background.height);
 				btn.x = 1;
@@ -209,8 +207,7 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 		dropPanel.visible = false;
 		add(dropPanel);
 
-		for (btn in list)
-		{
+		for (btn in list) {
 			add(btn);
 			btn.visible = false;
 		}
@@ -250,23 +247,14 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 	{
 		var vDropPanel = dropPanel.visible;
 		var vButtons = [];
-		for (i in 0...list.length)
-		{
-			if (list[i] != null)
-			{
-				vButtons.push(list[i].visible);
-			}
-			else
-			{
-				vButtons.push(false);
-			}
+		for (i in 0...list.length){
+			vButtons.push(list[i] == null ? false : list[i].visible);
 		}
 		super.set_visible(Value);
 		dropPanel.visible = vDropPanel;
 		for (i in 0...list.length)
 		{
-			if (list[i] != null)
-			{
+			if (list[i] != null) {
 				list[i].visible = vButtons[i];
 			}
 		}
@@ -296,30 +284,22 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 	{
 		var i:Int = 0;
 
-		if (DataList != null)
-		{
-			for (data in DataList)
-			{
+		if (DataList != null) {
+			for (data in DataList) {
 				var recycled:Bool = false;
-				if (list != null)
-				{
-					if (i <= list.length - 1)
-					{ // If buttons exist, try to re-use them
+				if (list != null) {
+					if (i <= list.length - 1) { // If buttons exist, try to re-use them
 						var btn:FlxUIButton = list[i];
-						if (btn != null)
-						{
+						if (btn != null) {
 							btn.label.text = data.label; // Set the label
 							list[i].name = data.name; // Replace the name
 							recycled = true; // we successfully recycled it
 						}
 					}
-				}
-				else
-				{
+				} else {
 					list = [];
 				}
-				if (!recycled)
-				{ // If we couldn't recycle a button, make a fresh one
+				if (!recycled) { // If we couldn't recycle a button, make a fresh one
 					var t:FlxUIButton = makeListButton(i, data.label, data.name);
 					list.push(t);
 					add(t);
@@ -329,21 +309,26 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 			}
 
 			// Remove excess buttons:
-			if (list.length > DataList.length)
-			{ // we have more entries in the original set
-				for (j in DataList.length...list.length)
-				{ // start counting from end of list
+			if (list.length > DataList.length) { // we have more entries in the original set
+				while(list.length > DataList.length){
 					var b:FlxUIButton = list.pop(); // remove last button on list
 					b.visible = false;
 					b.active = false;
 					remove(b, true); // remove from widget
 					b.destroy(); // destroy it
 					b = null;
+
 				}
+				// for (j in DataList.length...list.length)
+				// { // start counting from end of list
+				// }
 			}
 
 			selectSomething(DataList[0].name, DataList[0].label);
 		}
+		// for(id => button in list){
+		// 	button.onUp.callback = onClickItem.bind(id);
+		// }
 
 		dropPanel.resize(header.background.width, getPanelHeight());
 		updateButtonPositions();
@@ -378,8 +363,7 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 		t.autoCenterLabel();
 		t.x = 1;
 
-		for (offset in t.labelOffsets)
-		{
+		for (offset in t.labelOffsets) {
 			offset.x += 2;
 		}
 
@@ -392,8 +376,7 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 	public function changeLabelByIndex(i:Int, NewLabel:String):Void
 	{
 		var btn:FlxUIButton = getBtnByIndex(i);
-		if (btn != null && btn.label != null)
-		{
+		if (btn != null && btn.label != null) {
 			btn.label.text = NewLabel;
 		}
 	}
@@ -401,8 +384,7 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 	public function changeLabelById(name:String, NewLabel:String):Void
 	{
 		var btn:FlxUIButton = getBtnById(name);
-		if (btn != null && btn.label != null)
-		{
+		if (btn != null && btn.label != null) {
 			btn.label.text = NewLabel;
 		}
 	}
@@ -418,12 +400,8 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 
 	public function getBtnById(name:String):FlxUIButton
 	{
-		for (btn in list)
-		{
-			if (btn.name == name)
-			{
-				return btn;
-			}
+		for (btn in list) {
+			if (btn.name == name) return btn;
 		}
 		return null;
 	}
@@ -433,8 +411,7 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 		super.update(elapsed);
 
 		#if FLX_MOUSE
-		if (dropPanel.visible)
-		{
+		if (dropPanel.visible) {
 			if(list.length > 1 && canScroll) {
 				if(FlxG.mouse.wheel > 0 || FlxG.keys.justPressed.UP) {
 					// Go up
@@ -450,8 +427,7 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 				}
 			}
 
-			if (FlxG.mouse.justPressed && !FlxG.mouse.overlaps(this))
-			{
+			if (FlxG.mouse.justPressed && !FlxG.mouse.overlaps(this)) {
 				showList(false);
 			}
 		}
@@ -471,8 +447,7 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 
 	private function showList(b:Bool):Void
 	{
-		for (button in list)
-		{
+		for (button in list) {
 			button.visible = b;
 			button.active = b;
 		}
@@ -486,8 +461,7 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 		FlxUI.forceFocus(b, this); // avoid overlaps
 	}
 
-	private function onDropdown():Void
-	{
+	private function onDropdown():Void {
 		showList(!dropPanel.visible);
 	}
 
@@ -496,13 +470,11 @@ class PsychDropDown extends FlxUIGroup implements IFlxUIWidget implements IFlxUI
 		var item:FlxUIButton = list[i];
 		selectSomething(item.name, item.label.text);
 
-		if (callback != null)
-		{
+		if (callback != null) {
 			callback(item.name);
 		}
 
-		if (broadcastToFlxUI)
-		{
+		if (broadcastToFlxUI) {
 			FlxUI.event(CLICK_EVENT, this, item.name, params);
 		}
 		showList(false);

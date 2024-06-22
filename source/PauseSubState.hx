@@ -21,6 +21,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import flixel.ui.FlxBar;
 import flixel.util.FlxStringUtil;
+import se.utilities.SEUIUtilities;
 #if discord_rpc
 	import Discord.DiscordClient;
 #end
@@ -110,9 +111,9 @@ class PauseSubState extends MusicBeatSubstate {
 		bg.scrollFactor.set();
 		add(bg);
 
-		CoolUtil.setFramerate(60,null,true);
+		// CoolUtil.setFramerate(60,null,true);
 
-		levelInfo = new FlxText(20, -15, 0, "", 32);
+		levelInfo = new FlxText(20, 0, 0, "", 32);
 		levelInfo.text = CoolUtil.formatChartName(PlayState.SONG.song);
 		levelInfo.scrollFactor.set();
 		levelInfo.setFormat(CoolUtil.font, 32,OUTLINE,0xff000000);
@@ -120,19 +121,26 @@ class PauseSubState extends MusicBeatSubstate {
 		levelInfo.updateHitbox();
 		add(levelInfo);
 
-		levelDifficulty = new FlxText(20, -47, 0, "", 24);
-		levelDifficulty.text = CoolUtil.difficultyString();
+		levelDifficulty = new FlxText(20, 0, 0, (PlayState.SONG.artist ?? PlayState.SONG.author ?? ""), 24);
+		if(levelDifficulty.text != "") levelDifficulty.text+='\n';
+		levelDifficulty.text+=CoolUtil.difficultyString();
+
 		levelDifficulty.scrollFactor.set();
 		levelDifficulty.setFormat(CoolUtil.font, 24,OUTLINE,0xff000000);
 		levelDifficulty.borderSize = 2;
 		levelDifficulty.updateHitbox();
 		add(levelDifficulty);
 
-		restarts = new FlxText(20, -75, 0, 'Restart count: ${PlayState.restartTimes}', 20);
+		restarts = new FlxText(20, 0, 0, 'Restart count: ${PlayState.restartTimes}', 20);
 		restarts.scrollFactor.set();
 		restarts.setFormat(CoolUtil.font, 20,OUTLINE,0xff000000);
 		restarts.borderSize = 2;
 		restarts.updateHitbox();
+		SEUIUtilities.addSpacedUI(this,{y:15,objects:[
+			[levelInfo],
+			[levelDifficulty],
+			[restarts]
+		]});
 		add(restarts);
 
 		levelDifficulty.alpha = 0;
@@ -143,12 +151,11 @@ class PauseSubState extends MusicBeatSubstate {
 		restarts.x = FlxG.width - (restarts.width + 20);
 
 		FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartIn});
-		FlxTween.tween(levelInfo, {alpha: 1, y: -levelInfo.y}, 0.4, {ease: FlxEase.bounceOut, startDelay: 0.3});
-		FlxTween.tween(levelDifficulty, {alpha: 1, y: -levelDifficulty.y}, 0.4, {ease: FlxEase.bounceOut, startDelay: 0.5});
-		FlxTween.tween(restarts, {alpha: 1, y: -restarts.y}, 0.4, {ease: FlxEase.bounceOut, startDelay: 0.6});
+		FlxTween.tween(levelInfo, {alpha: 1}, 0.4, {ease: FlxEase.bounceOut, startDelay: 0.3});
+		FlxTween.tween(levelDifficulty, {alpha: 1}, 0.4, {ease: FlxEase.bounceOut, startDelay: 0.5});
+		FlxTween.tween(restarts, {alpha: 1}, 0.4, {ease: FlxEase.bounceOut, startDelay: 0.6});
 
-		grpMenuShit = new FlxTypedGroup<Alphabet>();
-		add(grpMenuShit);
+		add(grpMenuShit = new FlxTypedGroup<Alphabet>());
 
 		for (i in 0...menuItems.length){
 			var _text = menuItems[i];
@@ -160,7 +167,7 @@ class PauseSubState extends MusicBeatSubstate {
 			songText.screenCenter(X);
 			var sX = songText.x;
 			songText.x = -(20 + songText.width);
-			FlxTween.tween(songText,{x : sX},0.9,{ease:FlxEase.cubeInOut});
+			FlxTween.tween(songText,{x : sX},0.9,{ease:FlxEase.bounceOut});
 		}
 		changeSelection();
 		if(!SESave.data.transparentPause) FlxG.state.persistentDraw = false;
@@ -298,7 +305,7 @@ class PauseSubState extends MusicBeatSubstate {
 		}
 	}
 	function quit(){
-		CoolUtil.setFramerate(0,true,false);
+		// CoolUtil.setFramerate(0,true,false);
 		FlxG.sound.music.stop();
 		retMenu();
 

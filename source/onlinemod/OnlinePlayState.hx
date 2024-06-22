@@ -127,6 +127,7 @@ class OnlinePlayState extends PlayState
 
 		// Add the score UI for other players
 		for (i in clients.keys()) {
+			if(clients[i].disconnected) continue;
 			clients[i].score = 0;
 			clientCount++;
 

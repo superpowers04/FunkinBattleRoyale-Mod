@@ -23,6 +23,7 @@ import openfl.net.Socket;
 	var receiver:Receiver;
 	var admin:Bool = false;
 	var self:Bool = false;
+	var playing:Bool = false;
 	var afk:Bool = false;
 	var alive:Bool = true;
 	var muted:Bool = false;

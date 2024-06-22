@@ -10,6 +10,7 @@ import openfl.events.ServerSocketConnectEvent;
 import openfl.utils.Endian;
 import onlinemod.Player;
 import flixel.FlxG;
+import onlinemod.Packets;
 
 @:publicFields @:structInit class Command {
 	// var name:String;
@@ -93,8 +94,11 @@ class SEServer{
 					player.nick = data[0];
 					trace('${socketID}: registered as ${player.nick}');
 					Sender.SendPacket(Packets.NICKNAME_CONFIRM, [0], socket);
+					broadcastToAllClients(Packets.BROADCAST_NEW_PLAYER,[socketID,player.nick],player);
+				
 				case Packets.JOINED_LOBBY:
 					Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['Hosting is not currently finished, nothing besides chatting is implemented at the moment..'],socket);
+					Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,["'ceabf544' This is a compatibility message, Ignore me!"],socket);
 				case Packets.SEND_CHAT_MESSAGE:{
 					if(player != null && data[1] is String && data[1].substring(0,prefix.length) == prefix){
 						try{
@@ -113,6 +117,10 @@ class SEServer{
 						Sender.SendPacket(Packets.BROADCAST_CHAT_MESSAGE,data,playerObject.socket);
 					}
 				}
+				/* TODO IMPLEMENT FILE SENDING*/
+				case Packets.REQUEST_INST | Packets.REQUEST_VOICES:
+					Sender.SendPacket(Packets.DENY,[],player.socket);
+
 			}
 		}catch(e){
 			trace('Error handling packet($pktName) from $socketID:${e.message}');
@@ -146,7 +154,9 @@ class SEServer{
 			try{
 				clientsFromNames[connectedPlayers[ID].nick] = null;
 			}catch(e){}
-
+			try{
+				broadcastToAllClients(Packets.PLAYER_LEFT,[ID]);
+			}catch(e){}
 		}
 	}
 	public static function OnCloseSock(ID:Int,e:Event) {
@@ -189,6 +199,9 @@ class SEServer{
 		trace('Error with socket $sockID: ${e.text}');
 		// FlxG.switchState(new OnlinePlayMenuState('Socket error: ${e.text}'));
 	}
+	public static function sendMessageToClient(str:String,player:ConnectedPlayer){
+		Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,[str],player.socket);
+	}
 	public static function sendMessageToAllClients(str:String,?player:ConnectedPlayer){
 		if(player == null){
 			for (playerObject in connectedPlayers){
@@ -201,7 +214,19 @@ class SEServer{
 			if(playerObject.socket == null || playerObject == player) continue;
 			Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,[str],playerObject.socket);
 		}
-
+	}
+	public static function broadcastToAllClients(packet:Int,content:Array<Dynamic>,?player:ConnectedPlayer){
+		if(player == null){
+			for (playerObject in connectedPlayers){
+				if(playerObject.socket == null) continue;
+				Sender.SendPacket(packet,content,playerObject.socket);
+			}
+			return;
+		}
+		for (playerObject in connectedPlayers){
+			if(playerObject.socket == null || playerObject == player) continue;
+			Sender.SendPacket(packet,content,playerObject.socket);
+		}
 	}
 	/*Instance shit
 		Currently only using this so commands don't waste memory for no fuckin reason
@@ -212,30 +237,52 @@ class SEServer{
 	public var instPath:String = "";
 	public var voicePath:String = "";
 	public var chart:String="";
+	public var midGame:Bool = true;
 	public var commands:Map<String,Command> = [
 		'help' => {
 			description:"Returns all commands available",
 			execute:function(player:ConnectedPlayer,cmd:String,split:Array<String>){
 				for(name=>cmd in SEServer.instance.commands){
 					if(cmd.admin && !player.admin) continue;
-					Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['$name - ${cmd.description}'],player.socket);
+					sendMessageToClient('$name - ${cmd.description}',player);
 				}
 			}
 		},
 		// TODO ADD PROPER CLIENT SONG SETTING
 		'setsong' => {
 			description:"Sets the song",
+			admin:true,
 			execute:function(player:ConnectedPlayer,cmd:String,split:Array<String>){
-				if(split[2] == null){
+				if(!player.admin) return sendMessageToClient('You don\'t have permission to run this command!',player);
+				if(split[1] == null){
 					if(player.self) return FlxG.switchState(new OnlineSongMenuState());
-					Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['No song specified!'],player.socket);
+					sendMessageToClient('No song specified!',player);
 					return;
 				}
-				Sender.SendPacket(Packets.SERVER_CHAT_MESSAGE,['This command is not implemented!'],player.socket);
+				sendMessageToClient('This command is not implemented!',player);
+			}
+		},
+		'start' => {
+			description:"Starts the game",
+			admin:true,
+			execute:function(player:ConnectedPlayer,cmd:String,split:Array<String>){
+				if(!player.admin) return sendMessageToClient('You don\'t have permission to run this command!',player);
+				return startGame();
+				// return sendMessageToClient('This command is not implemented!',player.socket);
+				
 			}
 		}
 	];
 	public function new(){}
+
+	static public function startGame(){
+		var path = instance.chartPath.split('/');
+		var l = path.length;
+		var json = path[l-1].substring(0,path[l-1].lastIndexOf('/'));
+		var folder = path[l-2];
+		instance.midGame=true;
+		broadcastToAllClients(Packets.GAME_START,[json,folder]);
+	}
 
 	public function updateSong(){
 		sendMessageToAllClients('Song updated to $songName');

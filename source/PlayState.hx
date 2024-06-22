@@ -82,7 +82,6 @@ typedef OutNote = {
 	var rating:String;
 	var isSustain:Bool;
 }
-class FakeException extends Exception{}
 
 class PlayState extends ScriptMusicBeatState
 {
@@ -2581,7 +2580,7 @@ class PlayState extends ScriptMusicBeatState
 			rating = new FlxSprite().loadGraphic(SELoader.cache.loadGraphic('assets/shared/images/$daRating.png')); // TODO: Add mod folder support and precaching
 			rating.x = (SESave.data.ratingOnNote ? strum.x : (firstStrum.x - firstStrum.width));
 
-			rating.y = strum.y + (strum.height * 0.5);
+			rating.y = strum.y + strum.height;
 			rating.acceleration.y = 550;
 			rating.velocity.y = (FlxG.random.int(140, 175) * -(daNote.hitDistance - 0.5) * 2);
 			rating.velocity.x = FlxG.random.int(-10, 10);
@@ -2703,7 +2702,6 @@ class PlayState extends ScriptMusicBeatState
 		var inputEngines = ["SE-LEGACY" + (SESave.data.accurateNoteSustain ? "-ACNS" : ""),
 							'SE'+ (SESave.data.accurateNoteSustain ? "-ACNS" : "")
 		];
-		trace('Using ${inputMode}');
 		// noteShit handles moving notes around and opponent hitting them
 		// keyShit handles player input and hitting notes
 		// These can both be replaced by scripts :>
@@ -2724,7 +2722,8 @@ class PlayState extends ScriptMusicBeatState
 				MainMenuState.handleError('${inputMode} is not a valid input! Please change your input mode!');
 
 		}
-		inputEngineName = if(inputEngines[inputMode] != null) inputEngines[inputMode] else "Unspecified";
+		inputEngineName = inputEngines[inputMode] ?? "Unspecified";
+		trace('Using ${inputMode}');
 
 
 	}

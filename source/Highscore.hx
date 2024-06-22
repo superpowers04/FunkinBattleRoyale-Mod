@@ -38,6 +38,7 @@ class SongScores {
 				SELoader.createDirectory(path.substr(0,path.lastIndexOf("/")));
 			}
 			SELoader.saveContent(path,Json.stringify({songNames:songNames,scores:scores}));
+			se.objects.SaveIcon.show();
 		}catch(e){
 			MusicBeatState.instance.showTempmessage('Unable to save scores! ${e.message}',0xFF0000);
 		}
