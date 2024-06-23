@@ -1,4 +1,4 @@
-24.06.22.2248;
+24.06.23.1601;
 * Better Psych character support(Still kinda experimental but should be more stable)
 * Fix some small errors
 * Fix characters not loading due to using ID instead of folderName

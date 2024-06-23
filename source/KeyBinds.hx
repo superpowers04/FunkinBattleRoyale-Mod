@@ -36,6 +36,11 @@ class KeyBinds
 	];
 
 	public static function keyCheck():Void{
+		if(SESave.data.keys == null){
+			SESave.data.keys = [];
+		}
+
+
 		for(count => keys in defaultKeys){
 			var _keys = SESave.data.keys[count];
 			if(_keys == null){
