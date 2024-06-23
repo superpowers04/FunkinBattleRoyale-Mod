@@ -46,7 +46,7 @@ class SENotification extends FlxGroup{
 	public function set_y(v){
 		for (member in members){
 			var member = cast(member,FlxObject);
-			member.y+=(-x)+v;
+			member.y+=(-y)+v;
 		}
 		return y=v;
 	}
@@ -79,7 +79,7 @@ class SENotification extends FlxGroup{
 			FlxTween.tween(this,{y:y},1,{startDelay:duration});
 		}else{
 			x=(direction==1 ? -bg.width : FlxG.width);
-			y=30;
+			y=600;
 			FlxTween.tween(this,{x:(direction==1?10:FlxG.width-(bg.width+10))},0.5);
 			FlxTween.tween(this,{x:x},0.5,{startDelay:duration,onComplete:function(_){
 				currentNotification=null;
