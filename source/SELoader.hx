@@ -21,6 +21,7 @@ import lime.media.AudioBuffer;
 import haxe.io.Bytes;
 import se.formats.SongInfo;
 import se.formats.Song.SwagSong;
+import se.formats.VSliceSongMeta;
 // import vlc.VLCSound;
 using StringTools;
 
@@ -284,15 +285,51 @@ class SELoader {
 		gc();
 	}
 	@:keep inline public static function getContent(textPath:String):String{return loadText(textPath,false);}
-	public static function getChart(textPath:String,?difficulty:String=""):SwagSong{
-		return Song.parseJSONshit(loadText(textPath,false));
-/*		if(difficulty != "") return Song.fromVSlice(textPath,difficulty);
+	public static function getChart(textPath:String,?difficulty:String="normal"):SwagSong{
+		// return Song.parseJSONshit(loadText(textPath,false));
 
 		var colonIndex = textPath.lastIndexOf(':');
-		if(colonIndex == -1) return Song.parseJSONshit(loadText(textPath,false));
-		textPath = textPath.substring(0,colonIndex);
-		difficulty = textPath.substring(colonIndex+1);
-		return Song.fromVSlice(textPath,difficulty);*/
+		var oldPath = textPath;
+		if(colonIndex > 4) {
+			difficulty = textPath.substring(colonIndex+1);
+			textPath = textPath.substring(0,colonIndex);
+		}
+		if(!(textPath.lastIndexOf('-metadata') != -1 || textPath.lastIndexOf('-chart') != -1)){
+			return Song.parseJSONshit(loadText(oldPath,false));
+		}
+
+		textPath = textPath.replace('-metadata','_FILE_').replace('-chart','_FILE_');
+		var rawJson = loadText(textPath.replace('_FILE_','-chart'),false);
+		var metaJson = loadText(textPath.replace('_FILE_','-metadata'),false);
+
+		rawJson = '{"meta":'+metaJson+','+rawJson.substring(rawJson.indexOf('{')+1,rawJson.lastIndexOf('}')+1);
+		return Song.fromVSlice(rawJson,difficulty);
+
+
+		// if(textPath.lastIndexOf('-metadata.json') != -1){
+		// 	if(colonIndex != -1){
+		// 	}
+		// 	var meta = loadText(textPath,false);
+		// 	var chartPath = (textPath.substring(0,textPath.lastIndexOf('-'))+'-chart.json');
+
+		// 	return Song.fromVSlice(rawJson,difficulty);
+		// }
+
+		// if(colonIndex == -1 && difficulty == "") return Song.parseJSONshit(loadText(textPath,false));
+		
+		// if(colonIndex != -1){
+		// 	textPath = textPath.substring(0,colonIndex);
+		// 	difficulty = textPath.substring(colonIndex+1);
+		// }
+		
+		// var rawJson = loadText(textPath,false);
+		// rawJson = rawJson.substring(rawJson.indexOf('{'),rawJson.lastIndexOf('}'));
+		// var metaPath = (textPath.substring(0,textPath.lastIndexOf('-'))+'-metadata.json');
+		// trace('$metaPath');
+		// if(exists(metaPath)){
+		// 	var meta = loadText(metaPath,false);
+		// 	rawJson = '{"meta":'+meta+','+rawJson.substring(1);
+		// }
 	}
 	@:keep inline public static function triggerSave(textPath:String,content:String):Dynamic{
 		se.objects.SaveIcon.show();
@@ -411,6 +448,7 @@ class SELoader {
 			var path = getPath(i);
 			var folder = path.substring(0,path.lastIndexOf('/'));
 			var file = path.substring(path.lastIndexOf('/')+1);
+
 			for(FILE in readDirectory(folder)){
 				if(FILE.toLowerCase() != file.toLowerCase()) continue;
 				return folder+"/"+FILE;
@@ -520,6 +558,55 @@ class SELoader {
 			var data = path.newDirectory('data/');
 			if(data.exists('songData')){ // Legacy psych
 				data = data.newDirectory('songData');
+			}
+			if(data.exists('songs')){ // VSlice
+				var data = data.newDirectory('songs');
+				var list = data.readDirectory();
+				for (folder in list){
+					var path = data.newDirectory('$folder');
+					if(!path.isDirectory() || !songsFolder.exists('$folder/Inst.ogg')) continue;
+					for (file in orderList(path.readDirectory())){
+						if(file.lastIndexOf('-metadata') == -1) continue;
+						var e:VSliceSongMeta = Json.parse(SELoader.getContent(path.appendPath(file)));
+						var folder = songsFolder.newDirectory(folder);
+						var name = file.replace('-metadata','');
+						name=name.substring(0,name.lastIndexOf('.'));
+						var song:SongInfo = {
+							name:name,
+							charts:[],
+							namespace:null,
+
+							path:path.toString()
+						};
+						var t = name.indexOf('-') == -1 ? "" : name.substring(name.indexOf('-'));
+						var pe = e.playData.characters.player;
+						var p = pe;
+						song.voices = folder.appendPath('Voices-$p$t.ogg');
+						while(!exists(song.voices)){
+							var index = p.lastIndexOf('-');
+							if(index == -1){
+								song.voices=folder.appendPath('Voices-$p$t.ogg');
+								break;
+							}
+							p = p.substring(0,index);
+							song.voices=folder.appendPath('Voices-$p$t.ogg');
+						}
+						song.inst = folder.appendPath('Inst$t.ogg');
+						for (diff in e.playData.difficulties){
+							song.charts.push(file.replace('-metadata','-chart')+':'+diff);
+						}
+						returnArray.push(song);
+						
+					}
+					// song.inst = songsFolder.appendPath('$folder/Inst.ogg');
+					// song.voices = songsFolder.appendPath('$folder/Voices.ogg');
+					// for (file in orderList(path.readDirectory())){
+					// 	if(file.substring(file.length-5) != ".json" || blockedFiles.contains(file.toLowerCase())) 
+					// 		continue;
+					// 	song.charts.push(file);
+					// }
+					
+				}
 			}
 			var list = data.readDirectory();
 			// for (chart in list){

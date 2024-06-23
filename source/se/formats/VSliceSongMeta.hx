@@ -19,10 +19,11 @@ typedef VSliceChart = {
 	var scrollSpeed:Map<String,Float>;
 	var events:Array<VEvent>;
 	var notes:Dynamic;
+	var ?meta:VSliceSongMeta;
 	// Map<String,Array<VNote>>
 }
 typedef VSliceChartCharacters = {
-	var bf:String;
+	var player:String;
 	var girlfriend:String;
 	var opponent:String;
 }
@@ -48,6 +49,8 @@ class VSliceUtils {
 		switch(event.e){
 			case "FocusCamera":
 				return [event.t,-1,"followchar",event.v.char];
+			case "ZoomCamera":
+				return [event.t,-1,"camzoom",event.v.zoom];
 			default:
 				return [event.t,-1,'vslice-${event.e}',event.v];
 		}

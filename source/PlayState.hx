@@ -2211,7 +2211,8 @@ class PlayState extends ScriptMusicBeatState
 				practiceText.screenCenter(X);
 			} else finishSong(false);
 		}
- 		if (SESave.data.resetButton && onlinemod.OnlinePlayMenuState.socket == null && controls.RESET) finishSong(false);
+ 		if (SESave.data.resetButton && onlinemod.OnlinePlayMenuState.socket == null && controls.RESET) 
+ 			finishSong(false);
 		try{
 			addNotes();
 		}catch(e){trace('Error adding notes to pool? ${e.message}');}

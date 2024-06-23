@@ -124,9 +124,9 @@ class OfflinePlayState extends PlayState {
 		loadedVoices.persist = true;
 
 		SEProfiler.qStamp('Loading Music');
-	trace('Loading $voicesFile, $instFile');
+		trace('Loaded $voicesFile, $instFile');
 	
-  }
+	}
 	override function destroy(){
 		if(loadedVoices != null){loadedVoices.pause();loadedVoices.time = 0;}
 		super.destroy();
@@ -141,8 +141,8 @@ class OfflinePlayState extends PlayState {
 			if(chartFile.endsWith(".sm")){
 				PlayState.SONG = smTools.SMFile.loadFile(chartFile).convertToFNF();
 			}else{
-				PlayState.SONG = Song.parseJSONshit(SELoader.getContent(chartFile));
-
+				PlayState.SONG = SELoader.getChart(chartFile);
+// Song.parseJSONshit(SELoader.getContent(chartFile))
 			}
 				// if(nameSpace != ""){
 				// 	if(TitleState.retChar(nameSpace + "|" + PlayState.player2) != null){

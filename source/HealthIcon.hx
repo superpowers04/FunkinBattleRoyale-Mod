@@ -73,7 +73,7 @@ class HealthIcon extends FlxSprite
 			// }
 		}
 		imgPath = charInfo.iconLocation;
-		trace(imgPath);
+		// trace(imgPath);
 		if (!SELoader.exists(imgPath)){
 			changeSprite(char.getNamespacedName());
 			return;

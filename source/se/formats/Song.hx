@@ -216,6 +216,7 @@ class Song
 			// song.bpm = 
 			var noteList = song.notes[0].sectionNotes;
 			var meow:Array<VNote> = Reflect.getProperty(rawJson.notes,difficulty);
+			trace(difficulty);
 			if(meow == null) throw('$difficulty is an invalid difficulty!');
 			for(_ => n in meow){
 				var NOTE:Array<Dynamic> = [n.t,n.d,n.l,n.k];
@@ -228,6 +229,20 @@ class Song
 			}
 			song.keyCount=4;
 			song.chartType="VSlice Compat";
+			song.needsVoices=true;
+			if(rawJson.meta != null){
+				var meta:VSliceSongMeta = rawJson.meta;
+				song.song = meta.songName;
+				song.artist = meta.artist;
+				song.stage=meta.playData.stage;
+				song.player1=meta.playData.characters.player;
+				song.player2=meta.playData.characters.opponent;
+				song.gfVersion=meta.playData.characters.girlfriend;
+				song.bpm = meta.timeChanges[0].bpm;
+				for(_ => n in meta.timeChanges){
+					eventList.push([n.t,-1,'changebpm',n.bpm]);
+				}
+			}
 			if(Math.isNaN(song.offset)) song.offset = 0;
 			if (song.noteMetadata == null) song.noteMetadata = Song.defNoteMetadata;
 			return song;
@@ -251,6 +266,7 @@ class Song
 			if(rawJson == null){
 				swagShit = getEmptySong();
 			}else if(rawJson.version != null){
+				trace('Loading a VSlice song from parseJSONshit!?!?!?');
 				return fromVSlice(_json);
 			}else if(rawJson.song == null){
 				swagShit = getEmptySong();

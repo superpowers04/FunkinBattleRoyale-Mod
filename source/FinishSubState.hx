@@ -513,6 +513,13 @@ class FinishSubState extends MusicBeatSubstate
 		// }
 		var camPos = PlayState.instance.cameraPositions[0];
 		FlxG.camera.scroll.set(camPos[0],camPos[1]);
+		if (FlxG.keys.justPressed.R){
+			if(SESave.data.QuickReloading && !isError){
+				restartSong();
+				return;
+			}
+			if(win){FlxG.resetState();}else{restart();}
+		}
 		if (ready){
 			if (controls.ACCEPT){
 				retMenu();
@@ -529,13 +536,7 @@ class FinishSubState extends MusicBeatSubstate
 			#end
 
 			if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.S){saveScore(true);}
-			if (FlxG.keys.justPressed.R){
-				if(SESave.data.QuickReloading && !isError){
-					restartSong();
-					return;
-				}
-				if(win){FlxG.resetState();}else{restart();}
-			}
+
 			if (isError && FlxG.keys.justPressed.I){
 				PlayState.PSignoreScripts = true;
 				PlayState.scripts = [];

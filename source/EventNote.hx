@@ -73,7 +73,7 @@ class EventNote implements flixel.util.FlxDestroyUtil.IFlxDestroyable{
 				// Replaces hit func
 				hit = function(?charID:Int = 0,note){PlayState.charAnim(info[0],(if(info[0] == 2) "cheer" else "hey"),true);}; 
 			}
-			case "changebpm" | "bgm change": {
+			case "changebpm" | "bpm" | "bpm change": {
 				try{
 					info = [(if(rawNote[4] != "" && !Math.isNaN(Std.parseFloat(rawNote[4])))Std.parseFloat(rawNote[4]) else Std.parseFloat(rawNote[3]))]; 
 				}catch(e){info = [120,0];}
@@ -186,7 +186,7 @@ class EventNote implements flixel.util.FlxDestroyUtil.IFlxDestroyable{
 					PlayState.instance.followChar(info[0],info[1]);
 				};
 			}
-			case "lockcam" | "lock camera" : {
+			case "lockcam" | "lock camera" | "controlcamera": {
 				try{
 					info = [
 						switch(Std.string(rawNote[3]).toLowerCase()){

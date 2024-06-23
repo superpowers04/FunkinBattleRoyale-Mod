@@ -517,8 +517,8 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 			}
 			trace('Loading $songName  $chart');
 			loadScriptsFromSongPath(songLoc);
-			onlinemod.OfflinePlayState.voicesFile = (songInfo.voices ?? (SELoader.exists('${songLoc}/Voices.ogg') ? '${songLoc}/Voices.ogg' : ""));
 			PlayState.hsBrTools = new HSBrTools('${songLoc}');
+			onlinemod.OfflinePlayState.voicesFile = (songInfo.voices ?? (SELoader.exists('${songLoc}/Voices.ogg') ? '${songLoc}/Voices.ogg' : ""));
 			onlinemod.OfflinePlayState.instFile = (songInfo.inst ?? '${songLoc}/Inst.ogg');
 			if(SELoader.exists(onlinemod.OfflinePlayState.chartFile + "-Inst.ogg")){
 				onlinemod.OfflinePlayState.instFile = onlinemod.OfflinePlayState.chartFile + "-Inst.ogg";

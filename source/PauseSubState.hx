@@ -165,9 +165,6 @@ class PauseSubState extends MusicBeatSubstate {
 			songText.targetY = i;
 			grpMenuShit.add(songText);
 			songText.screenCenter(X);
-			var sX = songText.x;
-			songText.x = -(20 + songText.width);
-			FlxTween.tween(songText,{x : sX},0.9,{ease:FlxEase.bounceOut});
 		}
 		changeSelection();
 		if(!SESave.data.transparentPause) FlxG.state.persistentDraw = false;
@@ -196,14 +193,23 @@ class PauseSubState extends MusicBeatSubstate {
 	@:keep inline function getJumpTo(){
 
 		var time:String = FlxStringUtil.formatTime(Math.floor(Math.abs(jumpToTime / 1000)), false);
+		var currentTime:String = FlxStringUtil.formatTime(Math.floor(Math.abs(Conductor.songPosition / 1000)), false); 
 		if(jumpToTime < 0){
 			time = "-" + time;
 		}
-		return 'Jump to ${time} / ${songLengthTxt}';
+		return 'Jump to ${time} / ${currentTime}';
 	} 
 	@:keep inline function getChartSel(){
 		var chart = PlayState.songDifficulties[currentChart];
-		return '< ${chart.substring(chart.lastIndexOf('/') + 1,chart.lastIndexOf('.'))} >';
+		var next = PlayState.songDifficulties[currentChart+1];
+		var last = PlayState.songDifficulties[currentChart-1];
+		if(chart.lastIndexOf(':') != -1) chart = chart.substring(chart.lastIndexOf(':')+1);
+		else{
+			if(chart.lastIndexOf('.') != -1) chart = chart.substring(0,chart.lastIndexOf('.'));
+			if(chart.lastIndexOf('/') != -1) chart = chart.substring(chart.lastIndexOf('/')+1);
+			
+		}
+		return (last==null?"|":"<")+' $chart ' + (next==null?"|":">");
 	} 
 	@:keep inline function updateJumpTo(){
 		var i = menuItems.indexOf('Jump to');
