@@ -66,7 +66,7 @@ class Conductor {
 			}
 
 
-			var deltaSteps:Int = v.lengthInSteps;
+			var deltaSteps:Int = Math.isNaN(v.lengthInSteps) ? v.lengthInSteps : 16;
 			totalSteps += deltaSteps;
 			totalPos += ((60 / curBPM) * 1000 / 4) * deltaSteps;
 		}
@@ -74,5 +74,6 @@ class Conductor {
 
 	@:keep inline public static function changeBPM(newBpm:Float) {
 		stepCrochet = (crochet = ((60 / (bpm = Math.abs(Math.isNaN(newBpm) || newBpm == 0 ? 120 : newBpm))) * 1000)) / 4;
+		// FlxG.animationTimeScale=bpm/120;
 	}
 }

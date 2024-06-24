@@ -34,10 +34,10 @@ class Ratings
 	@:keep public static function getRank(?accuracy:Float = 0) {// Grab ranking from accuracy
 		var retRanking = rankings[rankings.length - 1];
 		for (ranking in rankings){
-			if(accuracy >= ranking.accuracy){
-				retRanking = ranking;
-				break;
-			}
+			if(accuracy < ranking.accuracy) continue;
+			retRanking = ranking;
+			break;
+			
 		}
 		return retRanking;
 	}
