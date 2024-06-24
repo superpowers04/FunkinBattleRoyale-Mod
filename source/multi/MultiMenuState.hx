@@ -992,8 +992,13 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 				if(dir != null) return dir;
 			}
 			if(SELoader.exists('mods/weeks/$namespace')){
-				var packDir = 'mods/weeks/$namespace/charts';
-				var dir = SELoader.anyExists(['$packDir/$songName/$songName.json','$packDir/$songNameWithoutDifficulty/$songName.json']);
+				var packDir = 'mods/weeks/$namespace';
+				var dir = SELoader.anyExists([
+					'$packDir/$songName/$songName.json',
+					'$packDir/$songNameWithoutDifficulty/$songName.json',
+					'$packDir/charts/$songName/$songName.json',
+					'$packDir/charts/$songNameWithoutDifficulty/$songName.json'
+				]);
 				if(dir != null) return dir;
 			}
 		}

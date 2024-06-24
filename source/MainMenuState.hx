@@ -400,8 +400,9 @@ class MainMenuState extends SickMenuState {
 				case "download charts":
 					FlxG.switchState(new ChartRepoState());
 				case 'story mode':
-					loading = true;
-					FlxG.switchState(new StoryMenuState());
+					handleError('Story mode is disabled while it gets overhauled');
+					// loading = true;
+					// FlxG.switchState(new StoryMenuState());
 				case 'deprecated freeplay':
 					loading = true;
 					FlxG.switchState(new FreeplayState());

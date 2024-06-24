@@ -18,6 +18,7 @@ import lime.net.curl.CURLCode;
 import sys.io.File;
 import sys.FileSystem;
 import multi.MultiPlayState;
+import multi.MultiMenuState;
 import openfl.Assets;
 
 
@@ -107,47 +108,47 @@ class StoryMenuState extends ScriptMusicBeatState
 		var curDir:String = "Unspecified";
 		try{
 			var i = weekData.length;
-			if (FileSystem.exists("mods/weeks/")) {
-				for (directory in FileSystem.readDirectory("mods/weeks/")) {
+			var weekFolder = SELoader.getAsDirectory('mods/weeks/');
+			if (weekFolder.exists()) {
+				for (directory in weekFolder.readDirectory()) {
 					curDir = directory;
-					if (FileSystem.exists(Sys.getCwd() + "mods/weeks/"+directory+"/config.json")) {
-						var json:WeekJSON = Json.parse(SELoader.loadText("mods/weeks/"+directory+"/config.json"));
-						var songList:Array<String> = [];
-						var chartList:Array<String> = [];
-						var si = 0;
-						if(json.songs != null && json.songs[0] != null) {
-							for (item in json.songs) {
-								if (Std.isOfType(item,String)){
-									songList[si] = item;
-									chartList[si] = item;
-									si++;
-								}else if (item.name != null){
-									songList[si] = item.name;
-									chartList[si] = item.chartName;
-									si++;
-								}
+					if (!weekFolder.exists(directory+"/config.json")) continue;
+					var json:WeekJSON = Json.parse(SELoader.loadText(weekFolder+directory+"/config.json"));
+					var songList:Array<String> = [];
+					var chartList:Array<String> = [];
+					var si = 0;
+					if(json.songs != null && json.songs[0] != null) {
+						for (item in json.songs) {
+							if (item is String){
+								songList[si] = item;
+								chartList[si] = item;
+								si++;
+							}else if (item.name != null){
+								songList[si] = item.name;
+								chartList[si] = item.chartName;
+								si++;
 							}
 						}
-						if(json.songList != null && json.songList[0] != null) {
-							for (item in json.songList) {
-								if (item != null && item != ""){
-									songList[si] = item;
-									chartList[si] = item;
-									si++;
-								}
-							}
-						}
-						// var char2 = ;
-						weekData[i] = songList;
-						weekCharacters[i] = (if(si > 0) ['bf','bf','gf'] else ['','','']);
-						weekNames[i] = if(json.name == null || json.name == "") directory else json.name;
-						weekChartNames[i] = chartList;
-						weekDirectories[i] = directory;
-						weekDialogue[i] = (if(json.dontLoadDialog) false else true);
-						weekEmbedded[i] = false;
-
-						i++;
 					}
+					if(json.songList != null && json.songList[0] != null) {
+						for (item in json.songList) {
+							if (item == null || item == "") continue;
+							songList[si] = item;
+							chartList[si] = item;
+							si++;
+							
+						}
+					}
+					// var char2 = ;
+					weekData[i] = songList;
+					weekCharacters[i] = ((si > 0) ? ['bf','bf','gf'] : ['','','']);
+					weekNames[i] = (json.name == null || json.name == "") ?  directory : json.name;
+					weekChartNames[i] = chartList;
+					weekDirectories[i] = directory;
+					weekDialogue[i] = !json.dontLoadDialog;
+					weekEmbedded[i] = false;
+					i++;
+					
 				}
 			} 
 		}catch(e){
@@ -163,103 +164,108 @@ class StoryMenuState extends ScriptMusicBeatState
 			// 				}
 			var weekName = weekNames[curWeek];
 			PlayState.storyWeek = "-custom-" + weekName;
-			var songJSON = "";
-			var selSong = "mods/weeks/" + weekDirectories[curWeek] + "/" + PlayState.storyPlaylist[0].toLowerCase();
-			var diffic = "";
-
-			switch (curDifficulty) {
-				case 0:
-					diffic = 'easy';
-				case 1:
-					diffic = 'normal';
-				case 2:
-					diffic = 'hard';
-			}
-
-			if(!SELoader.exists(selSong)){
-
-				if(SELoader.exists('mods/charts/' + PlayState.storyPlaylist[0])){
-					selSong = 'mods/charts/' + PlayState.storyPlaylist[0];
-				}else if(SELoader.exists('mods/charts/' + PlayState.storyPlaylist[0].toLowerCase() )){
-					selSong = 'mods/charts/' + PlayState.storyPlaylist[0].toLowerCase();
-				}else{
-					songJSON = multi.MultiMenuState.findSongByName(PlayState.storyPlaylist[0] + "-" + diffic,weekName);
-					if(songJSON == "") songJSON = multi.MultiMenuState.findSongByName(PlayState.storyPlaylist[0].toLowerCase() + "-" + diffic,weekName);
-					if(songJSON == ""){
-						MainMenuState.handleError("Unable to find song '" + PlayState.storyPlaylist[0] + "'!");
-						return;
-					}
-				}
-
-			}
-			// songJSON = if(weekChartNames[curWeek][i] == null)
-
-			if(songJSON == ""){
-
-				var fucked = [
-						PlayState.storyPlaylist[0].toLowerCase() + "-" + diffic,
-						PlayState.storyPlaylist[0] + "-" + diffic,
-						diffic,
-						PlayState.storyPlaylist[0].toLowerCase(),
-						PlayState.storyPlaylist[0]
-					];
-				for (i in fucked)
-				{
-					if(SELoader.exists('${selSong}/${i}.json')){
-						songJSON = i + ".json";
-						if(PlayState.storyDifficulty != 1 && i == PlayState.storyPlaylist[0].toLowerCase() || i == PlayState.storyPlaylist[0]){
-							PlayState.storyDifficulty = 1;
-							PlayState.customDiff = 'Normal($diffic not found)';
-						}
-						break;
-					}
-				}
-			}
-			// for (i in fucked) {
-			// 	songJSON=;
-			// }
-			if(songJSON == ""){
-				MainMenuState.handleError("Unable to find a valid chart for '" + PlayState.storyPlaylist[0] + "' on difficulty " + PlayState.storyDifficulty + "!",!inStoryMenu);
+			// var songJSON = "";
+			var selSong = PlayState.storyPlaylist[0].toLowerCase();
+			if(!MultiMenuState.playSongByName(selSong,weekName)){
+				MainMenuState.handleError("Unable to find song '" + PlayState.storyPlaylist[0] + "'!");
 				return;
-
 			}
-			trace('Loading ${songJSON}');
-
-			onlinemod.OfflinePlayState.chartFile = '${selSong}/${songJSON}';
-			PlayState.actualSongName = songJSON;
-			// PlayState.actualSongName = songJSON;
-
-
-			onlinemod.OfflinePlayState.voicesFile = '';
 			PlayState.stateType = 6;
 			PlayState.isStoryMode = true;
-			PlayState.hsBrTools = new HSBrTools('${selSong}');
+			// var diffic = "";
 
-			if (SELoader.exists('${selSong}/Voices.ogg')) onlinemod.OfflinePlayState.voicesFile = '${selSong}/Voices.ogg';
+			// switch (curDifficulty) {
+			// 	case 0:
+			// 		diffic = 'easy';
+			// 	case 1:
+			// 		diffic = 'normal';
+			// 	case 2:
+			// 		diffic = 'hard';
+			// }
+
+			// if(!SELoader.exists(selSong)){
+
+			// 	if(SELoader.exists('mods/charts/' + PlayState.storyPlaylist[0])){
+			// 		selSong = 'mods/charts/' + PlayState.storyPlaylist[0];
+			// 	}else if(SELoader.exists('mods/charts/' + PlayState.storyPlaylist[0].toLowerCase() )){
+			// 		selSong = 'mods/charts/' + PlayState.storyPlaylist[0].toLowerCase();
+			// 	}else{
+			// 		songJSON = multi.MultiMenuState.findSongByName(PlayState.storyPlaylist[0] + "-" + diffic,weekName);
+			// 		if(songJSON == "") songJSON = multi.MultiMenuState.findSongByName(PlayState.storyPlaylist[0].toLowerCase() + "-" + diffic,weekName);
+			// 		if(songJSON == ""){
+			// 			MainMenuState.handleError("Unable to find song '" + PlayState.storyPlaylist[0] + "'!");
+			// 			return;
+			// 		}
+			// 	}
+
+			// }
+			// // songJSON = if(weekChartNames[curWeek][i] == null)
+
+			// if(songJSON == ""){
+
+			// 	var fucked = [
+			// 			PlayState.storyPlaylist[0].toLowerCase() + "-" + diffic,
+			// 			PlayState.storyPlaylist[0] + "-" + diffic,
+			// 			diffic,
+			// 			PlayState.storyPlaylist[0].toLowerCase(),
+			// 			PlayState.storyPlaylist[0]
+			// 		];
+			// 	for (i in fucked)
+			// 	{
+			// 		if(SELoader.exists('${selSong}/${i}.json')){
+			// 			songJSON = i + ".json";
+			// 			if(PlayState.storyDifficulty != 1 && i == PlayState.storyPlaylist[0].toLowerCase() || i == PlayState.storyPlaylist[0]){
+			// 				PlayState.storyDifficulty = 1;
+			// 				PlayState.customDiff = 'Normal($diffic not found)';
+			// 			}
+			// 			break;
+			// 		}
+			// 	}
+			// }
+			// // for (i in fucked) {
+			// // 	songJSON=;
+			// // }
+			// if(songJSON == ""){
+			// 	MainMenuState.handleError("Unable to find a valid chart for '" + PlayState.storyPlaylist[0] + "' on difficulty " + PlayState.storyDifficulty + "!",!inStoryMenu);
+			// 	return;
+
+			// }
+			// trace('Loading ${songJSON}');
+
+			// onlinemod.OfflinePlayState.chartFile = '${selSong}/${songJSON}';
+			// PlayState.actualSongName = songJSON;
+			// // PlayState.actualSongName = songJSON;
+
+
+			// onlinemod.OfflinePlayState.voicesFile = '';
+
+			// PlayState.hsBrTools = new HSBrTools('${selSong}');
+
+			// if (SELoader.exists('${selSong}/Voices.ogg')) onlinemod.OfflinePlayState.voicesFile = '${selSong}/Voices.ogg';
 			// if (FileSystem.exists('${selSong}/script.hscript')) {
 			// 	trace("Song has script!");
 			// 	MultiPlayState.scriptLoc = '${selSong}/script.hscript';
 			// 	// PlayState.songScript = File.getContent('${selSong}/script.hscript');
 			// }else {PlayState.hsBrTools = null;MultiPlayState.scriptLoc = "";PlayState.songScript = "";}
-			if (SELoader.exists('${selSong}/dialogue.txt')) {
-				trace("Song has dialogue!");
-				PlayState.dialogue = CoolUtil.coolFormat(SELoader.loadText('${selSong}/dialogue.txt'));
-			}else {PlayState.dialogue = [];}
+			// if (SELoader.exists('${selSong}/dialogue.txt')) {
+			// 	trace("Song has dialogue!");
+			// 	PlayState.dialogue = CoolUtil.coolFormat(SELoader.loadText('${selSong}/dialogue.txt'));
+			// }else {PlayState.dialogue = [];}
 
-			if (SELoader.exists('${selSong}/enddialogue.txt')) {
-				trace("Song has endDialogue!");
-				PlayState.endDialogue = CoolUtil.coolFormat(SELoader.loadText('${selSong}/enddialogue.txt'));
-			}else if (SELoader.exists('${selSong}/end-dialogue.txt')) {
-				trace("Song has endDialogue!");
-				PlayState.endDialogue = CoolUtil.coolFormat(SELoader.loadText('${selSong}/end-dialogue.txt'));
-			}else {PlayState.endDialogue = [];}
-			onlinemod.OfflinePlayState.instFile = '${selSong}/Inst.ogg';
-			onlinemod.OfflinePlayState.nameSpace = weekNames[curWeek];
-			// LoadingState.loadAndSwitchState(new MultiPlayState());
-			new FlxTimer().start(1, function(tmr:FlxTimer){
-				LoadingScreen.loadAndSwitchState(new MultiPlayState(), true);
-			// 	// PlayState.instance.clearVariables();
-			});
+			// if (SELoader.exists('${selSong}/enddialogue.txt')) {
+			// 	trace("Song has endDialogue!");
+			// 	PlayState.endDialogue = CoolUtil.coolFormat(SELoader.loadText('${selSong}/enddialogue.txt'));
+			// }else if (SELoader.exists('${selSong}/end-dialogue.txt')) {
+			// 	trace("Song has endDialogue!");
+			// 	PlayState.endDialogue = CoolUtil.coolFormat(SELoader.loadText('${selSong}/end-dialogue.txt'));
+			// }else {PlayState.endDialogue = [];}
+			// onlinemod.OfflinePlayState.instFile = '${selSong}/Inst.ogg';
+			// onlinemod.OfflinePlayState.nameSpace = weekNames[curWeek];
+			// // LoadingState.loadAndSwitchState(new MultiPlayState());
+			// new FlxTimer().start(1, function(tmr:FlxTimer){
+			// 	LoadingScreen.loadAndSwitchState(new MultiPlayState(), true);
+			// // 	// PlayState.instance.clearVariables();
+			// });
 		}catch(e){MainMenuState.handleError(e,"Error switching songs for week " + '${weekNames[curWeek]}',!inStoryMenu);
 		}
 	}

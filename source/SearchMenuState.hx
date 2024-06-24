@@ -210,7 +210,7 @@ class SearchMenuState extends ScriptMusicBeatState {
 		try{if(onlinemod.OnlinePlayMenuState.socket != null) onlinemod.OnlinePlayMenuState.receiver.HandleData = HandleData;}catch(e){}
 
 		super.create();
-		openfl.system.System.gc();
+		SELoader.gc();
 		try{
 			FlxG.sound.music.onComplete = null;
 

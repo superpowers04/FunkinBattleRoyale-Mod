@@ -153,15 +153,11 @@ class Note extends FlxSprite
 	}
 	public function changeSprite(?name:String = "default",?_frames:FlxAtlasFrames,?_anim:String = "",?setFrames:Bool = true,path_:String = "mods/noteassets",?noteJSON:NoteAssetConfig){
 		try{
-			var curAnim = if(_anim == "" && animation.curAnim != null) animation.curAnim.name else if(_anim != "") _anim else "";
+			var curAnim = (_anim == "" && animation.curAnim != null) ? animation.curAnim.name : ((_anim != "") ? _anim : "");
 			var _sx:Float = scale.x;
 			var _sy:Float = scale.y;
 			var _ox:Float = offset.x;
-			if(noteJSON != null){
-				this.noteJSON = noteJSON;
-			}else{
-				this.noteJSON = null;
-			}
+			this.noteJSON = noteJSON;
 			if(setFrames && (_frames != null || name != "")){
 				if(_frames == null){
 					if(name == "skin"){
