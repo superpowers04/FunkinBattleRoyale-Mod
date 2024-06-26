@@ -15,6 +15,7 @@ import haxe.CallStack;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.events.UncaughtErrorEvent;
+import openfl.events.KeyboardEvent;
 
 import openfl.Lib;
 using StringTools;
@@ -215,7 +216,7 @@ class FuckState extends FlxUIState {
 					var textFieldBot = new TextField();
 					addChild(textFieldBot);
 					textFieldBot.width = 1280;
-					textFieldBot.text = "Please take a screenshot and report this";
+					textFieldBot.text = "Please take a screenshot and report this.\nPress enter or escape to close";
 					textFieldBot.y = 720 * 0.8;
 					if(saved){
 						var dateNow:String = StringTools.replace(StringTools.replace(Date.now().toString(), " ", "_"), ":", ".");
@@ -228,6 +229,8 @@ class FuckState extends FlxUIState {
 					textFieldBot.embedFonts = textFieldTop.embedFonts = textField.embedFonts = true;
 					textFieldBot.defaultTextFormat =textFieldTop.defaultTextFormat =textField.defaultTextFormat = tf;
 					allowLogWrite = false;
+
+					FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, OPENFLKEYPRESS);
 				}
 
 				// Main.instance.addChild(new se.ErrorSprite('${exception}\nThis happened in ${info}',saved));
@@ -242,6 +245,9 @@ class FuckState extends FlxUIState {
 	}
 	public static function FUCK_OPENFL(E:UncaughtErrorEvent){
 		FUCK(E);
+	}
+	public static function OPENFLKEYPRESS(E:KeyboardEvent){
+		if(E.keyCode == 13 || E.keyCode==27) Sys.exit(-1);
 	}
 	public static function hook(){
 		// trace('Enabling standard uncaught error handler...');

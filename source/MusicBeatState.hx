@@ -381,13 +381,19 @@ class MusicBeatState extends FlxUIState {
 		LoadingScreen.hide();
 		
 	}
+	override function startOutro(onOutroComplete:() -> Void) {
+		super.startOutro(function(){
+			if(loading) LoadingScreen.show();
+			onOutroComplete();
+		});
+	}
 	function tranOut(){
 		// active = false;
 		
-		if(loading) LoadingScreen.show();
 		
 		
-		FlxTween.tween(FlxG.camera, {x:FlxG.width},0.9,{ease: FlxEase.expoIn});
+		
+		// FlxTween.tween(FlxG.camera, {x:FlxG.width,alpha:0},0.5,{ease: FlxEase.expoIn});
 		FlxTween.tween(FlxG.camera, {zoom:2},1,{ease: FlxEase.expoIn});
 
 	}

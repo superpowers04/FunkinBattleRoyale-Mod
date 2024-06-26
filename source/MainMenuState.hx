@@ -321,24 +321,33 @@ class MainMenuState extends SickMenuState {
 		}
 		selected = false;
 	}
-
-  override function select(sel:Int){
+	var selectedID = 0;
+	function actualStartOutro(onOutroComplete:() -> Void){
+		super.startOutro(onOutroComplete);
+	}
+	override function startOutro(onOutroComplete:() -> Void)
+	{
+		var _obj = grpControls.members[selectedID];
+		FlxTween.tween(_obj.scale,{x:1.2,y:1.2},0.4,{ease:FlxEase.quadIn,
+				onComplete:function(_) {actualStartOutro(onOutroComplete);}});
+		// FlxTween.tween(_obj,{x:500},0.4,{ease:FlxEase.quadIn});
+		for (obj in grpControls.members){
+			if(obj == _obj) continue;
+			FlxTween.tween(obj,{x:-500},0.4,{ease:FlxEase.quadIn
+			});
+		}
+	}
+	override function select(sel:Int){
 		MainMenuState.errorMessage="";
 		if (selected){return;}
 		selected = true;
+		selectedID=sel;
 		var daChoice:String = options[sel];
 		SELoader.playSound('assets/sounds/confirmMenu',true);
 		triedChar = false;
-		if(daChoice != "other" && daChoice != 'back' && daChoice != 'open mods folder'){
-			var _obj = grpControls.members[sel];
-			FlxTween.tween(_obj,{x:500},0.4,{ease:FlxEase.quadIn});
-			// FlxTween.tween(_obj,{x:500},0.4,{ease:FlxEase.quadIn});
-			for (obj in grpControls.members){
-				if(obj == _obj) continue;
-				FlxTween.tween(obj,{x:-500},0.4,{ease:FlxEase.quadIn});
-			}
-		}
-		
+		// if(daChoice != "other" && daChoice != 'back' && daChoice != 'open mods folder'){
+
+		// }
 		switch (daChoice){
 
 			case 'open closed chart':
