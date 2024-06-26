@@ -48,6 +48,8 @@ class VSliceUtils {
 	public static function convertEvent(event:VEvent):Array<Dynamic>{
 		switch(event.e){
 			case "FocusCamera":
+				if(event.v.char == 2)
+					return [event.t,-1,"followchar",event.v.char,true];
 				return [event.t,-1,"followchar",event.v.char];
 			case "ZoomCamera":
 				return [event.t,-1,"camzoom",event.v.zoom];

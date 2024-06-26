@@ -11,6 +11,11 @@ package se.formats;
 	function get_voices() return voices == "" ? path+'Voices.ogg' : voices;
 	var inst(get,default):String = "";
 	function get_inst() return inst == "" ? path+'Inst.ogg' : inst;
+	var extraVoices(get,default):Array<String>;
+	function get_extraVoices(){
+		if(extraVoices==null) extraVoices=[];
+		return extraVoices;
+	}
 
 	var path:String = "";
 	var namespace:String = null;

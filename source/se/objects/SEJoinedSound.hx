@@ -28,6 +28,12 @@ import flixel.sound.FlxSound;
 		sync();
 	}
 	function draw(){}
+	function destroy(){
+		for(song in sounds){
+			song.destroy();
+		}
+		super.destroy();
+	}
 
 	function sync(){
 		var sound = sound;

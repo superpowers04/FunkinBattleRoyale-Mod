@@ -327,6 +327,43 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 					emptyCats.push('Charts Folder');
 				}
 			}
+			if (SELoader.exists('./assets/onlinedata/')){
+
+				// var dirs = orderList(SELoader.readDirectory('./assets/onlinedata'));
+				// var catID = 0;
+				// var containsSong = false;
+				var catID = categories.length;
+
+				LoadingScreen.loadingText = 'Scanning assets/onlinedata';
+				var folderSongs:Array<SongInfo> = SELoader.getSongsFromFolder('./assets/onlinedata');
+				_packCount++;
+				if(folderSongs.length != 0){
+					addCategory('Downloaded(assets/offlinedata)',i);
+					i++;
+					for (song in folderSongs){
+						song.categoryID=catID;
+						song.namespace='offlineData';
+						addListing(song.name,i,song);
+						songInfoArray.push(song);
+						i++;
+					}
+				}
+				// for (directory in dirs){
+				// 	if (!SELoader.isDirectory('${dataDir}${directory}') || (search != "" && !query.match(directory.toLowerCase()))) continue; // Handles searching
+				// 	var song = addSong('${dataDir}${directory}',directory,catID);
+				// 	if(song == null) continue;
+				// 	if(!containsSong){
+				// 		containsSong = true;
+				// 		addCategory('Charts Folder',i);
+						
+				// 		i++;
+				// 	}
+
+				// 	addListing(directory,i,song);
+				// 	songInfoArray.push(song);
+				// 	i++;
+				// }
+			}
 			if (SELoader.exists("mods/weeks")){
 				for (name in orderList(SELoader.readDirectory("mods/weeks"))){
 					var catID = categories.length;

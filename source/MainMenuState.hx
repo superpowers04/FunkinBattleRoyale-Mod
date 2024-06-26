@@ -315,8 +315,10 @@ class MainMenuState extends SickMenuState {
 		curSelected = 0;
 		callInterp('mmSwitch',[]);
 		if(cancelCurrentFunction) return;
-		if(regen)generateList();
-		if(regen)changeSelection();
+		if(regen){
+			generateList();
+			changeSelection();
+		}
 		selected = false;
 	}
 
@@ -325,12 +327,12 @@ class MainMenuState extends SickMenuState {
 		if (selected){return;}
 		selected = true;
 		var daChoice:String = options[sel];
-		FlxG.sound.play(Paths.sound('confirmMenu'));
+		SELoader.playSound('assets/sounds/confirmMenu',true);
 		triedChar = false;
 		if(daChoice != "other" && daChoice != 'back' && daChoice != 'open mods folder'){
 			var _obj = grpControls.members[sel];
 			FlxTween.tween(_obj,{x:500},0.4,{ease:FlxEase.quadIn});
-			FlxTween.tween(_obj,{x:500},0.4,{ease:FlxEase.quadIn});
+			// FlxTween.tween(_obj,{x:500},0.4,{ease:FlxEase.quadIn});
 			for (obj in grpControls.members){
 				if(obj == _obj) continue;
 				FlxTween.tween(obj,{x:-500},0.4,{ease:FlxEase.quadIn});
@@ -376,7 +378,8 @@ class MainMenuState extends SickMenuState {
 				#end
 				case 'online songs':
 					loading = true;
-					FlxG.switchState(new onlinemod.OfflineMenuState());
+					MainMenuState.handleError('Offline songs have been moved to the modded songs list!');
+					// FlxG.switchState(new onlinemod.OfflineMenuState());
 				case 'changelog' | 'update':
 					FlxG.switchState(new OutdatedSubState());
 				// case "Setup characters":

@@ -11,6 +11,7 @@ import sys.FileSystem;
 import sys.io.File;
 import se.ThreadedAction;
 import Overlay;
+import se.formats.SongInfo;
 
 
 import Section.SwagSection;
@@ -41,6 +42,7 @@ class OfflinePlayState extends PlayState {
 	var shouldLoadJson:Bool = true;
 	var stateType = 2;
 	var shouldLoadSongs = true;
+	public static var songInfo:SongInfo;
 	public static var voicesFile = "";
 	public static var instFile = "";
 	public static var lastInstFile = "";
@@ -65,14 +67,7 @@ class OfflinePlayState extends PlayState {
 		var voicesThread = new ThreadedAction(() -> { // Offload to another thread for faster loading
 		#end
 			if(loadedVoices == null || lastVoicesFile != voicesFile){
-				if(voicesFile == null || voicesFile == ""){
-					voicesFile = SELoader.anyExists([
-							'assets/onlinedata/songs/${chartFile.substring(chartFile.lastIndexOf('/')+1,chartFile.lastIndexOf('.'))}/Voices.ogg',
-							'assets/onlinedata/songs/${PlayState.songDir}/Voices.ogg',
-							'assets/onlinedata/songs/${PlayState.actualSongName.toLowerCase()}/Voices.ogg',
-							'assets/onlinedata/songs/${PlayState.SONG.song.toLowerCase()}/Voices.ogg'
-						],"");
-				}
+
 				if(voicesFile != ""){
 					try{
 						loadedVoices = SELoader.loadFlxSound(voicesFile);

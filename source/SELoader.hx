@@ -585,13 +585,15 @@ class SELoader {
 						while(!exists(song.voices)){
 							var index = p.lastIndexOf('-');
 							if(index == -1){
-								song.voices=folder.appendPath('Voices-$p$t.ogg');
+								song.voices=folder.appendPath('Voices-$p.ogg');
 								break;
 							}
 							p = p.substring(0,index);
 							song.voices=folder.appendPath('Voices-$p$t.ogg');
 						}
+						if(!exists(song.voices)) song.voices=folder.appendPath('Voices.ogg');
 						song.inst = folder.appendPath('Inst$t.ogg');
+						if(!exists(song.inst)) song.inst = folder.appendPath('Inst.ogg');
 						for (diff in e.playData.difficulties){
 							song.charts.push(file.replace('-metadata','-chart')+':'+diff);
 						}

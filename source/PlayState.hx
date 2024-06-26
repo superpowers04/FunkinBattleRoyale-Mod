@@ -634,7 +634,6 @@ class PlayState extends ScriptMusicBeatState
 		for (i in 0 ... scripts.length) {
 			var v = scripts[i];
 			LoadingScreen.loadingText = 'Loading scripts: $v';
-			loadSingleScript(v);
 		}
 
 	}
@@ -906,7 +905,7 @@ class PlayState extends ScriptMusicBeatState
 			boyfriend = new EmptyCharacter(400,100);
 			gf = new EmptyCharacter(400, 100);
 		}
-		if(!gf.lonely && (dad == gf || bf == gf)) gf = new EmptyCharacter(400,100);
+		if(gf == null || (!gf.lonely && (dad == gf || bf == gf))) gf = new EmptyCharacter(400,100);
 		var camPos:FlxPoint = new FlxPoint(gf.getGraphicMidpoint().x, gf.getGraphicMidpoint().y);
 
 		camPos.set(camPos.x + gf.camX, camPos.y + gf.camY);
@@ -950,7 +949,7 @@ class PlayState extends ScriptMusicBeatState
 
 		Conductor.songPosition = -5000;
 		if(SESave.data.undlaTrans > 0){
-			underlay = new FlxSprite(-100,-100).makeGraphic((if(SESave.data.undlaSize == 0)Std.int(Note.swagWidth * 4 + 4) else 1920),1080,0xFF000010);
+			underlay = new FlxSprite(-100,-100).makeGraphic(((SESave.data.undlaSize == 0) ? Std.int(Note.swagWidth * 4 + 4) : 1920),1080,0xFF000010);
 			underlay.alpha = SESave.data.undlaTrans;
 			underlay.cameras = [camHUD];
 			add(underlay);
@@ -3515,6 +3514,7 @@ class PlayState extends ScriptMusicBeatState
 		handleHealth=true;
 		finished=false;
 		for (i=>v in notes.members){
+			if(v == null) continue;
 			v.acceleration.y = FlxG.random.int(200, 300);
 			v.velocity.y -= FlxG.random.int(140, 160);
 			v.velocity.x = FlxG.random.float(-5, 5);
@@ -3720,3 +3720,5 @@ class PlayState extends ScriptMusicBeatState
 	}
 
 }
+
+
