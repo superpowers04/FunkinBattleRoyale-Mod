@@ -63,7 +63,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 	}
 	override function beatHit(){
 		super.beatHit();
-		if (voices != null && shouldVoicesPlay && (!voices.playing || (voices.time > FlxG.sound.music.time + 20 || voices.time < FlxG.sound.music.time - 20))){
+		if (voices != null && shouldVoicesPlay && (!voices.playing || (voices.time > FlxG.sound.music.time + 2 || voices.time < FlxG.sound.music.time - 2))){
 			voices.time = FlxG.sound.music.time;
 			voices.play();
 		}

@@ -24,18 +24,12 @@
 	<!--These window settings apply to all targets-->
 	<window width="1280" height="720" fps="" background="#100010" hardware="true" vsync="false" allowShaders="true" />
 
-	<!--HTML5-specific-->
-	<window if="html5" resizable="true" />
-
 	<!--Desktop-specific-->
 	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
 
 	<!--Mobile-specific-->
 	<window if="mobile" orientation="landscape" fullscreen="true" resizable="false"/>
 
-
-	<!--Switch-specific-->
-	<window if="switch" orientation="landscape" fullscreen="true" resizable="true" />
 
 	<!-- _____________________________ Path Settings ____________________________ -->
 
@@ -52,33 +46,20 @@
 	<classpath name="othersources" />
 	<classpath name="haxe5" if="haxe5"/>
 
-	<assets path="assets/preload" rename="assets" exclude="*.mp3" if="web"/>
-	<assets path="assets/preload" rename="assets" exclude="*.mp3" embed='false' unless="web"/>
+	<assets path="assets/preload" rename="assets" exclude="*.mp3" embed='false'/>
 
 	
 	<define name="PRELOAD_ALL" unless="web" />
-	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
 	
-	<section if="EMBED_ALL">
-		<library name="shared"   preload="true" />
-	</section>
-	<section if="PRELOAD_ALL" unless="EMBED_ALL">
-		<library name="shared"   preload="true" />
-	</section>
-	
-	<section if="NO_PRELOAD_ALL">
-		<library name="shared"   preload="false" />
-	</section>
+	<library name="shared"   preload="true" />
 
 	<assets path="assets/shared"   library="shared"   exclude="*.mp3" />
 	
 	<assets path="assets/fonts" embed='true'/>
 	<assets path='example_mods' rename='mods' embed='false'/>
-	<assets path='art/readme.txt' rename='do NOT readme.txt' />
-	<assets path='art/credits.md' rename='Credits.md' />
-	<assets path='LICENSE' rename='LICENSE.txt' />
-	<!-- <template path='mods' /> -->
-	
+	<assets path='art/readme.txt' rename='do NOT readme.txt' embed='false'/>
+	<assets path='art/credits.md' rename='Credits.md' embed='false'/>
+	<assets path='LICENSE' rename='LICENSE.txt' embed='false'/>
 	<!-- <assets path="CHANGELOG.md" rename='changelog.txt'/> -->
 
 	<!-- NOTE FOR FUTURE SELF SINCE FONTS ARE ALWAYS FUCKY 
@@ -86,20 +67,8 @@
 		THEN UHHH I USED THE NAME OF THE FONT WITH SETFORMAT() ON THE TEXT!!!
 		NOT USING A DIRECT THING TO THE ASSET!!!
 	-->
-	<section if="EMBED_ALL">
-		<assets path="assets/preload/data/introText.txt" embed='true'/> 
-		<!-- <assets path="assets/data/introText.txt" embed='true'/>  -->
-		<assets path="assets/shared/images/EVENTNOTE.png" embed='true'/> 
-		<assets path="assets/shared/images/EVENTNOTE.xml" embed='true'/> 
-		<assets path="assets/preload/images/iconGrid.png" embed='true'/> 
-		<assets path="assets/preload/images/" embed='true'/> 
-		<assets path="assets/preload/images/logoBumpin.png" embed='true'/> 
-		
-		<assets path="assets/shared/images/characters" embed='true'/>
-	</section>
-	<!-- _______________________________ Libraries ______________________________ -->
 
-	<haxedev set='webgl' if="web"/>
+	<!-- _______________________________ Libraries ______________________________ -->
 	
 
 
@@ -176,22 +145,19 @@
 
 	<!-- <haxedef name="HXCPP_DEBUGGER"/> -->
 	<!-- This is to hopefully increase preformance on x64 systems, if it's not compiling to them already for some reason -->
-	<haxedef name="HXCPP_M64"/> 
-	<haxedef name="HXCPP_CHECK_POINTER"/>
-	<haxedef name="HXCPP_STACK_LINE"/>
-	<haxedef name="HXCPP_STACK_TRACE"/>
-	<haxedef name="HXCPP_GC_GENERATIONAL"/>
-	<haxedef name="HXCPP_CATCH_SEGV"/>
-	<haxedef name='HXCPP_DEBUG_LINK' if='desktop'/>
+	<section if="cpp">
+		<haxedef name="HXCPP_M64"/> 
+		<haxedef name="HXCPP_CHECK_POINTER"/>
+		<haxedef name="HXCPP_STACK_LINE"/>
+		<haxedef name="HXCPP_STACK_TRACE"/>
+		<haxedef name="HXCPP_GC_GENERATIONAL"/>
+		<haxedef name="HXCPP_CATCH_SEGV"/>
+		<haxedef name='HXCPP_DEBUG_LINK' if='desktop'/>
+	</section>
 	<!-- <haxedef name="HXCPP_DEBUGGER"/> -->
 	<haxedef name="NO_PRECOMPILED_HEADERS"/>
 
 
-	<haxedef name='no_ssl' if='hl linux'/>
-
-
-	<!--Enable this for Nape release builds for a serious peformance improvement-->
-	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 

@@ -506,24 +506,29 @@ class Note extends FlxSprite
 				}
 			}
 		}else if (aiShouldPress && (dad == null || !dad.isStunned) && PlayState.dadShow && !PlayState.p2canplay && strumTime <= Conductor.songPosition) {
-			hit(1,this);
-			
-			callInterp("noteHitDad",[dad,this]);
-			
-
-			dad.holdTimer = 0;
-
-			if (dad.useVoices){
-				dad.voiceSounds[noteData].play(1);
-				dad.voiceSounds[noteData].time = 0;
-				PlayState.instance.vocals.volume = 0;
-			}else if (PlayState.instance.vocals != null){
-				PlayState.instance.vocals.volume = SESave.data.voicesVol;
-			}
-
-			PlayState.instance.notes.remove(this, true);
-			destroy();
+			dadNotePress();
 		}
 		callInterp("noteUpdateAfter",[this]);
+	}
+	@:keep inline public function dadNotePress(?kill:Bool=true){
+		var dad = PlayState.opponentCharacter;
+		hit(1,this);
+		callInterp("noteHitDad",[dad,this]);
+		
+
+		dad.holdTimer = 0;
+
+		if (dad.useVoices){
+			dad.voiceSounds[noteData].play(1);
+			dad.voiceSounds[noteData].time = 0;
+			PlayState.instance.vocals.volume = 0;
+		}else if (PlayState.instance.vocals != null){
+			PlayState.instance.vocals.volume = SESave.data.voicesVol;
+		}
+		if(kill){
+			PlayState.instance.notes.remove(this);
+			destroy();
+
+		}
 	}
 }

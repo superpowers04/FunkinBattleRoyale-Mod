@@ -2255,7 +2255,11 @@ class PlayState extends ScriptMusicBeatState
 			while (eventNotes[0] != null && eventNotes[0].strumTime < Conductor.songPosition){
 				var note = eventNotes.shift();
 				try{
-					note.hit((note.mustPress ? 0 : 1),note);
+					if(note.eventNote){
+						note.hit((note.mustPress ? 0 : 1),note);
+					}else{
+						note.dadNotePress(false);
+					}
 					note.destroy();
 				}catch(e){
 					if(note != null){
@@ -2855,8 +2859,8 @@ class PlayState extends ScriptMusicBeatState
 							if(daNote.mustPress && swagRect.height < 0 ) {goodNoteHit(daNote);continue;}
 
 							daNote.clipRect = swagRect;
-							daNote.susHit(if(daNote.mustPress) 0 else 1,daNote);
-							callInterp("susHit" + (if(daNote.mustPress) "" else "Dad"),[daNote]);
+							daNote.susHit((daNote.mustPress) ? 0 : 1,daNote);
+							callInterp((daNote.mustPress) ? "susHit" : "susHitDad",[daNote]);
 						}
 					}
 					
@@ -2875,8 +2879,8 @@ class PlayState extends ScriptMusicBeatState
 				}
 
 				daNote.visible = false;
-				daNote.kill();
-				notes.remove(daNote, true);
+				notes.remove(daNote);
+				daNote.destroy();
 			}
 		}
 		SEProfiler.qStamp('note updating');

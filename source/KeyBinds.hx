@@ -24,7 +24,7 @@ class KeyBinds
 		["A","S","D","F","J","K","L","SEMICOLON"],
 		["A","S","D","F","SPACE","J","K","L","SEMICOLON"],
 		["Q","W","E","R","V","N","U","I","O","P"],
-		["Q","W","E","R","V","Space","N","U","I","O","P"],
+		["Q","W","E","R","V","SPACE","N","U","I","O","P"],
 		["A","S","D","F","C","V","N","M","J","K","L","SEMICOLON"],
 		["A","S","D","F","C","V","SPACE","N","M","J","K","L","SEMICOLON"],
 		["Q","W","E","R","S","D","F","J","K","L","U","I","O","P"],

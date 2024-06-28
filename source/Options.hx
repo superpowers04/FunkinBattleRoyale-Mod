@@ -847,8 +847,8 @@ class VolumeOption extends Option
 	override function right():Bool {
 		Reflect.setField(SESave.data,opt+"Vol", Reflect.field(SESave.data,opt+"Vol") + (if(FlxG.keys.pressed.SHIFT) 0.01 else 0.1));
 
-		if (Reflect.field(SESave.data,opt+"Vol") > 1)
-			Reflect.setField(SESave.data,opt+"Vol", 1);
+		if (Reflect.field(SESave.data,opt+"Vol") > 2)
+			Reflect.setField(SESave.data,opt+"Vol", 2);
 		// display = updateDisplay();
 		return true;
 	}
