@@ -393,11 +393,14 @@ class ReloadCharlist extends Option
 		acceptValues = true;
 		display = "Reload Char/Stage List";
 	}
-	public override function press():Bool
-	{
+	public static function RELOAD(){
 		SELoader.AssetPathCache = [];
 		TitleState.checkCharacters();
 		TitleState.loadNoteAssets(true,true);
+	}
+	public override function press():Bool
+	{
+		RELOAD();
 
 		// SickMenuState.reloadMusic = true;
 		return true;
@@ -748,14 +751,13 @@ class HCBoolOption extends Option{
 	public override function press():Bool{
 		try{
 
-		Reflect.setProperty(SESave.data,id,Reflect.getProperty(SESave.data,id) != true);
-		display = updateDisplay();
-		if(callback!=null)callback();
-		return true;
+			Reflect.setProperty(SESave.data,id,Reflect.getProperty(SESave.data,id) != true);
+			display = updateDisplay();
+			if(callback!=null)callback();
 		}catch(e){
 			FuckState.FUCK(e,'options.press');
-			return true;
 		}
+		return true;
 	}
 
 	override function updateDisplay():String

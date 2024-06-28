@@ -735,37 +735,14 @@ class TitleState extends MusicBeatState
 
 			transIn = FlxTransitionableState.defaultTransIn;
 			transOut = FlxTransitionableState.defaultTransOut;
-			
-			// FlxTween.tween(Main.fpsCounter,{alpha:1},0.2);
 
-
-			// HAD TO MODIFY SOME BACKEND SHIT
-			// IF THIS PR IS HERE IF ITS ACCEPTED UR GOOD TO GO
-			// https://github.com/HaxeFlixel/flixel-addons/pull/348
-
-			// var music:FlxSound = new FlxSound();
-			// music.loadStream(Paths.music('freakyMenu'));
-			// FlxG.sound.list.add(music);
-			// music.play();
 			FlxG.sound.playMusic(SELoader.loadSound('assets/music/StartItchBuild.ogg'), 0.1);
 			FlxG.sound.music.pause();
-			// LoadingState.loadingText = new FlxText(FlxG.width * 0.8,FlxG.height * 0.8,"Loading...");
-			// LoadingState.loadingText.setFormat();
 
 			
 			#if android
 
 				FlxG.android.preventDefaultKeys = [BACK];
-				// trace(lime.system.System.applicationStorageDirectory);
-				// var reason = 0;
-				// if(!FileSystem.exists(lime.system.System.applicationStorageDirectory + '/path.txt')){
-				// 	reason = 1;
-				// }else if(!FileSystem.exists(sys.io.File.getContent(FileSystem.exists(lime.system.System.applicationStorageDirectory + '/path.txt')))){
-				// 	reason = 2;
-				// }
-				// if(reason != 0){
-
-				// }
 				var grantedPerms = Main.grantedPerms = android.Permissions.getGrantedPermissions();
 				if(!grantedPerms.contains('android.permission.WRITE_EXTERNAL_STORAGE')){
 					android.Permissions.requestPermission('android.permission.WRITE_EXTERNAL_STORAGE',1);
@@ -830,8 +807,8 @@ class TitleState extends MusicBeatState
 				Alphabet.Frames = null;
 				LoadingScreen.forceHide();
 				LoadingScreen.initScreen();
-				if((CoolUtil.font = if(SELoader.exists('mods/font.ttf')) SELoader.getPath('mods/font.ttf') else Paths.font(CoolUtil.fontName)
-					) != Paths.font("vcr.ttf")) flixel.system.FlxAssets.FONT_DEFAULT = CoolUtil.font;
+				CoolUtil.font = (SELoader.exists('mods/font.ttf') ? SELoader.getPath('mods/font.ttf') : Paths.font(CoolUtil.fontName));
+				if(CoolUtil.font == Paths.font("vcr.ttf")) flixel.system.FlxAssets.FONT_DEFAULT = CoolUtil.font;
 			#end
 			var isUsingPaths = false;
 			if(SELoader.exists('path.txt')){
@@ -976,6 +953,7 @@ class TitleState extends MusicBeatState
 			superLogo = new FlxSprite(0,FlxG.height*0.52);
 		}
 		add(superLogo);
+		lime.app.Application.current.window.setIcon(lime.graphics.Image.fromBitmapData(SELoader.loadBitmap('assets/images/icon64.png')));
 		superLogo.visible = false;
 		superLogo.screenCenter(X);
 
