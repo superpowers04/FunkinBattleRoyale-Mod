@@ -671,7 +671,8 @@ class AnimationDebug extends MusicBeatState
 			if (SELoader.exists(chara.loadedFrom)) {backed=true;SELoader.copy(chara.loadedFrom,chara.loadedFrom + "-bak.json");}
 			SELoader.triggerSave(chara.loadedFrom,Json.stringify(charJson, "fancy"));
 			showTempmessage('Saved to ${if (chara.loadedFrom.length > 20) '...' + chara.loadedFrom.substring(-20) else chara.loadedFrom} successfully.' + (if(backed) "Old json was backed up to -bak.json." else ""));
-			FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
+			// FlxG.sound.play(Paths.sound("scrollMenu"), 0.4);
+			SELoader.playSound('assets/sounds/scrollMenu.ogg',0.4);
 			spawnChar(true);
 
 
@@ -840,7 +841,12 @@ class AnimationDebug extends MusicBeatState
 		if(uiMap['animFPS'] == null){
 			chara.addAnimation("ANIMATIONDEBUG_tempAnim",name,24);
 		}else{
-			chara.addAnimation("ANIMATIONDEBUG_tempAnim",name,Std.int(uiMap['animFPS'].value),uiMap['loop'].checked,uiMap['flipanim'].checked);
+			var indices = [];
+			if((uiMap['animFinish'].value == 0))
+				indices == null;
+			else
+				for(i in uiMap['animStart'].value...uiMap['animFinish'].value) indices.push(i);
+			chara.addAnimation("ANIMATIONDEBUG_tempAnim",name,indices,Std.int(uiMap['animFPS'].value),uiMap['loop'].checked,uiMap['flipanim'].checked);
 
 		}
 		chara.playAnim("ANIMATIONDEBUG_tempAnim");
@@ -923,13 +929,15 @@ class AnimationDebug extends MusicBeatState
 		{
 			// trace('Drop3: ${Std.parseInt(anim)}');
 			animUICurName = charAnims[Std.parseInt(anim)];
-			if(animUICurName == "**Unbind"){
+			if(animUICurName.toLowerCase() == "**unbind"){
 				if(charAnims[1] != null) animUICurName = charAnims[1];
 				chara.alpha = 0.5;
 			}else{
 				chara.alpha = 1;
 			}
 			if(animUICurName != "**Unbind") playTempAnim(animUICurName);
+			uiMap["animStart"].value = 0;
+			uiMap["animFinish"].value = 0;
 			// uiMap["animSel"].text = charAnims[Std.parseInt(anim)];
 		});
 		animDropDown3.selectedLabel = '';animDropDown3.cameras = [camHUD];
@@ -971,6 +979,10 @@ class AnimationDebug extends MusicBeatState
 		uiMap["animFPS"] = new FlxUINumericStepper(140, 110, 1, 24);
 		uiMap["looptxt"] = new FlxText(10, 130,0,"Loop start frame");
 		uiMap["loopStart"] = new FlxUINumericStepper(140, 130, 1, 0,0);
+		uiMap["AnimationLengthText"] = new FlxText(10, 130,0,"Animation Start > Finish");
+		uiMap["animStart"] = new FlxUINumericStepper(140, 130, 1, 0,0);
+		uiMap["animFinish"] = new FlxUINumericStepper(140, 130, 1, 0,0);
+		uiMap["animStart"].callback = uiMap["animFinish"].callback = function(_,_) {updateTempAnim();};
 
 		uiMap["animFPS"].callback = function(value,_){ updateTempAnim();};
 
@@ -978,7 +990,10 @@ class AnimationDebug extends MusicBeatState
 			try{
 
 				var Anim = uiMap["animSel"].text;
-				editAnimation(Anim, (animUICurName == "**Unbind") ? null : {
+				var indices = [];
+				if(uiMap['animFinish'].value != 0) for(i in uiMap['animStart'].value...uiMap['animFinish'].value) indices.push(i);
+				trace(indices);
+				editAnimation(Anim, (animUICurName.toLowerCase() == "**unbind") ? null : {
 					anim: Anim,
 					name: animUICurName,
 					loop: uiMap["loop"].checked,
@@ -986,7 +1001,7 @@ class AnimationDebug extends MusicBeatState
 					noreplaywhencalled:!uiMap["restplay"].checked,
 					fps: Std.int(uiMap["animFPS"].value),
 					loopStart:Std.int(uiMap["loopStart"].value),
-					indices: [],
+					indices: indices,
 					priority:Std.int(uiMap["priorityText"].value)
 				});
 				
@@ -1016,18 +1031,31 @@ class AnimationDebug extends MusicBeatState
 					// 	if(checkAnim.contains('left')) checkAnim.replace('left','right');
 					// 	else if(checkAnim.contains('right')) checkAnim.replace('right','left');
 					// }
-					for(n in ['left','down','up','right']){
-						if(checkAnim.contains(n)){
-							if(_animName == "") _animName = "sing";
-							if(flipped){
-								_animName += (n=="left" ? "right" :(n=="right" ? "left" : n));
-							}else{
-								_animName += '${n}';
-							}
-							break;
-						}
+					// for(n in ['left','down','up','right']){
+					// 	if(!checkAnim.contains(n)) continue;
+					// 	if(_animName == "") _animName = "sing";
+					// 	if(flipped){
+					// 		_animName += (n=="left" ? "right" :(n=="right" ? "left" : n));
+					// 	}else{
+					// 		_animName += '${n}';
+					// 	}
+					// 	break;
+						
+					// }
+					// I promise, this is faster
+					if(checkAnim.contains('left')){
+						if(_animName == "") _animName = "sing";
+						_animName += flipped ? "right" : 'left';
+					}else if(checkAnim.contains('right')){
+						if(_animName == "") _animName = "sing";
+						_animName += flipped ? 'left' : "right";
+					}else if(checkAnim.contains('up')){
+						if(_animName == "") _animName = "sing";
+						_animName += 'up';
+					}else if(checkAnim.contains('down')){
+						if(_animName == "") _animName = "sing";
+						_animName += 'down';
 					}
-					trace('$_animName $checkAnim $animation');
 
 					if(checkAnim.contains('miss'))_animName += 'miss';
 					if(checkAnim.contains('alt'))_animName += '-alt';
@@ -1035,6 +1063,7 @@ class AnimationDebug extends MusicBeatState
 
 
 					if(_animName == "") continue;
+					trace('$_animName $checkAnim $animation');
 					if(Character.animCaseInsensitive[_animName] != null) _animName = Character.animCaseInsensitive[_animName];
 					
 					editAnimation(_animName,{
@@ -1067,9 +1096,9 @@ class AnimationDebug extends MusicBeatState
 			[uiMap["priorityText"],uiMap["prioritytxt"]],
 			[uiMap["animFPS"],uiMap["animtxt"]],
 			[uiMap["loopStart"],uiMap["looptxt"]],
+			[uiMap["animStart"],uiMap["animFinish"],uiMap["AnimationLengthText"]],
 			null,
-			[autoDetAnims],
-			[uiMap["commitButton"]],
+			[uiMap["commitButton"],null,null,null,null,null,autoDetAnims],
 
 		]});
 

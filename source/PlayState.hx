@@ -417,44 +417,44 @@ class PlayState extends ScriptMusicBeatState
 			return ((interps['${nameSpace}-${v}'] == null));
 		}
 		public override function callInterp(func_name:String, args:Array<Dynamic>,?id:String = "") { // Modified from Modding Plus, I am too dumb to figure this out myself
-				
-				try{
-					switch(func_name){
-						case ("noteHitDad"):{
-							charCall("noteHitSelf",[args[1]],1);
-							charCall("noteHitOpponent",[args[1]],0);
-						}
-						case ("noteHit"):{
-							charCall("noteHitSelf",[args[1]],0);
-							charCall("noteHitOpponent",[args[1]],1);
-						}
-						case ("susHitDad"):{
-							charCall("susHitSelf",[args[1]],1);
-							charCall("susHitOpponent",[args[1]],0);
-						}
-						case ("susHit"):{
-							charCall("susHitSelf",[args[1]],0);
-							charCall("susHitOpponent",[args[1]],1);
-						}
-
+			
+			try{
+				switch(func_name){
+					case ("noteHitDad"):{
+						charCall("noteHitSelf",[args[1]],1);
+						charCall("noteHitOpponent",[args[1]],0);
 					}
-				}catch(e){return MainMenuState.handleError('${func_name} for "${id}":\n $e');}
-				try{
-					args.insert(0,this);
-					if (id == "") {
-						for (name => interp in interps) {
-							callSingleInterp(func_name,args,name,interp);
-						}
-						if(Console.instance != null && Console.instance.commandBox != null){
-							if(Console.instance.commandBox.interp != null) callSingleInterp(func_name,args,'console-hx',Console.instance.commandBox.interp);
-							#if linc_luajit
-								if(Console.instance.commandBox.selua != null) callSingleInterp(func_name,args,'console-lua',Console.instance.commandBox.selua);
-							#end
-						}
-					}else callSingleInterp(func_name,args,id);
-				}catch(e:hscript.Expr.Error){handleError('${func_name} for "${id}":\n ${e.toString()}');}
+					case ("noteHit"):{
+						charCall("noteHitSelf",[args[1]],0);
+						charCall("noteHitOpponent",[args[1]],1);
+					}
+					case ("susHitDad"):{
+						charCall("susHitSelf",[args[1]],1);
+						charCall("susHitOpponent",[args[1]],0);
+					}
+					case ("susHit"):{
+						charCall("susHitSelf",[args[1]],0);
+						charCall("susHitOpponent",[args[1]],1);
+					}
 
-			}
+				}
+			}catch(e){return MainMenuState.handleError('${func_name} for "${id}":\n $e');}
+			try{
+				args.insert(0,this);
+				if (id == "") {
+					for (name => interp in interps) {
+						callSingleInterp(func_name,args,name,interp);
+					}
+					if(Console.instance != null && Console.instance.commandBox != null){
+						if(Console.instance.commandBox.interp != null) callSingleInterp(func_name,args,'console-hx',Console.instance.commandBox.interp);
+						#if linc_luajit
+							if(Console.instance.commandBox.selua != null) callSingleInterp(func_name,args,'console-lua',Console.instance.commandBox.selua);
+						#end
+					}
+				}else callSingleInterp(func_name,args,id);
+			}catch(e:hscript.Expr.Error){handleError('${func_name} for "${id}":\n ${e.toString()}');}
+
+		}
 
 	public function throwError(?error:String = "",?forced:Bool = false) {
 		handleError(error,forced);
@@ -493,18 +493,19 @@ class PlayState extends ScriptMusicBeatState
 			var _forced = (!songStarted && !forced && playCountdown);
 			generatedMusic = persistentUpdate = false;
 			persistentDraw = true;
-			if(FinishSubState.instance != null){
-				// showTempmessage('Error! ${error}',FlxColor.RED);
-				FinishSubState.instance.destroy();
-				doUpdate=false;
-				openSubState(new ErrorSubState(0,0,error,true));
-				canPause = true;
-				return;
-			}
+			// if(FinishSubState.instance != null){
+			// 	// showTempmessage('Error! ${error}',FlxColor.RED);
+			// 	FinishSubState.instance.destroy();
+			// 	doUpdate=false;
+			// 	openSubState(new ErrorSubState(0,0,error,true));
+			// 	canPause = true;
+			// 	return;
+			// }
 			// _forced
 			Main.game.blockUpdate = Main.game.blockDraw = false;
 			doUpdate=false;
-			openSubState(new FinishSubState(0,0,error,true));
+			openSubState(new ErrorSubState(0,0,error,true));
+			// openSubState(new FinishSubState(0,0,error,true));
 		}catch(e){
 			trace('${e.message}\n${e.stack}');MainMenuState.handleError(error);
 		}
@@ -634,6 +635,7 @@ class PlayState extends ScriptMusicBeatState
 		for (i in 0 ... scripts.length) {
 			var v = scripts[i];
 			LoadingScreen.loadingText = 'Loading scripts: $v';
+			loadSingleScript(v);
 		}
 
 	}
@@ -675,6 +677,8 @@ class PlayState extends ScriptMusicBeatState
 		clearVariables();
 		hasStarted = true;
 		logGameplay = SESave.data.logGameplay;
+		if(FinishSubState.instance != null) FinishSubState.instance.destroy();
+		if(ErrorSubState.instance != null) ErrorSubState.instance.destroy();
 
 
 		FlxG.sound.music?.stop();
@@ -861,22 +865,23 @@ class PlayState extends ScriptMusicBeatState
 					gf.y = 100;
 					gf.playAnim('songStart');
 				}catch(e){
-					handleError((if(SESave.data.persistGF) 'Crashed while setting up GF, maybe try disabling persistant GF in your options? ' else 'Crash while trying to setup GF:') + '${e.message}\n${e.stack}');
+					handleError((SESave.data.persistGF ? 'Crashed while setting up GF, maybe try disabling persistant GF in your options? ' : 'Crash while trying to setup GF:') + '${e.message}\n${e.stack}');
 					gf = new EmptyCharacter(770,100);
 				}
 			}
 			gf.scrollFactor.set(0.95, 0.95);
 			
 			LoadingScreen.loadingText = "Loading opponent";
-			if (!ChartingState.charting && SONG.player1 == "gf" && SESave.data.charAuto) player1 = "gf";
-			if (!ChartingState.charting && SONG.player2 == "gf" && SESave.data.charAuto) player2 = "gf";
+			if(!ChartingState.charting && SESave.data.charAuto){
+				if (SONG.player1 == "gf") player1 = "gf";
+				if (SONG.player2 == "gf") player2 = "gf";
+			}
 
 			// if(dad == null || !SESave.data.persistOpp || (!(dadShow || SESave.data.dadShow) && !Std.isOfType(dad,EmptyCharacter)) || dad.getNamespacedName() != player2){
-			if(player2 == "gf"){
-				dad = gf;
-			}else if (_dadShow)
-				dad = {x:100, y:100, charInfo:player2CharInfo,isPlayer:false,charType:1};
-			else dad = new EmptyCharacter(100, 100);
+
+			dad = player2 == "gf" ? gf 
+			: _dadShow ? {x:100, y:100, charInfo:player2CharInfo,isPlayer:false,charType:1}
+				: new EmptyCharacter(100, 100);
 			dad.playAnim("songStart");
 			// }else{
 				// dad.x = 100;

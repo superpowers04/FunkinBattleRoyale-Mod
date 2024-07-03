@@ -49,15 +49,15 @@ class ErrorSubState extends MusicBeatSubstate {
 			PlayState.instance.generatedMusic = PlayState.instance.handleTimes = PlayState.instance.acceptInput = false;
 			PlayState.instance.camHUD.alpha = PlayState.instance.camTOP.alpha = 1;
 		}
+		FlxG.state.persistentUpdate = false;
 		super();
 
 
 
-		FlxG.state.persistentUpdate = false;
 		cam = new FlxCamera();
 		FlxG.cameras.add(cam);
 		// FlxG.cameras.setDefaultDrawTarget(cam,true);
-		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]]; 
+		cameras = [cam]; 
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.alpha = 0;
 		bg.scrollFactor.set();
@@ -111,6 +111,7 @@ class ErrorSubState extends MusicBeatSubstate {
 		add(errText);
 		add(contText);
 		add(reportText);
+		SELoader.playSound('assets/sounds/cancelMenu.ogg',true);
 		FlxG.camera.zoom = 1;
 				
 			

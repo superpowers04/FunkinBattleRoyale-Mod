@@ -166,7 +166,7 @@ class OptionsMenu extends MusicBeatState
 		new OptionCategory("Compatibility", [
 			new HCBoolOption("Legacy hurt notes","Load legacy Tricky mod format notes","useHurtArrows"),
 			new HCBoolOption("Seperate PE chars from SE Chars","Add -pe to Psych character ID's to prevent conflicts","PECharSeperate",ReloadCharlist.RELOAD),
-			new HCBoolOption("Add Psych Engine Characters","(Requires a reload of character list) Allows Psych characters to load. Psych Characters are not properly implemented yet","PECharLoading",ReloadCharlist.RELOAD),
+			new HCBoolOption("Add Psych Engine Characters","(Requires a reload of character list) Allows Psych characters to load.\nPsych Characters are not properly implemented yet","PECharLoading",ReloadCharlist.RELOAD),
 			new HCBoolOption("Load Psych Events","Attempts to load Psych events from songs(Experimental)","loadPsychEvents"),
 			new HCBoolOption("Quick reloading songs","Allows songs to quick-reload when you restart. This can break some songs","QuickReloading"),
 		],'Toggle compatibility with specific features from mods/engines'),

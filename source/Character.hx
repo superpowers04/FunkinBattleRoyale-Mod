@@ -999,7 +999,7 @@ class CharAnimController extends FlxAnimationController{
 	}
 
 	override function update(elapsed:Float) {
-		try{
+		// try{
 
 			if(amPreview || debugMode || animation.curAnim == null) return super.update(elapsed);
 
@@ -1028,7 +1028,7 @@ class CharAnimController extends FlxAnimationController{
 			callInterp("update",[elapsed]);
 
 			super.update(elapsed);
-		}catch(e:Dynamic){handleError('Caught character "update" crash: ${e}');}
+		// }catch(e:Dynamic){handleError('Caught character "update" crash: ${e}');}
 	}
 
 	
@@ -1226,7 +1226,7 @@ class CharAnimController extends FlxAnimationController{
 			animationList.push({
 				anim : anim,
 				name : prefix,
-				indices : (if (indices != null && indices.length > 0)indices else []),
+				indices : ((indices != null && indices.length > 0) ? indices : []),
 				fps : fps,
 				loop : loop
 			});

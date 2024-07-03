@@ -12,7 +12,7 @@ import flixel.FlxBasic;
 import se.formats.Song;
 import flixel.FlxObject;
 
-class SENotification extends FlxGroup{
+class SENotification extends SEGroup{
 	public static var currentNotification:SENotification;
 	public static function removal(){
 		if(currentNotification == null) return;
@@ -34,29 +34,7 @@ class SENotification extends FlxGroup{
 
 		SENotification.show('Now Playing:',notificationStr);
 	}
-	var x(default,set):Float = 0;
-	var y(default,set):Float = 0;
-	public function set_x(v){
-		for (member in members){
-			var member = cast(member,FlxObject);
-			member.x+=(-x)+v;
-		}
-		return x=v;
-	}
-	public function set_y(v){
-		for (member in members){
-			var member = cast(member,FlxObject);
-			member.y+=(-y)+v;
-		}
-		return y=v;
-	}
-	override public function add(b:FlxBasic):FlxBasic{
-		if(b == null) return b;
-		var e = cast(super.add(b),FlxObject);
-		e.x+=x;
-		e.y+=y;
-		return e;
-	}
+
 	var bg:FlxSprite;
 	public function new(title:String="you've been distracted",content:String="",duration:Float=5,direction:Int = 1){
 		super();

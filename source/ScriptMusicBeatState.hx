@@ -561,6 +561,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 					callInterp('update',[e]);
 					if(cancelCurrentFunction) return;
 				}
+				
 				super.update(e);
 			}
 			override public function openSubState(s:FlxSubState){

@@ -106,7 +106,7 @@ class FuckState extends FlxUIState {
 						"Ow, that really hurt :(",
 						"missingno",
 						"Did I ask for your opinion?",
-						"Oh lawd he crashing",
+						"Oh lawd it crashing",
 						"get stickbugged lmao",
 						"Mom? Come pick me up. I'm scared...",
 						"It's just standing there... Menacingly.",
@@ -134,7 +134,11 @@ class FuckState extends FlxUIState {
 						'you\'re mother',
 						'sex pt 2: electric boobaloo',
 						'sex pt 3: gone wrong',
-						'the stalemate button was boobytrapped'
+						'the stalemate button was boobytrapped',
+						'mf shoulda just stayed with psych engine :sob:',
+						'super engine moment',
+						'Another one bites the dust',
+						"It's fine, everything is good. What do you mean this is a crash report?"
 						
 					];
 					funnyQuip = jokes[Std.int(Math.random() * jokes.length - 1) ]; // I know, this isn't FlxG.random but fuck you the game just crashed

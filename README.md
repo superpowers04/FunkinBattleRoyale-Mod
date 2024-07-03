@@ -1,21 +1,25 @@
+# DO NOT USE RELEASES TO DOWNLOAD, I USE GITHUB ACTIONS FOR UPDATES, THE RELEASE IS FROM 2022 AND IS NO LONGER SUPPORTED
+## To download: 
+Click on [Actions](https://github.com/superpowers04/Super-Engine/actions), select a commit and go to the artifacts to download, you need a github account to download artifacts
+
 # Super Engine (Unstable) [![Build](https://github.com/superpowers04/FunkinBattleRoyale-Mod/actions/workflows/main.yml/badge.svg)](https://github.com/superpowers04/FunkinBattleRoyale-Mod/actions/workflows/main.yml)
-An overhaul of [Funkin Battle Royale](https://github.com/XieneDev/FunkinBattleRoyale/) and [Kade Engine](https://github.com/KadeDev/Kade-Engine) to add a whole bunch of features.
+A custom engine based on [Funkin Battle Royale](https://github.com/XieneDev/FunkinBattleRoyale/) and very loosely based on [Kade Engine](https://github.com/KadeDev/Kade-Engine) to add a whole bunch of features such as
 - No base game bloat
-- Easy to setup custom characters 
-- One single install for all of your mods
-- Error handling that rarely ever needs you to restart the game
-- A bunch of customization to make the engine tailored to how you want to play
-- Dragging charts into the game's window/mod folder to play them without much setup
-- Scripting capabilities that allow you to add mechanics, features, new input systems or out-right overhauls
-- Easy importing of existing mods so you can play charts with a (hopefully) better input system and user experience
+- No hardcoding(Except for BF, GF and the default stage to provide fallbacks)
+- Scriptable songs, states, stages and characters using HScript that allows you extensive control over the game allowing for new mechanics, custom features, overhauls and more(Eventually I'll add lua support. it's technically implemented but extremely broken)
+- Customizability for most of the features in the engine to make the engine how you want it
+- Basic support for Psych Engine, VSlice, and base game mod folders(In some cases you can just symlink or drag and drop a folder for a mod into your `mods/packs` folder and all of the charts will just appear)
+- Error handling that'll never have you restart the game because a chart was missing(why is this an issue in other engines :sob:)
+- Drag and drop charts into the game's window to play them
 - Multikey support
 
-All without recompiling the game at all or editing source code. Infact, editing source code is discouraged unless you're going to directly contribute to the engine or make a fork of the engine.
+All without recompiling the game at all or editing source code.
+<br>Infact, editing source code is discouraged unless you're going to directly contribute to the engine or make a fork of the engine.
 
 This is powered by a modded version of [Kade Engine](https://github.com/KadeDev/Kade-Engine) with a hint of [FPSPlus](https://github.com/ThatRozebudDude/FPS-Plus-Public/) added in and with some inspiration from [Psych Engine](https://github.com/ShadowMario/FNF-PsychEngine)/[FNF Multi](https://shadowmario.itch.io/funkinmulti) <br>
 I do not own Friday Night Funkin, Kade Engine or Funkin Battle Royale, I'd highly recommend checking them out.
 
- Click on a commit and go to the artifacts to download, you need a github account to download artifacts
+
 <br>You can find downloads, custom content, get help and more at the [Super Engine Discord server](https://discord.gg/28GPGTRuuR)
 <br><br>Note that due to the setup on my end, I push commits all at once, so pull requests and other things might be out of date and need to be merged manually
 # Modding information
@@ -38,12 +42,9 @@ Links: **[itch.io page](https://ninja-muffin24.itch.io/funkin) ⋅ [Newgrounds](
 **Kade Engine** is a mod for Friday Night Funkin', including a full engine rework, replays, and more.
 
 Links: **[GameBanana mod page](https://gamebanana.com/gamefiles/16761) ⋅ [play in browser](https://funkin.puyo.xyz) ⋅ [latest stable release](https://github.com/KadeDev/Kade-Engine/releases/latest)
-
 ## Friday Night Funkin' Modding Plus
 Friday Night Funkin' Modding Plus is a mod of Friday Night Funkin' that aims to make modding easier.
 Links: **[GameBanana mod page](https://gamebanana.com/gamefiles/14264) ⋅ [latest stable release](https://github.com/FunkinModdingPlus/ModdingPlus/releases/)
-
-
 # Credits for everything
 <small>I think I got everyone, lemmie know if I missed anyone</small>
 ## Friday Night Funkin'
