@@ -880,7 +880,7 @@ class PlayState extends ScriptMusicBeatState
 			// if(dad == null || !SESave.data.persistOpp || (!(dadShow || SESave.data.dadShow) && !Std.isOfType(dad,EmptyCharacter)) || dad.getNamespacedName() != player2){
 
 			dad = player2 == "gf" ? gf 
-			: _dadShow ? {x:100, y:100, charInfo:player2CharInfo,isPlayer:false,charType:1}
+				: _dadShow ? {x:100, y:100, charInfo:player2CharInfo,isPlayer:false,charType:1}
 				: new EmptyCharacter(100, 100);
 			dad.playAnim("songStart");
 			// }else{
