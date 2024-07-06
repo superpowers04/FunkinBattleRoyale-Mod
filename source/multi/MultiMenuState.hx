@@ -529,6 +529,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		}
 		var songInfo:SongInfo = cast grpSongs.members[sel].menuValue;
 		onlinemod.OfflinePlayState.nameSpace = "";
+		PlayState.songInfo = songInfo;
 		if(songInfo.namespace != null){
 			onlinemod.OfflinePlayState.nameSpace = songInfo.namespace;
 			trace('Using namespace ${onlinemod.OfflinePlayState.nameSpace}');

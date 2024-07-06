@@ -66,41 +66,40 @@ class OfflinePlayState extends PlayState {
 		#if(target.threaded)
 		var voicesThread = new ThreadedAction(() -> { // Offload to another thread for faster loading
 		#end
-			if(loadedVoices == null || lastVoicesFile != voicesFile){
+			// if(loadedVoices == null || lastVoicesFile != voicesFile){
 
 				if(voicesFile != ""){
 					try{
-						loadedVoices = SELoader.loadFlxSound(voicesFile);
+						// loadedVoices = SELoader.loadFlxSound(voicesFile);
+						vocals.load(voicesFile);
 					}catch(e){
 						trace('Unable to load voices ${e.details()}');
-						loadedVoices = new FlxSound();
+						// loadedVoices = new FlxSound();
 						PlayState.SONG.needsVoices = false;
 					}
 				}else if(voicesFile == "" && PlayState.SONG != null){
-					loadedVoices = new FlxSound();
+					// loadedVoices = new FlxSound();
+					vocals.clear();
 					PlayState.SONG.needsVoices = false;
 				}
-				if(loadedVoices.length < 1){
+				if(vocals.sounds.length < 1){
 					trace('Voices.ogg didn\'t load properly. Try converting to MP3 and then into OGG Vorbis');
 				}
+				final songInfo = PlayState.songInfo;
+				if(songInfo != null && songInfo.extraVoices.length > 0){
+					for(path in songInfo.extraVoices){
+						trace('Loading extra voices $path');
+						vocals.load(path);
+					}
+				}
 
-			}
+			// }
 		#if(target.threaded)
 		});
 		#end
 
 		if(loadedInst == null || lastInstFile != instFile){ // This doesn't need to be threaded
 			try{
-
-				if(instFile == null || instFile == ""){
-					var list = [
-							'assets/onlinedata/songs/${chartFile.substring(chartFile.lastIndexOf('/')+1,chartFile.lastIndexOf('.'))}/Inst.ogg',
-							'assets/onlinedata/songs/${PlayState.actualSongName.toLowerCase()}/Inst.ogg',
-							'assets/onlinedata/songs/${PlayState.songDir.toLowerCase()}/Inst.ogg',
-							'assets/onlinedata/songs/${PlayState.SONG.song.toLowerCase()}/Inst.ogg'
-						];
-					instFile = SELoader.anyExists(list,"");
-				}
 				if (instFile == null || instFile == ""){ // why the fuck is instFile null? :sob:
 					throw('${PlayState.actualSongName} is missing a inst file!');
 				}
@@ -112,11 +111,11 @@ class OfflinePlayState extends PlayState {
 		#if(target.threaded)
 		voicesThread.wait();
 		#end
-		if(loadedVoices != null)loadedVoices.time = 0;
+		// if(loadedVoices != null)loadedVoices.time = 0;
 
 		lastInstFile = instFile;
 		lastVoicesFile = voicesFile;
-		loadedVoices.persist = true;
+		// loadedVoices.persist = true;
 
 		SEProfiler.qStamp('Loading Music');
 		trace('Loaded $voicesFile, $instFile');
@@ -164,13 +163,13 @@ class OfflinePlayState extends PlayState {
 
 		PlayState.stateType=stateType;
 
-		if (shouldLoadSongs) loadSongs();
 
 		var oldScripts:Bool = false;
 		if(willChart){ // Loading scripts is redundant when we're just going to go into charting state
 			oldScripts = QuickOptionsSubState.getSetting("Song hscripts");
 			QuickOptionsSubState.setSetting("Song hscripts",false);
 		}
+		if (shouldLoadSongs) loadSongs();
 		super.create();
 
 
@@ -195,7 +194,7 @@ class OfflinePlayState extends PlayState {
 		super.startCountdown();
 	}
 	  override function generateSong(?dataPath:String = ""){
-		vocals = ((PlayState.SONG.needsVoices && Math.abs(loadedVoices.length - loadedInst.length) < 20000) ? loadedVoices : new FlxSound());
+		// vocals = ((PlayState.SONG.needsVoices ? loadedVoices : new FlxSound());
 		super.generateSong(dataPath);
 
   }

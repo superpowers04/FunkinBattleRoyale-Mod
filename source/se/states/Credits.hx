@@ -48,7 +48,7 @@ class Credits extends SearchMenuState
 "],['Libraries',"All of the libraries Super Engine uses or has custom versions of
 
 * Haxe - Coding language
-* Lime/OpenFL - Too much to list here :skul:
+* Lime/OpenFL - The reimplementation 
 * Flixel - Game Engine
 
 * extension-androidtools - Some tools related to android support

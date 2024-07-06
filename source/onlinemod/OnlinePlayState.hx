@@ -224,7 +224,7 @@ class OnlinePlayState extends PlayState
 
 		// curSong = songData.song;
 
-		vocals = (PlayState.SONG.needsVoices ? loadedVoices : new FlxSound());
+		// vocals = (PlayState.SONG.needsVoices ? loadedVoices : new FlxSound());
 		super.generateSong(dataPath);
 
 		// Instantly get note id's, if this isn't done now, a note might not get added to the list

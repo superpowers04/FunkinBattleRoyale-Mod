@@ -498,6 +498,11 @@ class SELoader {
 	public static function createDirectory(path:String){
 		return FileSystem.createDirectory(getPath(path));
 	}
+	public static function createDirUnlessExists(path:String){
+		var p = getPath(path);
+		if(FileSystem.exists(p)) return;
+		return FileSystem.createDirectory(p);
+	}
 	public static function copy(from:String,to:String){
 		return File.copy(getPath(from),getPath(to));
 	}
@@ -592,6 +597,20 @@ class SELoader {
 							song.voices=folder.appendPath('Voices-$p$t.ogg');
 						}
 						if(!exists(song.voices)) song.voices=folder.appendPath('Voices.ogg');
+
+						var oe = e.playData.characters.opponent;
+						var opponentVoices = folder.appendPath('Voices-$oe$t.ogg');
+						while(!exists(song.voices)){
+							var index = oe.lastIndexOf('-');
+							if(index == -1){
+								opponentVoices=folder.appendPath('Voices-$oe.ogg');
+								break;
+							}
+							oe = oe.substring(0,index);
+							opponentVoices=folder.appendPath('Voices-$oe$t.ogg');
+						}
+						if(exists(opponentVoices)) song.extraVoices.push(opponentVoices);
+
 						song.inst = folder.appendPath('Inst$t.ogg');
 						if(!exists(song.inst)) song.inst = folder.appendPath('Inst.ogg');
 						for (diff in e.playData.difficulties){

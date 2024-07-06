@@ -99,6 +99,7 @@ class SearchMenuState extends ScriptMusicBeatState {
 		if (/*SESave.data.songUnload && */PlayState.SONG != null) {PlayState.SONG = null;} // I'm not even sure if this is needed but whatever
 		ChartingState.charting = false;
 		PlayState.songDifficulties = [];
+		PlayState.songInfo=null;
 		PlayState.nameSpace = "";
 		PlayState.scripts = [];
 		PlayState.hsBrTools = null;

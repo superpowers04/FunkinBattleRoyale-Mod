@@ -156,43 +156,29 @@ class OnlineLoadState extends MusicBeatState
 
 					// Set difficulty
 					PlayState.storyDifficulty = 1;
-					if (StringTools.endsWith(jsonInput.toLowerCase(), '-hard'))
-					{
+					if (StringTools.endsWith(jsonInput.toLowerCase(), '-hard')) {
 						PlayState.storyDifficulty = 2;
 					}
-					else if (StringTools.endsWith(jsonInput.toLowerCase(), '-easy'))
-					{
+					else if (StringTools.endsWith(jsonInput.toLowerCase(), '-easy')) {
 						PlayState.storyDifficulty = 0;
 					}
 
-					if (FileSystem.exists(Paths.json(folder.toLowerCase() + '/' + jsonInput.toLowerCase()))) // In case of a vanilla song
-					{
-						customSong = false;
 
-						loadVoices('assets/songs/${folder.toLowerCase()}/Voices.ogg');
-						loadInst('assets/songs/${folder.toLowerCase()}/Inst.ogg');
+					customSong = true;
 
-						// Set week
-						PlayState.storyWeek = weeks[folder.toLowerCase()];
-						Paths.setCurrentLevel("week" + PlayState.storyWeek);
-					}
-					else // In case of a custom song
-					{
-						customSong = true;
+					SELoader.createDirUnlessExists('assets/onlinedata/data/${folder.toLowerCase()}');
+					SELoader.saveBytes('./assets/onlinedata/data/${folder.toLowerCase()}/${jsonInput.toLowerCase()}.json', file);
+					
+					if (SELoader.exists('./assets/onlinedata/songs/${folder.toLowerCase()}/Voices.ogg')) // If Voices.ogg has already been downladed
+						loadVoices('./assets/onlinedata/songs/${folder.toLowerCase()}/Voices.ogg');
+					else
+						requestVoices();
 
-						if (!SELoader.exists('assets/onlinedata/data/${folder.toLowerCase()}')) SELoader.createDirectory('assets/onlinedata/data/${folder.toLowerCase()}');
-						SELoader.saveBytes('assets/onlinedata/data/${folder.toLowerCase()}/${jsonInput.toLowerCase()}.json', file);
-						
-						if (SELoader.exists('assets/onlinedata/songs/${folder.toLowerCase()}/Voices.ogg')) // If Voices.ogg has already been downladed
-							loadVoices('assets/onlinedata/songs/${folder.toLowerCase()}/Voices.ogg');
-						else
-							requestVoices();
-
-						if (FileSystem.exists('assets/onlinedata/songs/${folder.toLowerCase()}/Inst.ogg')) // If Inst.ogg has already been downloaded
-							loadInst('assets/onlinedata/songs/${folder.toLowerCase()}/Inst.ogg');
-						else
-							requestInst();
-					}
+					if (SELoader.exists('./assets/onlinedata/songs/${folder.toLowerCase()}/Inst.ogg')) // If Inst.ogg has already been downloaded
+						loadInst('./assets/onlinedata/songs/${folder.toLowerCase()}/Inst.ogg');
+					else
+						requestInst();
+					
 
 				case Packets.SEND_VOICES:
 					var file:Bytes = cast(data[0], Bytes);

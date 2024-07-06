@@ -17,6 +17,7 @@ package se.formats;
 		return extraVoices;
 	}
 
+
 	var path:String = "";
 	var namespace:String = null;
 	@:optional var categoryID:Int = 0;

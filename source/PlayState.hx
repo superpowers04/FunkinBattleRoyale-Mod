@@ -69,6 +69,8 @@ import CharacterJson;
 import StageJson;
 import TitleState;
 import se.objects.Stage;
+import se.objects.SEJoinedSound;
+import se.formats.SongInfo;
 
 
 
@@ -90,6 +92,7 @@ class PlayState extends ScriptMusicBeatState
 	/* Song Shite */
 		public static var curStage:String = '';
 		public static var SONG:SwagSong;
+		public static var songInfo:SongInfo;
 		public static var actualSongName:String = ''; // The actual song name, instead of the shit from the JSON
 		public static var songDir:String = ''; // The song's directory
 		public static var isStoryMode:Bool = false;
@@ -206,7 +209,7 @@ class PlayState extends ScriptMusicBeatState
 		public static var hitSoundEff:Sound;
 		public static var hurtSoundEff:Sound;
 		static var vanillaHurtSounds:Array<Sound> = [];
-		public var vocals:FlxSound;
+		public var vocals:SEJoinedSound = new SEJoinedSound();
 		var hitSound:Bool = false;
 
 	/* Script Shite*/
@@ -1757,17 +1760,17 @@ class PlayState extends ScriptMusicBeatState
 	}
 	public function generateSong(?dataPath:String = ""){
 
-		var songData = SONG;
+		final songData = SONG;
 		Conductor.changeBPM(songData.bpm);
 
 		curSong = songData.song;
 		// if ( ){
 		// 	if(SONG.needsVoices) trace("Song needs voices but none found! Automatically disabled");
 
-		SONG.needsVoices = (vocals != null);
-		vocals = vocals ?? new FlxSound();
-		vocals.looped = false;
-		FlxG.sound.list.add(vocals);
+		SONG.needsVoices = (vocals.sounds.length > 0);
+		// vocals = vocals ?? new FlxSound();
+		// vocals.looped = false;
+		// FlxG.sound.list.add(vocals);
 
 		callInterp("generateSongBefore",[]);
 		generateNotes();
@@ -2020,10 +2023,11 @@ class PlayState extends ScriptMusicBeatState
 	function resyncVocals():Void {
 		Conductor.songPosition = FlxG.sound.music.time;
 		FlxG.sound.music.play();
-		if(vocals != null && (!vocals.playing || vocals.time > Conductor.songPosition + 5 || vocals.time < Conductor.songPosition - 5)){
-			vocals.time = FlxG.sound.music.time;
-			vocals.play();
-		}
+		vocals.syncToSound(FlxG.sound.music);
+		// if((!vocals.playing || vocals.time > Conductor.songPosition + 5 || vocals.time < Conductor.songPosition - 5)){
+		// 	vocals.time = FlxG.sound.music.time;
+		// 	vocals.play();
+		// }
 		resyncCount++;
 	}
 
@@ -2074,8 +2078,9 @@ class PlayState extends ScriptMusicBeatState
 					// We need to make CERTAIN vocals exist and are non-empty
 					// before we try to play them. Otherwise the game crashes.
 					lime.media.openal.AL.sourcef(FlxG.sound.music._channel.__source.__backend.handle, lime.media.openal.AL.PITCH, speed);
-					if (vocals != null && vocals.length > 0) 
-						lime.media.openal.AL.sourcef(vocals._channel.__source.__backend.handle, lime.media.openal.AL.PITCH, speed);
+					vocals.pitch = speed;
+					// if (vocals != null && vocals.length > 0) 
+						// lime.media.openal.AL.sourcef(vocals._channel.__source.__backend.handle, lime.media.openal.AL.PITCH, speed);
 				}catch (e) {}
 			}
 			#else
@@ -2086,8 +2091,9 @@ class PlayState extends ScriptMusicBeatState
 					// We need to make CERTAIN vocals exist and are non-empty
 					// before we try to play them. Otherwise the game crashes.
 					lime.media.openal.AL.sourcef(FlxG.sound.music._channel.__audioSource.__backend.handle, lime.media.openal.AL.PITCH, speed);
-					if (vocals != null && vocals.length > 0) 
-						lime.media.openal.AL.sourcef(vocals._channel.__audioSource.__backend.handle, lime.media.openal.AL.PITCH, speed);
+					vocals.pitch = speed;
+					// if (vocals != null && vocals.length > 0) 
+						// lime.media.openal.AL.sourcef(vocals._channel.__audioSource.__backend.handle, lime.media.openal.AL.PITCH, speed);
 				}catch (e) {}
 			}
 			#end
@@ -2174,14 +2180,12 @@ class PlayState extends ScriptMusicBeatState
 					}else{
 						Conductor.songPosition = FlxG.sound.music.time;
 					}
-					if(vocals != null && vocals.playing && Conductor.songPosition > vocals.length){
-						vocals.pause();
-					}
 					lastFrameTime = FlxG.sound.music.time;
 					if(Conductor.songPosition > FlxG.sound.music.length - 100 && !endingSong && FlxG.sound.music.onComplete != null){
 						var complete = FlxG.sound.music.onComplete;
 						FlxG.sound.music.onComplete = null;
 						FlxG.sound.music.stop();
+						vocals.stop();
 						complete();
 					}
 				}
@@ -2189,6 +2193,7 @@ class PlayState extends ScriptMusicBeatState
 				if (subState == null ) songPositionBar = Conductor.songPosition;
 			}
 		}
+		vocals.update(elapsed);
 
 		if(SESave.data.animDebug && updateOverlay){
 			var vt = 0;
@@ -3517,6 +3522,7 @@ class PlayState extends ScriptMusicBeatState
 
 		Conductor.songPosition = -5000;
 		vocals.time = FlxG.sound.music.time = 0;
+		vocals.volume = SESave.data.voicesVol;
 		startingSong=true;
 		songStarted = false;
 		startedCountdown = false;

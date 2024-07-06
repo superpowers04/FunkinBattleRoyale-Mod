@@ -127,6 +127,7 @@ class PauseSubState extends MusicBeatSubstate {
 
 		levelDifficulty.scrollFactor.set();
 		levelDifficulty.setFormat(CoolUtil.font, 24,OUTLINE,0xff000000);
+		levelDifficulty.alignment=RIGHT;
 		levelDifficulty.borderSize = 2;
 		levelDifficulty.updateHitbox();
 		add(levelDifficulty);

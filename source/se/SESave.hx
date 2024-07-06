@@ -168,6 +168,7 @@ typedef YourMother = Dynamic;
 	var loadPsychEvents:Bool = false;
 	var animDebugMusic:Bool=true;
 	var optionsMusic:Bool=true;
+	var ignoreErrors:Bool=false;
 
 	public function new(){}
 }
