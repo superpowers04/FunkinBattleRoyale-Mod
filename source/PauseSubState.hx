@@ -119,6 +119,7 @@ class PauseSubState extends MusicBeatSubstate {
 		levelInfo.setFormat(CoolUtil.font, 32,OUTLINE,0xff000000);
 		levelInfo.borderSize = 2;
 		levelInfo.updateHitbox();
+		levelInfo.alignment=RIGHT;
 		add(levelInfo);
 
 		levelDifficulty = new FlxText(20, 0, 0, (PlayState.SONG.artist ?? PlayState.SONG.author ?? ""), 24);
@@ -137,6 +138,7 @@ class PauseSubState extends MusicBeatSubstate {
 		restarts.setFormat(CoolUtil.font, 20,OUTLINE,0xff000000);
 		restarts.borderSize = 2;
 		restarts.updateHitbox();
+		restarts.alignment=RIGHT;
 		SEUIUtilities.addSpacedUI(this,{y:15,objects:[
 			[levelInfo],
 			[levelDifficulty],
@@ -147,9 +149,9 @@ class PauseSubState extends MusicBeatSubstate {
 		levelDifficulty.alpha = 0;
 		levelInfo.alpha = 0;
 
-		levelInfo.x = FlxG.width - (levelInfo.width + 20);
-		levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
-		restarts.x = FlxG.width - (restarts.width + 20);
+		levelInfo.x = FlxG.width - levelInfo.width ;
+		levelDifficulty.x = FlxG.width - 20;
+		restarts.x = FlxG.width - 20;
 
 		FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartIn});
 		FlxTween.tween(levelInfo, {alpha: 1}, 0.4, {ease: FlxEase.bounceOut, startDelay: 0.3});

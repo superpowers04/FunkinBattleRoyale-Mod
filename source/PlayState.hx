@@ -3725,6 +3725,7 @@ class PlayState extends ScriptMusicBeatState
 			if(gf != null && !SESave.data.persistGF) gf.destroy();
 			PlayState.dadShow = true; // Reenable this to prevent issues later
 			instance = null;
+			vocals.destroy();
 		}catch(e){}
 		super.destroy();
 	}
