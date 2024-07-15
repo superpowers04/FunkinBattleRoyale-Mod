@@ -392,10 +392,20 @@ class SearchMenuState extends ScriptMusicBeatState {
 		if (change != 0) SELoader.playSound('assets/sounds/scrollMenu.ogg',true);
 		callInterp('changeSelection',[change]);
 		if(cancelCurrentFunction) return;
-		curSelected += change;
+		var start = curSelected;
 
-		if (curSelected < 0) curSelected = grpSongs.members.length - 1;
-		if (curSelected >= grpSongs.members.length) curSelected = 0;
+		curSelected += change;
+		change = change > 0 ? 1 : -1;
+		// while(true){
+			if (curSelected < 0) curSelected = grpSongs.members.length - 1;
+			if (curSelected >= grpSongs.members.length) curSelected = 0;
+		// 	if (curSelected != 0 && !grpSongs.members[curSelected].visible){
+		// 		curSelected += change;
+		// 		continue;
+		// 	}
+		// 	break;
+
+		// }
 
 		var bullShit:Int = 0;
 		

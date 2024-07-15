@@ -872,7 +872,6 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 	}
 
 	override function changeSelection(change:Int = 0){
-		var looped = 0;
 		super.changeSelection(change);
 		var songInfo:SongInfo = grpSongs.members[curSelected]?.menuValue;
 		if(songInfo == null || !songInfo.charts.contains('${songInfo.name}.json')){

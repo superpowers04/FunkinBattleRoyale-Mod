@@ -848,9 +848,10 @@ class PlayState extends ScriptMusicBeatState
 
 			player1CharInfo = TitleState.getCharFromList(p1List,onlinemod.OfflinePlayState.nameSpace);
 			player2CharInfo = TitleState.getCharFromList(p2List,onlinemod.OfflinePlayState.nameSpace);
+			player3CharInfo = TitleState.findChar(SESave.data.gfChar);
 			PlayState.player1 = player1CharInfo.getNamespacedName();
 			PlayState.player2 = player2CharInfo.getNamespacedName();
-			PlayState.player3 = (player3CharInfo = TitleState.findChar(SESave.data.gfChar)).getNamespacedName();
+			PlayState.player3 = player3CharInfo.getNamespacedName();
 		}
 
 		if(loadChars && (SESave.data.gfShow || _dadShow || SESave.data.bfShow)){
@@ -882,7 +883,7 @@ class PlayState extends ScriptMusicBeatState
 
 			// if(dad == null || !SESave.data.persistOpp || (!(dadShow || SESave.data.dadShow) && !Std.isOfType(dad,EmptyCharacter)) || dad.getNamespacedName() != player2){
 
-			dad = player2 == "gf" ? gf 
+			dad = (player2 == "gf" || player2 == gf.curChar || player2CharInfo.id == gf.curCharacter) ? gf 
 				: _dadShow ? {x:100, y:100, charInfo:player2CharInfo,isPlayer:false,charType:1}
 				: new EmptyCharacter(100, 100);
 			dad.playAnim("songStart");
@@ -895,16 +896,15 @@ class PlayState extends ScriptMusicBeatState
 			if(player1 == "gf"){
 				bf = gf;
 			}else if(boyfriend == null || !SESave.data.persistBF || (!SESave.data.bfShow && !Std.isOfType(boyfriend,EmptyCharacter)) || boyfriend.getNamespacedName() != player1){
-				if (bfShow)
-					boyfriend = {x:770, y:100, charInfo:player1CharInfo,isPlayer:true,charType:0} ;
-				else boyfriend =  new EmptyCharacter(770,100);
+				boyfriend = bfShow ? {x:770, y:100, charInfo:player1CharInfo,isPlayer:true,charType:0} 
+					: new EmptyCharacter(770,100);
 			}else{
 				try{
 					boyfriend.x = 770;
 					boyfriend.y = 100;
 					boyfriend.playAnim('songStart');
 				}catch(e){
-					handleError((if(SESave.data.persistBF) 'Crashed while setting up BF, maybe try disabling persistantBF in your options? ' else 'Crash while trying to setup BF:') + '${e.message}\n${e.stack}');
+					handleError((SESave.data.persistBF ?  'Crashed while setting up BF, maybe try disabling persistantBF in your options? ' : 'Crash while trying to setup BF:') + '${e.message}\n${e.stack}');
 					boyfriend = new EmptyCharacter(770,100);
 				}
 			}
@@ -924,24 +924,14 @@ class PlayState extends ScriptMusicBeatState
 		LoadingScreen.loadingText = "Adding characters";
 
 		// REPOSITIONING PER STAGE
-		for (i => v in [bfPos,dadPos,gfPos]) {
-			if (v[0] != 0 || v[1] != 0){
-				switch(i){
-					case 0:boyfriend.x+=v[0];boyfriend.y+=v[1];
-					case 1:dad.x+=v[0];dad.y+=v[1];
-					case 2:gf.x+=v[0];gf.y+=v[1];
-				}
-			}
-		}
-		// if (dad.spiritTrail && SESave.data.distractions){
-		// 	var dadTrail = new FlxSprTrail(dad,0.2,0,2);
-		// 	add(dadTrail);
-		// }
-		// if (boyfriend.spiritTrail && SESave.data.distractions){
-		// 	var bfTrail = new FlxSprTrail(boyfriend,0.2,0,2);
-		// 	add(bfTrail);
-		// }
 
+		boyfriend.x+=bfPos[0];
+		boyfriend.y+=bfPos[1];
+		dad.x+=dadPos[0];
+		dad.y+=dadPos[1];
+		gf.x+=gfPos[0];
+		gf.y+=gfPos[1];
+		
 
 		add(gf);
 		charCall("addGF",[],-1);
@@ -962,10 +952,9 @@ class PlayState extends ScriptMusicBeatState
 			underlay.cameras = [camHUD];
 			add(underlay);
 		}
-		strumLine = new FlxSprite(0, 50).makeGraphic(FlxG.width, 10);
+		strumLine = new FlxSprite(0, downscroll ? FlxG.height - 165 : 50).makeGraphic(FlxG.width, 10);
 		strumLine.scrollFactor.set();
 		
-		if (downscroll) strumLine.y = FlxG.height - 165;
 
 		add(strumLineNotes = new FlxTypedGroup<StrumArrow>());
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>(10);
@@ -975,7 +964,7 @@ class PlayState extends ScriptMusicBeatState
 		var downscroll = downscroll || (SESave.data.flipScrollY && !downscroll); // Very dumb way of implementing it but fuck it
 
 		if (SONG.difficultyString != null && SONG.difficultyString != "") songDiff = SONG.difficultyString;
-		else songDiff = (customDiff != "" ? customDiff : (stateType == 4 ? "mods/charts" : (stateType == 5 ? "osu! beatmap" : (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy"))));
+		else songDiff = (customDiff != "" ? customDiff : (stateType == 4 ? "mods/charts" : (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy")));
 			// songDiff = if(customDiff != "") customDiff else if(stateType == 4) "mods/charts" else if (stateType == 5) "osu! beatmap" else (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy");
 		playerStrums = new FlxTypedGroup<StrumArrow>();
 		cpuStrums = new FlxTypedGroup<StrumArrow>();
@@ -1012,8 +1001,7 @@ class PlayState extends ScriptMusicBeatState
 			songTimeTxt = new FlxText(0,0,0,"00:00/00:00", 16);
 		}
 
-		healthBarBG = new FlxSprite(0, FlxG.height * 0.9 - SESave.data.guiGap).loadGraphic(SELoader.loadGraphic('assets/shared/images/healthBar.png',true));
-		if (downscroll) healthBarBG.y = 50 + SESave.data.guiGap;
+		healthBarBG = new FlxSprite(0, (downscroll ? 50 + SESave.data.guiGap : FlxG.height * 0.9 - SESave.data.guiGap)).loadGraphic(SELoader.loadGraphic('assets/shared/images/healthBar.png',true));
 		healthBarBG.screenCenter(X);
 		healthBarBG.scrollFactor.set();
 		add(healthBarBG);
@@ -1028,9 +1016,9 @@ class PlayState extends ScriptMusicBeatState
 		
 
 		if(actualSongName == ""){
-			actualSongName = (if(ChartingState.charting) "Charting" else curSong + " " + songDiff);
+			actualSongName = (ChartingState.charting ? "Charting" : curSong + " " + songDiff);
 		}
-		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50 - SESave.data.guiGap,0,'$actualSongName - $inputEngineName', 16);
+		kadeEngineWatermark = new FlxText(4,downscroll ? FlxG.height * 0.9 + 45 + SESave.data.guiGap : healthBarBG.y + 50 - SESave.data.guiGap,0,'$actualSongName - $inputEngineName', 16);
 		kadeEngineWatermark.setFormat(CoolUtil.font, 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
 		kadeEngineWatermark.scrollFactor.set();
 		if(QuickOptionsSubState.getSetting("Flippy mode")){
@@ -1040,7 +1028,6 @@ class PlayState extends ScriptMusicBeatState
 		}
 		add(kadeEngineWatermark);
 
-		if (downscroll) kadeEngineWatermark.y = FlxG.height * 0.9 + 45 + SESave.data.guiGap;
 
 		
 		if (SESave.data.songInfo == 0 || SESave.data.songInfo == 3) {
@@ -1103,7 +1090,7 @@ class PlayState extends ScriptMusicBeatState
 		iconP1.isTracked = iconP2.isTracked = !practiceMode;
 		if(practiceMode){
 			// if(practiceMode ){
-			practiceText = new FlxText(0,healthBar.y - 64,(if(botPlay) "Botplay" else if(flippy)"Flippy Mode" else if(ChartingState.charting) "Testing Chart" else "Practice mode"),16);
+			practiceText = new FlxText(0,healthBar.y - 64,(botPlay ?  "Botplay" : flippy ? "Flippy Mode" : (ChartingState.charting) ? "Testing Chart" : "Practice mode"),16);
 			if(onlinemod.OnlinePlayMenuState.socket == null){
 				practiceText.setFormat(CoolUtil.font, 42, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
 				practiceText.cameras = [camHUD];
@@ -1807,7 +1794,7 @@ class PlayState extends ScriptMusicBeatState
 				readdCam(camTOP);
 			}else{
 				if(opponentNoteCamera != null) opponentNoteCamera.destroy();
-				opponentNoteCamera = new FlxCamera(0,0,FlxG.width,(if(middlescroll) FlxG.height*2 else FlxG.height));
+				opponentNoteCamera = new FlxCamera(0,0,FlxG.width,(middlescroll ?  FlxG.height*2 : FlxG.height));
 				opponentNoteCamera.bgColor = 0x00000000;
 				opponentNoteCamera.color = 0xAAFFFFFF;
 
@@ -1836,12 +1823,9 @@ class PlayState extends ScriptMusicBeatState
 			babyArrow.updateHitbox();
 			babyArrow.scrollFactor.set();
 
-			// if (!isStoryMode)
-			// {
 			babyArrow.y -= 10;
 			babyArrow.alpha = 0;
 			babyArrow.angle = 20;
-			// babyArrow.scale.set(babyArrow.scale.x * scale,babyArrow.scale.y * scale);
 			FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: 1,angle:0}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
 			if(player == 1) babyArrow.color = 0xdddddd;
 			// }
@@ -1860,15 +1844,14 @@ class PlayState extends ScriptMusicBeatState
 			if(useNoteCameras){
 
 				babyArrow.screenCenter(X);
-				babyArrow.x += ((strumWidth  * (SESave.data.useStrumsAsButtons ? 1.5 : 1) ) * i) + i - 
-				(strumWidth + (strumWidth *    (SESave.data.useStrumsAsButtons ? 1 : 0.5) ));
 				
 				if(SESave.data.useStrumsAsButtons){
-					// babyArrow.setGraphicSize(1);
 					babyArrow.scale.set(1,1);
 					babyArrow.updateHitbox();
+					babyArrow.x += (strumWidth * 1.5 * i) + i - (strumWidth + strumWidth);
+				}else{
+					babyArrow.x += (strumWidth * i) + i - strumWidth + (strumWidth * 0.5) ;
 				}
-				// babyArrow.x += 2 + (Note.swagWidth * i + 1);
 				babyArrow.cameras = [player == 1 ? playerNoteCamera : opponentNoteCamera];
 			}else{
 
@@ -1877,27 +1860,17 @@ class PlayState extends ScriptMusicBeatState
 						babyArrow.screenCenter(X);
 						babyArrow.x += (strumWidth * i) + i + (strumWidth * 0.5);
 					}else{
-						// babyArrow.screenCenter(X);
-						babyArrow.x = (FlxG.width * (if(babyArrow.ID > halfKeyCount)0.75 else 0.25)) + (strumWidth * i + i) - (strumWidth * 2 + 2);
+						babyArrow.x = (FlxG.width * ((babyArrow.ID > halfKeyCount) ? 0.75 : 0.25)) + (strumWidth * i + i) - (strumWidth * 2 + 2);
 					}
 
 				}else{
-					babyArrow.x = (FlxG.width * (if(player == 1) 0.625 else 0.15)) + (strumWidth * i) + i - strumWidth;
+					babyArrow.x = (FlxG.width * (player == 1 ? 0.625 : 0.15)) + (strumWidth * i) + i - strumWidth;
 				}
 			}
-			// babyArrow.visible = (player == 1);
 
 			
 
 			strumLineNotes.add(babyArrow);
-			// if(underlay != null && SESave.data.undlaSize == 0 && i == 0 && player == 1){
-			// 	if(middlescroll){
-			// 		underlay.screenCenter(X);
-			// 	}else{
-
-			// 		underlay.x = babyArrow.x;
-			// 	}
-			// }
 			charCall("strumNoteAdd",[babyArrow,player],if (player == 1) 0 else 1,true);
 			callInterp("strumNoteAdd",[babyArrow,player == 1]);
 
@@ -2024,10 +1997,6 @@ class PlayState extends ScriptMusicBeatState
 		Conductor.songPosition = FlxG.sound.music.time;
 		FlxG.sound.music.play();
 		vocals.syncToSound(FlxG.sound.music);
-		// if((!vocals.playing || vocals.time > Conductor.songPosition + 5 || vocals.time < Conductor.songPosition - 5)){
-		// 	vocals.time = FlxG.sound.music.time;
-		// 	vocals.play();
-		// }
 		resyncCount++;
 	}
 

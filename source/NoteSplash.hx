@@ -96,12 +96,11 @@ class NoteSplash extends FlxSprite
 				@:privateAccess
 				{
 					cameras = obj.cameras;
-
 				}
 				scrollFactor.set(obj.scrollFactor.x,obj.scrollFactor.y);
 				screenCenter();
-				targetX=(obj.x);
-				targetY=(obj.y + (obj.height * 0.5));
+				targetX=obj.x;
+				targetY=obj.y + (obj.height * 0.5);
 
 
 

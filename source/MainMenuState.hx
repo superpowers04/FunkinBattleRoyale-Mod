@@ -69,6 +69,7 @@ class MainMenuState extends SickMenuState {
 		}
 		if(MainMenuState.errorMessage.indexOf('${_error}\n${MainMenuState.errorMessage}') == -1)
 			MainMenuState.errorMessage = '${_error}\n${MainMenuState.errorMessage}';
+		MainMenuState.errorMessage = MainMenuState.errorMessage.replace('\nCalled from','\n Called from');
 		trace('${error}:${details}');
 		if(exception != null)
 			try{trace('${exception.message}\n${exception.stack}');
