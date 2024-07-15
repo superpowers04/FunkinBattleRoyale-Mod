@@ -63,18 +63,19 @@ import flixel.FlxBasic;
 				if(sound.playing) s.play();
 				else s.pause();
 			}
-			if(s.playing && syncTime && Math.abs(s.time-sound.time) > maxTimeDifference) s.time = sound.time;
+			if(s.playing && syncTime && sound.time <= s.length && Math.abs(s.time-sound.time) > maxTimeDifference) s.time = sound.time;
 
 		}
 	}
 	function syncToSound(sound:FlxSound){
 		final s = this.sound;
+		if(s == null) return;
 		if(syncVolume) s.volume = sound.volume;
 		if(syncPlaying && s.playing != sound.playing){
 			if(sound.playing) s.play();
 			else s.pause();
 		}
-		if(s.playing && syncTime && Math.abs(s.time-sound.time) > maxTimeDifference) s.time = sound.time;
+		if(s.playing && syncTime && sound.time <= s.length  && Math.abs(s.time-sound.time) > maxTimeDifference) s.time = sound.time;
 		sync();
 	}
 	function load(path:String):FlxSound{

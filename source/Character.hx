@@ -770,8 +770,8 @@ class CharAnimController extends FlxAnimationController{
 					var selAssets = -10;
 					for (i => charFile in charProperties.asset_files) {
 						if (charFile.char_side != null && charFile.char_side != 3 && charFile.char_side == charType){continue;} // This if statement hurts my brain
-						if (charFile.stage != "" && charFile.stage != null){if(PlayState.curStage.toLowerCase() != charFile.stage.toLowerCase()){continue;}} // Check if charFiletion specifies stage, skip if it doesn't match PlayState's stage
-						if (charFile.song != "" && charFile.song != null){if(PlayState.SONG.song.toLowerCase() != charFile.song.toLowerCase()){continue;}} // Check if charFiletion specifies song, skip if it doesn't match PlayState's song
+						if (charFile.stage != "" && charFile.stage != null && PlayState.curStage.toLowerCase() != charFile.stage.toLowerCase()){continue;} // Check if charFiletion specifies stage, skip if it doesn't match PlayState's stage
+						if (charFile.song != "" && charFile.song != null && PlayState.SONG.song.toLowerCase() != charFile.song.toLowerCase()){continue;} // Check if charFiletion specifies song, skip if it doesn't match PlayState's song
 						var tagsMatched = 0;
 						if (charFile.tags != null && charFile.tags[0] != null && PlayState.stageTags != null){
 							for (i in charFile.tags) {if (PlayState.stageTags.contains(i)) tagsMatched++;}

@@ -184,6 +184,7 @@ class ChartingState extends ScriptMusicBeatState
 	var chartType = "FNF";
 	static var snapSound:Sound;
 	static var clapSound:Sound;
+	static var noteKeyCharting:Bool = false;
 	public static function playSnap(){
 		if(snapSound == null) snapSound= SELoader.loadSound('./assets/shared/sounds/SNAP.ogg',true);
 		snapSound.play(new openfl.media.SoundTransform(SESave.data.hitVol));
@@ -574,6 +575,11 @@ class ChartingState extends ScriptMusicBeatState
 		stepperBPM.value = Conductor.bpm;
 		stepperBPM.name = 'song_bpm';
 
+		var check_noteKeys = new FlxUICheckBox(0,0, null, null, "Note key charting", 100);
+		check_noteKeys.checked = noteKeyCharting;
+		check_noteKeys.callback = function() {
+			noteKeyCharting = checked;
+		};
 		// var stepperBPMOffsetLabel = new FlxText(74,80,'BPM Offset');
 		// var stepperBPMOffset:FlxUINumericStepper = new FlxUINumericStepper(10, 80, 0, 1, -9999, 9999, 0);
 		// stepperBPMOffset.value = Conductor.offset;
@@ -747,6 +753,7 @@ class ChartingState extends ScriptMusicBeatState
 		// uiMap['hurtnotescoreapply'] = hurtnotescoreapply;
 		uiMap['hurtnotehealthtxt'] = hurtnotehealthtxt;
 		uiMap['hurtnotehealth'] = hurtnotehealth;
+		uiMap['noteKeyCharting'] = check_noteKeys;
 		// uiMap['hurtnotehealthapply'] = hurtnotehealthapply;
 
 
@@ -820,7 +827,7 @@ class ChartingState extends ScriptMusicBeatState
 			[stepperSongVol,stepperSongVolLabel],
 			null,
 			[waveformEnabled,waveformUseInstrumental],
-			[hitsounds],
+			[check_noteKeys,hitsounds],
 			[check_voices,hurtnotescore,hurtnotescoretxt],
 			[beatcheck,hurtnotehealth,hurtnotehealthtxt],
 			null,
@@ -1446,12 +1453,14 @@ class ChartingState extends ScriptMusicBeatState
 								FlxG.mouse.y);
 			}
 			var justAdded = false;
-			if (FlxG.mouse.justPressed){
+			if (FlxG.mouse.justPressed || FlxG.mouse.justPressedRight){
 				justAdded = true;
 				var overlaps = false;
-				for(note in curRenderedNotes.members){
-					if (FlxG.mouse.overlaps(note)){
-						overlaps = true;
+				if(!FlxG.mouse.justPressedRight){
+
+					for(note in curRenderedNotes.members){
+						if (FlxG.mouse.overlaps(note)){
+							overlaps = true;
 						if (FlxG.keys.pressed.CONTROL) {
 							selectNote(note);
 							if(FlxG.keys.pressed.SHIFT){
@@ -1487,7 +1496,7 @@ class ChartingState extends ScriptMusicBeatState
 				}
 				
 			}
-			if(FlxG.mouse.pressed){
+			if(FlxG.mouse.pressed || FlxG.mouse.pressedRight){
 				if (curSelectedNote != null && !modifyingNote && !justAdded && Math.floor(FlxG.mouse.x / GRID_SIZE) == (curSelectedNote[1] + 1)){
 					replaceNoteSustain(getStrumTime(dummyArrow.y) + sectionStartTime(curSection));
 					dummyArrow.visible = false;
