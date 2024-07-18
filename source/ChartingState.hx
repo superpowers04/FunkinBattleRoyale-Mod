@@ -575,10 +575,10 @@ class ChartingState extends ScriptMusicBeatState
 		stepperBPM.value = Conductor.bpm;
 		stepperBPM.name = 'song_bpm';
 
-		var check_noteKeys = new FlxUICheckBox(0,0, null, null, "Note key charting", 100);
+		var check_noteKeys = new FlxUICheckBox(0,0, null, null, "Note key charting(Unimplemented)", 100);
 		check_noteKeys.checked = noteKeyCharting;
 		check_noteKeys.callback = function() {
-			noteKeyCharting = checked;
+			noteKeyCharting = check_noteKeys.checked;
 		};
 		// var stepperBPMOffsetLabel = new FlxText(74,80,'BPM Offset');
 		// var stepperBPMOffset:FlxUINumericStepper = new FlxUINumericStepper(10, 80, 0, 1, -9999, 9999, 0);
@@ -1431,8 +1431,12 @@ class ChartingState extends ScriptMusicBeatState
 				saveLevel();
 			}
 		}
+		var pressingNote = false;
+		if(noteKeyCharting){
+			// if(controls.LEFT)
+		}
 
-		if(CoolUtil.activeObject == null || !disabledControls){
+		if(!pressingNote && (CoolUtil.activeObject == null || !disabledControls)){
 			if(FlxG.keys.pressed.CONTROL && FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.D){
 				Conductor.songPosition = 0;
 				_song.notes = [];
@@ -1461,20 +1465,20 @@ class ChartingState extends ScriptMusicBeatState
 					for(note in curRenderedNotes.members){
 						if (FlxG.mouse.overlaps(note)){
 							overlaps = true;
-						if (FlxG.keys.pressed.CONTROL) {
-							selectNote(note);
-							if(FlxG.keys.pressed.SHIFT){
-								addToSelected(note);
-								modifyingNote = true;
-								// selectedNotes.push(note);
+							if (FlxG.keys.pressed.CONTROL) {
+								selectNote(note);
+								if(FlxG.keys.pressed.SHIFT){
+									addToSelected(note);
+									modifyingNote = true;
+									// selectedNotes.push(note);
+								}else{
+									deselectNotes();
+								}
+
 							}else{
 								deselectNotes();
-							}
-
-						}else{
-							deselectNotes();
-							deleteNote(note);
-							modifyingNote = true;
+								deleteNote(note);
+								modifyingNote = true;
 							}
 						}
 					}
