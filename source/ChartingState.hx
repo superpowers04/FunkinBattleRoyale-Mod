@@ -1475,6 +1475,7 @@ class ChartingState extends ScriptMusicBeatState
 							deselectNotes();
 							deleteNote(note);
 							modifyingNote = true;
+							}
 						}
 					}
 				}

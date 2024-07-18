@@ -112,20 +112,20 @@ import lime.app.Application;
 		loadingText.isMenuItem = false;
 		loadingText.visible = true;
 		if(SESave.data.doCoolLoading){
-			// loadingIcon = new Sprite();
-			// loadingIcon.x = 640;
-			// loadingIcon.y = 300;
-			// addChild(loadingIcon);
-			// // var note = new Note(0, 0, null,false,false);
-			// // note.useFramePixels = true;
-			// // note.draw();
-			// var note = SELoader.loadBitmap('assets/shared/images/loadingIcon.png',true);
-			// loadingIcon.graphics.beginBitmapFill(note,false,true);
-			// // loadingIcon.graphics.moveTo();
-			// // 
-			// loadingIcon.graphics.drawRect(0,0, note.width, note.height);
-			// loadingIcon.graphics.endFill();
-			// loadingIcon.scaleX = loadingIcon.scaleY= 0.5;
+			loadingIcon = new Sprite();
+			loadingIcon.x = 640;
+			loadingIcon.y = 300;
+			addChild(loadingIcon);
+			// var note = new Note(0, 0, null,false,false);
+			// note.useFramePixels = true;
+			// note.draw();
+			var note = SELoader.loadBitmap('assets/shared/images/loadingIcon.png',true);
+			loadingIcon.graphics.beginBitmapFill(note,false,true);
+			// loadingIcon.graphics.moveTo();
+			// 
+			loadingIcon.graphics.drawRect(0,0, note.width, note.height);
+			loadingIcon.graphics.endFill();
+			loadingIcon.scaleX = loadingIcon.scaleY= 0.5;
 			
 		}
 

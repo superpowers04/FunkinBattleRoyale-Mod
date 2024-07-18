@@ -678,20 +678,11 @@ class CharAnimController extends FlxAnimationController{
 					} else {
 						charXml = SELoader.loadXML(xmlName); // Loads the XML as a string. 
 						if (charXml == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's XML can't be loaded
-						// if(charXml.substr(2).replace(String.fromCharCode(0),'').contains('UTF-16')){ // Flash CS6 outputs a UTF-16 xml even though no UTF-16 characters are usually used. This reformats the file to be UTF-8 *hopefully*
-						// 	charXml = '<?' + charXml.substr(2).replace(String.fromCharCode(0),'').replace('UTF-16','utf-8');
-						// }
 						tex = SEFlxFrames.fromSparrow(SELoader.loadGraphic(pngName), charXml);
 					}
 					if (tex == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's texture can't be loaded
 				}
-				// animOffsets['all'] = charProperties.position;
-				// animOffsets['all'][1] *=-1;
-				// animOffsets['all'][0] *=-1;
-				// animOffsets['all'][0] *=-1;
-			// dad = new EmptyCharacter(100, 100);
-			// boyfriend = new EmptyCharacter(400,100);
-			// gf = new EmptyCharacter(400, 100);
+
 				if(charProperties.position != null){
 
 					charProperties.cam_pos= charProperties.camera_position;
@@ -758,8 +749,6 @@ class CharAnimController extends FlxAnimationController{
 				throw('$curCharacter\'s JSON is invalid!');
 				return;
 			} // Boot to main menu if character's JSON can't be loaded
-			// if ((charProperties == null || charProperties.animations == null || charProperties.animations[0] == null) && amPreview){
-
 			loadedFrom = '${charLoc}/$curCharacter/config.json';
 			if(frames == null){
 				var pngName:String = "character.png";

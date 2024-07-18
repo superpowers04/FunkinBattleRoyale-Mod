@@ -277,26 +277,76 @@ class FlxGameEnhanced extends FlxGame{
 	public function set__requestedState(e:flixel.util.typeLimit.NextState) return _nextState=e;
 	public function get__requestedState() return _nextState;
 	#end
+	override function switchState():Void
+	{
+		SEProfiler.qStart('switch_state');
+		try{
+			// Basic reset stuff
+			FlxG.cameras.reset();
+			FlxG.inputs.onStateSwitch();
+			#if FLX_SOUND_SYSTEM
+			FlxG.sound.destroy();
+			#end
+
+			FlxG.signals.preStateSwitch.dispatch();
+
+			#if FLX_RECORD
+			FlxRandom.updateStateSeed();
+			#end
+
+			// Destroy the old state (if there is an old state)
+			if (_state != null)
+				_state.destroy();
+
+			// we need to clear bitmap cache only after previous state is destroyed, which will reset useCount for FlxGraphic objects
+			FlxG.bitmap.clearCache();
+			if(_nextState == null) throw('Switch state called with a null state?');
+
+			// Finally assign and create the new state
+			_state = _nextState.createInstance();
+			_state._constructor = _nextState;
+			_nextState = null;
+
+			if (_gameJustStarted)
+				FlxG.signals.preGameStart.dispatch();
+
+			FlxG.signals.preStateCreate.dispatch(_state);
+
+			_state.create();
+
+			if (_gameJustStarted)
+				gameStart();
+
+			#if FLX_DEBUG
+			debugger.console.registerObject("state", _state);
+			#end
+
+			FlxG.signals.postStateSwitch.dispatch();
+		}catch(e){
+			FuckState.FUCK(e,"FlxGame.SwitchState");
+		}
+		SEProfiler.qStamp('switch_state');
+	}
 	override function update(){
 		
 		try{
 			SEProfiler.start('update');
 
 			#if(target.threaded && !hl)
-				// if(_state != _requestedState && SESave.data.doCoolLoading){
-				// 	blockUpdate = blockEnterFrame = blockDraw = true;
-				// 	Main.funniSprite.removeChild(this);
-				// 	_oldAutoPause = FlxG.autoPause;
-				// 	FlxG.autoPause = false;
-				// 	visible = false;
-				// 	hasUpdated = false;
-				// 	sys.thread.Thread.create(() -> { 
-				// 		switchState();
-				// 		requestAdd = true;
-				// 		visible = true;
-				// 	});
-				// 	return;
-				// }
+				if(_state != _requestedState && _requestedState != null && SESave.data.doCoolLoading){
+					blockUpdate = blockEnterFrame = blockDraw = true;
+					Main.funniSprite.removeChild(this);
+					_oldAutoPause = FlxG.autoPause;
+					FlxG.autoPause = false;
+					visible = false;
+					hasUpdated = false;
+					sys.thread.Thread.create(() -> { 
+						switchState();
+						requestAdd = true;
+						visible = true;
+					});
+					return;
+				}
 			#end
 			if(blockUpdate) _update(); else {
 				hasUpdated = true;

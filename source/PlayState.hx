@@ -747,7 +747,7 @@ class PlayState extends ScriptMusicBeatState
 					loadBaseStage();
 				} default:{
 					stage = TitleState.retStage(stage);
-					if(stage == "nothing"){
+					if(stage == "nothing" || stage == "empty"){
 						defaultCamZoom = 0.9;
 						stageObject = new Stage();
 						stageObject.tags = ["empty"];
@@ -883,7 +883,7 @@ class PlayState extends ScriptMusicBeatState
 
 			// if(dad == null || !SESave.data.persistOpp || (!(dadShow || SESave.data.dadShow) && !Std.isOfType(dad,EmptyCharacter)) || dad.getNamespacedName() != player2){
 
-			dad = (player2 == "gf" || player2 == gf.curChar || player2CharInfo.id == gf.curCharacter) ? gf 
+			dad = (player2 == "gf" || player2 == gf.curCharacter || player2CharInfo.id == gf.curCharacter) ? gf 
 				: _dadShow ? {x:100, y:100, charInfo:player2CharInfo,isPlayer:false,charType:1}
 				: new EmptyCharacter(100, 100);
 			dad.playAnim("songStart");

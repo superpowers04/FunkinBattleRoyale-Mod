@@ -252,6 +252,7 @@ class SELoader {
 		return BitmapData.fromFile(pngPath);
 	}
 
+
 	public static function loadSparrowFrames(pngPath:String,?cache:Bool=false):FlxAtlasFrames{
 		pngPath = getPath(pngPath);
 		if(!exists('${pngPath}.png')){
