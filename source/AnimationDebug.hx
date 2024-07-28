@@ -449,38 +449,48 @@ class AnimationDebug extends MusicBeatState
 			charJson = chara.charProperties;
 			animList = [];
 			charAnims = ["**Unbind"];
-			if (chara.charXml != null){
-				if(chara.charXml.trim().substring(0,1) == "{"){ // Probably a sprite atlas
-					var obj:flixel.graphics.atlas.TexturePackerAtlas = Json.parse(chara.charXml);
-					inline function addAnim(name:String){
-						if(name.lastIndexOf('-') != -1 ) name = name.substring(0,name.lastIndexOf('-') - 1);
-						else if(name.lastIndexOf('0') != -1)name = name.substring(0,name.lastIndexOf('0') - 1);
-						if(!charAnims.contains(name))charAnims.push(name);
-					}
-					// yes I stole this from flxatlasframes, fight me
-					if ((obj.frames is Array)){
-						for (frame in Lambda.array(obj.frames)){
-							addAnim(frame.filename);
-						}
-					}else{
-						for (frameName in Reflect.fields(obj.frames)){
-							addAnim(frameName);
-						}
-					}
-				}else{
-					var charAnimsContains:Map<String,Bool> = []; 
-					var regTP:EReg = (~/<SubTexture name="([A-z0-9\-_ !?:;\(\)\[\]'\/\{\}+@#$%^&*~`.,\\\|]+)[0-9][0-9][0-9][0-9]"/gm);
-					var input:String = chara.charXml;
-					while (regTP.match(input)) {
-						input=regTP.matchedRight();
+			// if (chara.charXml != null){
+				// if(chara.charXml.trim().substring(0,1) == "{"){ // Probably a sprite atlas
+				// 	var obj:flixel.graphics.atlas.TexturePackerAtlas = Json.parse(chara.charXml);
+				// 	inline function addAnim(name:String){
+				// 		if(name.lastIndexOf('-') != -1 ) name = name.substring(0,name.lastIndexOf('-') - 1);
+				// 		else if(name.lastIndexOf('0') != -1)name = name.substring(0,name.lastIndexOf('0') - 1);
+				// 		if(!charAnims.contains(name))charAnims.push(name);
+				// 	}
+				// 	// yes I stole this from flxatlasframes, fight me
+				// 	if ((obj.frames is Array)){
+				// 		for (frame in Lambda.array(obj.frames)){
+				// 			addAnim(frame.filename);
+				// 		}
+				// 	}else{
+				// 		for (frameName in Reflect.fields(obj.frames)){
+				// 			addAnim(frameName);
+				// 		}
+				// 	}
+				// }else{
+				var regTP:EReg = (~/([A-z0-9\-_ !?:;\(\)\[\]'\/\{\}+@#$%^&*~`.,\\\|]+)[0-9][0-9][0-9][0-9]/gm);
+				var charAnimsContains:Map<String,Bool> = [];
+				@:privateAccess{
+					for(name=>_ in chara.frames.framesByName){
+						if(!regTP.match(name)) continue;
 						var matched = regTP.matched(1);
 						if (charAnimsContains.exists(matched)) continue;
-						
 						charAnimsContains[matched] = true;
 						charAnims.push(matched);
 					}
-				}
-			}
+				} 
+				// 	var regTP:EReg = (~/<SubTexture name="([A-z0-9\-_ !?:;\(\)\[\]'\/\{\}+@#$%^&*~`.,\\\|]+)[0-9][0-9][0-9][0-9]"/gm);
+				// 	var input:String = chara.charXml;
+				// 	while (regTP.match(input)) {
+				// 		input=regTP.matchedRight();
+				// 		var matched = regTP.matched(1);
+				// 		if (charAnimsContains.exists(matched)) continue;
+						
+				// 		charAnimsContains[matched] = true;
+				// 		charAnims.push(matched);
+				// 	}
+				// }
+			// }
 			try{
 				canEditJson = (charJson == null || chara.loadedFrom == "");
 				if(charJson.animations != null && charJson.animations[0] != null){
@@ -979,6 +989,9 @@ class AnimationDebug extends MusicBeatState
 		uiMap["animFPS"] = new FlxUINumericStepper(140, 110, 1, 24);
 		uiMap["looptxt"] = new FlxText(10, 130,0,"Loop start frame");
 		uiMap["loopStart"] = new FlxUINumericStepper(140, 130, 1, 0,0);
+		uiMap["loopStart"].callback=function(index:Int){
+			chara.playAnim("ANIMATIONDEBUG_tempAnim",true,index);
+		}
 		uiMap["AnimationLengthText"] = new FlxText(10, 130,0,"Animation Start > Finish");
 		uiMap["animStart"] = new FlxUINumericStepper(140, 130, 1, 0,0);
 		uiMap["animFinish"] = new FlxUINumericStepper(140, 130, 1, 0,0);

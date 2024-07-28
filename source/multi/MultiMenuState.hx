@@ -400,19 +400,14 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 			}
 			if (SELoader.exists("mods/packs")){
 				for (name in orderList(SELoader.readDirectory("mods/packs"))){
-					// dataDir = "mods/packs/" + dataDir + "/charts/";
+					LoadingScreen.loadingText = 'Scanning mods/packs/$name';
 					var catMatch = query.match(name.toLowerCase());
-					// var dataDir = SELoader.anyExists(['${baseDir}charts/','${baseDir}data/']);
-					// !SELoader.exists(dataDir) && !SELoader.exists(dataDir = "mods/packs/" + name + "/data/")
-					// if(dataDir == null) continue;
 					_packCount++;
 					if(!catMatch){
 						emptyCats.push(name);
 						continue;
 					}
 					var catID = categories.length;
-					// var containsSong = false;
-					// var dirs = orderList(SELoader.readDirectory(dataDir));
 					
 					var baseDir = 'mods/packs/$name/';
 					var folderSongs:Array<SongInfo> = SELoader.getSongsFromFolder(baseDir);

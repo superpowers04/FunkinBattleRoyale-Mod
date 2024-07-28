@@ -19,7 +19,7 @@ class HealthIcon extends FlxSprite
 	public var trackingOffset:Float = 0;
 	// public var pathh = "mods/characters";
 
-	public function new(?char:String = 'bf', ?isPlayer:Bool = false,?clone:String = "",?isMenuIcon:Bool = false,?path:String = "mods/characters") {
+	public function new(?char:String = 'face', ?isPlayer:Bool = false,?clone:String = "",?isMenuIcon:Bool = false,?path:String = "mods/characters") {
 		super();
 		this.isPlayer = isPlayer;
 		this.isMenuIcon = isMenuIcon;
@@ -48,13 +48,13 @@ class HealthIcon extends FlxSprite
 		if(char is CharInfo){
 			charInfo = cast(char);
 		}
-		if(char.namespace == "INTERNAL"){
-			changeSprite(charInfo?.getNamespacedName() ?? "face");
-			return;
-		}
 		if(charInfo == null){
 			trace('Invalid type passed, defaulting to vanilla');
-			changeSprite('INTERNAL|bf');
+			changeSprite('face');
+			return;
+		}
+		if(charInfo.nameSpace == "INTERNAL"){
+			changeSprite(charInfo?.getNamespacedName() ?? "face");
 			return;
 		}
 
@@ -112,7 +112,7 @@ class HealthIcon extends FlxSprite
 	public function changeSprite(?char:String = 'face',?clone:String = "face",?useClone:Bool = true,?pathh:String = "mods/characters") {
 		if(char == hichar) return;
 		if(char == "lonely") char = "face";
-		var chars:Array<String> = ["INTERNAL|bf","INTERNAL|gf","face",'EVENTNOTE','gf'];
+		var chars:Array<String> = ["INTERNAL|bf","INTERNAL|gf","internal|bf","internal|gf",'bf',"face",'EVENTNOTE','gf'];
 		var relAnims:Bool = true;
 
 		var _path = "";
@@ -169,15 +169,13 @@ class HealthIcon extends FlxSprite
 		
 		if(chars.contains(char.toLowerCase())){ // For vanilla characters
 			if (relAnims){
-				animation.add('bf-car', [0, 1], 0, false, isPlayer);
-				animation.add('bf-christmas', [0, 1], 0, false, isPlayer);
 				if(graphic.width > 451){ // Old icon grid
 					MainMenuState.errorMessage += ('You are using a really old iconGrid, this is usually caused by updating from a really old version of the game\nPlease reinstall the game');
 				}else{ // Based icon grid
+					animation.add('internal|bf', [0, 1], 0, false, isPlayer);
+					animation.add('internal|gf', [2], 0, false, isPlayer);
 					animation.add('gf', [2], 0, false, isPlayer);
-					animation.add('INTERNAL|gf', [2], 0, false, isPlayer);
-					
-					animation.add('EVENTNOTE', [5, 5], 0, false, false);
+					animation.add('eventnote', [5, 5], 0, false, false);
 				}
 			}
 			animation.play(char.toLowerCase());

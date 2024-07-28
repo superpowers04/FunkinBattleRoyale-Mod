@@ -31,6 +31,108 @@ class FuckState extends FlxUIState {
 	public static var useOpenFL:Bool = false;
 	public static var lastERROR = "";
 	public static var allowLogWrite:Bool = true;
+	public static function generateReport(error:String = "UNKNOWN ERROR?",type:String = "CRASH"):Bool{
+
+		var dateNow:String = "";
+		var err = "";
+		try{
+			var funnyQuip = "insert funny line here";
+			var _date = Date.now();
+			try{
+				var jokes = [
+					"Hey look, mom! I'm on a crash report!",
+					"This wasn't supposed to go down like this...",
+					"Don't look at me that way.. I tried",
+					"Ow, that really hurt :(",
+					"missingno",
+					"Did I ask for your opinion?",
+					"Oh lawd it crashing",
+					"get stickbugged lmao",
+					"Mom? Come pick me up. I'm scared...",
+					"It's just standing there... Menacingly.",
+					"Are you having fun? I'm having fun.",
+					"That crash though",
+					"I'm out of ideas.",
+					"Where do we go from here?",
+					"Coded in Haxe.",
+					"Oh what the hell?",
+					"I just wanted to have fun.. :(",
+					"Oh no, not this again",
+					"null object reference is real and haunts us",
+					'What is a error exactly?',
+					"I just got ratioed :(",
+					"L + Ratio + Skill Issue",
+					"Now with more crashes",
+					"I'm out of ideas.",
+					"me when null object reference",
+					'you looked at me funny :(',
+					'Hey VSauce, Michael here. What is an error?',
+					'AAAHHHHHHHHHHHHHH! Don\'t mind me, I\'m practicing my screaming',
+					'crash% speedrun less goooo!',
+					'hey look, the consequences of my actions are coming to haunt me',
+					'time to go to stack overflow for a solution',
+					'you\'re mother',
+					'sex pt 2: electric boobaloo',
+					'sex pt 3: gone wrong',
+					'the stalemate button was boobytrapped',
+					'mf shoulda just stayed with psych engine :sob:',
+					'super engine moment',
+					'Another one bites the dust',
+					"It's fine, everything is good. What do you mean this is a crash report?"
+					
+				];
+				funnyQuip = jokes[Std.int(Math.random() * jokes.length - 1) ]; // I know, this isn't FlxG.random but fuck you the game just crashed
+			}catch(e){}
+			err = '# Super Engine Crash Report: \n# $funnyQuip\n$error';
+			if(!SELoader.exists('crashReports/')){
+				SELoader.createDirectory('crashReports/');
+			}
+
+			dateNow = StringTools.replace(StringTools.replace(_date.toString(), " ", "_"), ":", ".");
+			try{
+				currentStateName = haxe.rtti.Rtti.getRtti(cast FlxG.state).path;
+			}catch(e){}
+			try{
+				err +="\n\n # ---------- SYSTEM INFORMATION --------";
+				
+				err +='\n Operating System: ${Sys.systemName()}';
+				err +='\n Working Path: ${SELoader.absolutePath('')}';
+				err +='\n Current Working Directory: ${Sys.getCwd()}';
+				err +='\n Executable path: ${Sys.programPath()}';
+				err +='\n Arguments: ${Sys.args()}';
+				err +="\n # ---------- GAME INFORMATION ----------";
+				err +='\n Version: ${MainMenuState.ver}';
+				err +='\n Buildtype: ${MainMenuState.compileType}';
+				err +='\n Debug: ${SESave.data.animDebug}';
+				err +='\n Registered character count: ${TitleState.characters.length}';
+				err +='\n Scripts: ${SESave.data.scripts}';
+				err +='\n State: ${currentStateName}';
+				err +='\n Save: ${SESave.data}';
+				err +='\n # --------------------------------------';
+				
+			}catch(e){
+				trace('Unable to get system information! ${e.message}');
+			}
+			try{
+				SELoader.saveContent('crashReports/SUPERENGINE_${type}-${dateNow}.log',err);
+			}catch(e){
+				sys.io.File.saveContent('crashReports/SUPERENGINE_${type}-${dateNow}.log',err);
+
+			}
+			
+			
+			trace('Wrote a crash report to ./crashReports/SUPERENGINE_${type}-${dateNow}.log!');
+			trace('Crash Report:\n$err');
+			return true;
+		}catch(e){
+			trace('Unable to write a crash report!');
+			if(err != null && err.indexOf('SYSTEM INFORMATION') != -1){
+				trace('Here is generated crash report:\n$err');
+
+			}
+		}
+		return false;
+	}
 	// This function has a lot of try statements.
 	// The game just crashed, we need as many failsafes as possible to prevent the game from closing or crash looping
 	@:keep inline public static function FUCK(e:Dynamic,?info:String = "unknown",_forced:Bool = false,_FATAL:Bool = false,_rawError:Bool=false){
@@ -87,7 +189,6 @@ class FuckState extends FlxUIState {
 			}catch(e){}
 		}
 		var saved = false;
-		var dateNow:String = "";
 		var err = "";
 		exception += _stack;
 
@@ -95,96 +196,8 @@ class FuckState extends FlxUIState {
 		if(lastERROR != exception && allowLogWrite){
 			lastERROR = exception;
 
-			try{
-				var funnyQuip = "insert funny line here";
-				var _date = Date.now();
-				try{
-					var jokes = [
-						"Hey look, mom! I'm on a crash report!",
-						"This wasn't supposed to go down like this...",
-						"Don't look at me that way.. I tried",
-						"Ow, that really hurt :(",
-						"missingno",
-						"Did I ask for your opinion?",
-						"Oh lawd it crashing",
-						"get stickbugged lmao",
-						"Mom? Come pick me up. I'm scared...",
-						"It's just standing there... Menacingly.",
-						"Are you having fun? I'm having fun.",
-						"That crash though",
-						"I'm out of ideas.",
-						"Where do we go from here?",
-						"Coded in Haxe.",
-						"Oh what the hell?",
-						"I just wanted to have fun.. :(",
-						"Oh no, not this again",
-						"null object reference is real and haunts us",
-						'What is a error exactly?',
-						"I just got ratioed :(",
-						"L + Ratio + Skill Issue",
-						"Now with more crashes",
-						"I'm out of ideas.",
-						"me when null object reference",
-						'you looked at me funny :(',
-						'Hey VSauce, Michael here. What is an error?',
-						'AAAHHHHHHHHHHHHHH! Don\'t mind me, I\'m practicing my screaming',
-						'crash% speedrun less goooo!',
-						'hey look, the consequences of my actions are coming to haunt me',
-						'time to go to stack overflow for a solution',
-						'you\'re mother',
-						'sex pt 2: electric boobaloo',
-						'sex pt 3: gone wrong',
-						'the stalemate button was boobytrapped',
-						'mf shoulda just stayed with psych engine :sob:',
-						'super engine moment',
-						'Another one bites the dust',
-						"It's fine, everything is good. What do you mean this is a crash report?"
-						
-					];
-					funnyQuip = jokes[Std.int(Math.random() * jokes.length - 1) ]; // I know, this isn't FlxG.random but fuck you the game just crashed
-				}catch(e){}
-				err = '# Super Engine Crash Report: \n# $funnyQuip\n${exception}\nThis happened in ${info}';
-				if(!SELoader.exists('crashReports/')){
-					SELoader.createDirectory('crashReports/');
-				}
+			saved = generateReport('${exception}\nThis happened in ${info}','CRASH');
 
-				dateNow = StringTools.replace(StringTools.replace(_date.toString(), " ", "_"), ":", ".");
-				try{
-					currentStateName = haxe.rtti.Rtti.getRtti(cast FlxG.state).path;
-				}catch(e){}
-				try{
-					err +="\n\n # ---------- SYSTEM INFORMATION --------";
-					
-					err +='\n Operating System: ${Sys.systemName()}';
-					err +='\n Working Path: ${SELoader.absolutePath('')}';
-					err +='\n Current Working Directory: ${Sys.getCwd()}';
-					err +='\n Executable path: ${Sys.programPath()}';
-					err +='\n Arguments: ${Sys.args()}';
-					err +="\n # ---------- GAME INFORMATION ----------";
-					err +='\n Version: ${MainMenuState.ver}';
-					err +='\n Buildtype: ${MainMenuState.compileType}';
-					err +='\n Debug: ${SESave.data.animDebug}';
-					err +='\n Registered character count: ${TitleState.characters.length}';
-					err +='\n Scripts: ${SESave.data.scripts}';
-					err +='\n State: ${currentStateName}';
-					err +='\n Save: ${SESave.data}';
-					err +='\n # --------------------------------------';
-					
-				}catch(e){
-					trace('Unable to get system information! ${e.message}');
-				}
-				sys.io.File.saveContent('crashReports/SUPERENGINE_CRASH-${dateNow}.log',err);
-				
-				saved = true;
-				trace('Wrote a crash report to ./crashReports/SUPERENGINE_CRASH-${dateNow}.log!');
-				trace('Crash Report:\n$err');
-			}catch(e){
-				trace('Unable to write a crash report!');
-				if(err != null && err.indexOf('SYSTEM INFORMATION') != -1){
-					trace('Here is generated crash report:\n$err');
-
-				}
-			}
 		}
 		Main.renderLock.release();
 		if(Main.game == null || _rawError || !TitleState.initialized || useOpenFL){

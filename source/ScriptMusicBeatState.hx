@@ -408,7 +408,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 			if (SELoader.exists(_path)){
 				
 				if(brtool == null) brtool = getBRTools(_path,v);
-				trace("$nameSpace - $_path");
+				trace('$nameSpace - $_path');
 				for (i in CoolUtil.orderList(SELoader.readDirectory(_path))) {
 					if(i.endsWith(".hscript") || #if linc_luajit i.endsWith(".lua") || #end i.endsWith(".hx")){
 						var cont = false;

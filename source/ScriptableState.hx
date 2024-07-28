@@ -143,8 +143,9 @@ class SelectScriptableState extends SearchMenuState{
 	}
 
 	public static function handleError(err:String){
-		try{ScriptableStateManager.die();}catch(e){}
-		MainMenuState.handleError(err);
+		// try{ScriptableStateManager.die();}catch(e){}
+		// MainMenuState.handleError(err);
+		throw(err);
 		// Main.game.forceStateSwitch(new SelectScriptableState(err));
 	}
 

@@ -5,6 +5,7 @@ import flixel.math.FlxMath;
 
 class SEProfiler{
 	public static var enabled:Bool = false;
+	public static var decay:Bool = true;
 	public static var list:Map<String,Profiler> = [];
 	@:keep inline public static function init(){
 		getProfiler('update',true);
@@ -76,6 +77,7 @@ class SEProfiler{
 	}
 	// TODO If this doesn't do anything extra soon, i'll remove the useless if and just make it return the check
 	@:keep inline function update():Bool{
+		if(!SEProfiler.decay) return false;
 		ticksSinceUpdate++;
 		if(!keep && ticksSinceUpdate > 120){
 			return true;

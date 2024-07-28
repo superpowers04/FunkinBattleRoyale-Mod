@@ -65,6 +65,7 @@ class SELoader {
 
 	static public var cache:InternalCache = new InternalCache();
 	public static var AssetPathCache:Map<String,String>=[];
+	public static var AssetPathListingCache:Map<String,Array<String>>=[];
 	public static var aliases:Map<String,String>=[];
 	
 	public static var PATH(default,set):String = '';
@@ -126,7 +127,6 @@ class SELoader {
 
 		return (PATH + path).replace('//','/'); // Fixes paths having //'s in them
 	}
-
 	public static function getAssetPath(path:String,?namespace:String = ""):String{
 		if(#if windows path.substring(1,2) == ':' || #end path.substring(0,1) == "/" || rawMode){
 			rawMode=false;
@@ -283,6 +283,8 @@ class SELoader {
 	}
 	public static function reset(){
 		cache.clear();
+		AssetPathListingCache = [];
+		AssetPathCache=[];
 		gc();
 	}
 	@:keep inline public static function getContent(textPath:String):String{return loadText(textPath,false);}
@@ -464,6 +466,30 @@ class SELoader {
 		return FileSystem.exists(getPath(path));
 	}
 	public static function readDirectory(path:String):Array<String>{
+		if(!SESave.data.HDDMode && (path.startsWith('assets/') || path.startsWith('assets:'))){
+			path = path.substring(7);
+			if(AssetPathListingCache[path] != null){
+				return AssetPathListingCache[path].copy();
+			}
+			var modsFolder = new SEDirectory(getRawPath('mods/'));
+			var packsFolder = modsFolder.newDirectory('packs/');
+			var listing:Map<String,Bool> = [];
+			for (pack in orderList(SELoader.readDirectory(packsFolder.toString()))){
+				if(exists('$packsFolder/$pack/assets/$path')){
+					for(p in readDirectory('$packsFolder/$pack/assets/$path')){
+						listing[p]=true;
+					}
+				}
+				if(exists('$packsFolder/$pack/assets/shared/$path')){
+					for(p in readDirectory('$packsFolder/$pack/assets/shared/$path')){
+						listing[p]=true;
+					}
+				}
+			}
+			var list = AssetPathListingCache[path] = [];
+			for(key in listing.keys()) list.push(key);
+			return list.copy();
+		}
 		return FileSystem.readDirectory(getPath(path));
 	}
 	public static function readDirectories(paths:Array<String>):Array<String>{

@@ -240,8 +240,8 @@ class Note extends FlxSprite
 			case 1:if (SESave.data.cpuStrums) {PlayState.instance.DadStrumPlayAnim(noteData);}
 		}; // Strums
 		if(noteAnimation != null){
-			var anim = (if(noteAnimation == "") getNoteAnim(noteData) else noteAnimation);
-			var char = (if(char == null)PlayState.getCharFromID(charID,true) else char);
+			var anim = ((noteAnimation == "") ?  getNoteAnim(noteData) : noteAnimation);
+			var char = ((char == null) ? PlayState.getCharFromID(charID,true) : char);
 			if(!isSustainNote && char.animName == anim){
 				char.animation.play('idle',true);
 			}

@@ -11,6 +11,7 @@ import openfl.text.TextFormat;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import lime.app.Application;
+import se.SEProfiler;
 
 @:NullSafety(StrictThreaded) class LoadingScreen extends Sprite{
 	public static var object:LoadingScreen;
@@ -261,6 +262,7 @@ import lime.app.Application;
 			forceHide();
 			return;
 		}
+		SEProfiler.decay = false;
 		// object.alpha = 1;
 		if(tween != null){tween.cancel();}
 		isVisible = object.funni = true;
@@ -277,6 +279,7 @@ import lime.app.Application;
 	}
 	public static function forceHide(){
 		if(object == null) return;
+		SEProfiler.decay = true;
 		if(tween != null){tween.cancel();}
 		isVisible = object.funni = false;
 		object.alpha = 0;
@@ -287,6 +290,7 @@ import lime.app.Application;
 	public static function hide(){
 		if(Main.game != null) Main.game.blockUpdate = Main.game.blockDraw = false;
 		if(object == null) return;
+		SEProfiler.decay = true;
 		if(!object.funni){
 			object.alpha = 0;
 			return;

@@ -139,7 +139,7 @@ class PauseSubState extends MusicBeatSubstate {
 		restarts.borderSize = 2;
 		restarts.updateHitbox();
 		restarts.alignment=RIGHT;
-		SEUIUtilities.addSpacedUI(this,{y:15,objects:[
+		SEUIUtilities.addSpacedUI(this,{x:FlxG.width - 5,y:15,objects:[
 			[levelInfo],
 			[levelDifficulty],
 			[restarts]
@@ -148,10 +148,6 @@ class PauseSubState extends MusicBeatSubstate {
 
 		levelDifficulty.alpha = 0;
 		levelInfo.alpha = 0;
-
-		levelInfo.x = FlxG.width - levelInfo.width ;
-		levelDifficulty.x = FlxG.width - 20;
-		restarts.x = FlxG.width - 20;
 
 		FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartIn});
 		FlxTween.tween(levelInfo, {alpha: 1}, 0.4, {ease: FlxEase.bounceOut, startDelay: 0.3});

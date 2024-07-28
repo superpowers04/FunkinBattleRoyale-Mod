@@ -242,9 +242,10 @@ class SearchMenuState extends ScriptMusicBeatState {
 		curSelected = 0;
 		if(reload){CoolUtil.clearFlxGroup(grpSongs);}
 		songs = [];
-
 		var i:Int = 0;
 		var query = new EReg((~/[-_ ]/g).replace(search.toLowerCase().replace('\\','\\\\'),'[-_ ]'),'i'); // Regex that allows _ and - for songs to still pop up if user puts space, game ignores - and _ when showing
+		callInterp('reloadList',[query]);
+		if(cancelCurrentFunction) return;
 		for (char in searchList){
 			if(search == "" || query.match(char.toLowerCase()) ){
 				addToList(char,i);
