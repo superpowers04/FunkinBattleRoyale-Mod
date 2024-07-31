@@ -1424,26 +1424,26 @@ class PlayState extends ScriptMusicBeatState
 		}
 		currentInterp.reset();
 	}
-	function loadPositions(){
-		var map:Map<String,KadeEngineData.ObjectInfo> = cast SESave.data.playStateObjectLocations;
-		for (i => v in map) {
-			var obj = Reflect.field(this,i);
-			if(obj != null){
-				if(!Std.isOfType(obj,FlxTypedGroup)){
-					FlxTween.tween(obj,{x:v.x,y:v.y},0.4);
-				}
-				if(GameplayCustomizeState.objs[i] != null){
-					for (subIndex => subValue in GameplayCustomizeState.objs[i]) {
-						var subObj = Reflect.field(this,subIndex);
-						if(subObj != null){
-							FlxTween.tween(subObj,{x:v.x + subValue.x,y:v.y + subValue.y},0.4);
-						}
-					}
+	// function loadPositions(){
+	// 	var map:Map<String,KadeEngineData.ObjectInfo> = cast SESave.data.playStateObjectLocations;
+	// 	for (i => v in map) {
+	// 		var obj = Reflect.field(this,i);
+	// 		if(obj != null){
+	// 			if(!Std.isOfType(obj,FlxTypedGroup)){
+	// 				FlxTween.tween(obj,{x:v.x,y:v.y},0.4);
+	// 			}
+	// 			if(GameplayCustomizeState.objs[i] != null){
+	// 				for (subIndex => subValue in GameplayCustomizeState.objs[i]) {
+	// 					var subObj = Reflect.field(this,subIndex);
+	// 					if(subObj != null){
+	// 						FlxTween.tween(subObj,{x:v.x + subValue.x,y:v.y + subValue.y},0.4);
+	// 					}
+	// 				}
 
-				}
-			}
-		}
-	}
+	// 			}
+	// 		}
+	// 	}
+	// }
 	function startSong(?IGNORED:Bool = false):Void{
 		if(FlxG.sound.music == null || FlxG.sound.music.length <= 0) {
 			throw("Instrumental failed to load?");

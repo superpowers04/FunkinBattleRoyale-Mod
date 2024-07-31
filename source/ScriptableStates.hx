@@ -331,8 +331,7 @@ class ScriptableSearchMenuState extends SearchMenuState{
 
 	}
 	override function new(){
-		ScriptableStateManager.callInterp('new',[this,]);
-		ScriptableStateManager.interp.variables.set("state",this);
+		ScriptableStateManager.initState(this);
 		super();
 		ScriptableStateManager.callInterp('newAfter',[]);
 	}
@@ -548,8 +547,8 @@ class ScriptableMusicBeatState extends MusicBeatState{
 	}
 	#end
 	override function new(){
-		ScriptableStateManager.callInterp('new',[this,]);
-		ScriptableStateManager.interp.variables.set("state",this);
+		ScriptableStateManager.initState(this);
+		
 		super();
 		ScriptableStateManager.callInterp('newAfter',[]);
 	}

@@ -378,11 +378,11 @@ class ScriptMusicBeatState extends MusicBeatState{
 		// 	}else{showTempmessage('Unable to load $v for $nameSpace: Script doesn\'t exist');}
 		// 	return ((interps['${nameSpace}-${v}'] == null));
 		// }
-		public function loadSingleScript(scriptPath:String){
-			if(!parseMoreInterps) return;
+		public function loadSingleScript(scriptPath:String):Dynamic{
+			if(!parseMoreInterps) return null;
 
 			for (i in ignoreScripts) {
-				if(scriptPath.contains(i)) return;
+				if(scriptPath.contains(i)) return null;
 			}
 			var reg = ~/([^\/]*)\/([^\/]*)$/;
 			var path = scriptPath.substr(0,scriptPath.lastIndexOf("/"));
@@ -394,10 +394,10 @@ class ScriptMusicBeatState extends MusicBeatState{
 			parentDir = parentDir.substr(parentDir.lastIndexOf("/"));
 
 			#if linc_luajit
-			if(scriptPath.endsWith('.lua')) parseLua(SELoader.loadText(scriptPath),getBRTools(path),'${parentDir}:${scriptName}',scriptPath);
+			if(scriptPath.endsWith('.lua')) return parseLua(SELoader.loadText(scriptPath),getBRTools(path),'${parentDir}:${scriptName}',scriptPath);
 			else
 			#end
-				parseHScript(SELoader.loadText(scriptPath),getBRTools(path),'${parentDir}:${scriptName}',scriptPath);
+				return parseHScript(SELoader.loadText(scriptPath),getBRTools(path),'${parentDir}:${scriptName}',scriptPath);
 			
 		}
 		var scriptSubDirectory:String = "nil/"; 
@@ -448,10 +448,13 @@ class ScriptMusicBeatState extends MusicBeatState{
 				}
 			}
 		}
+		public var shouldLoadGlobalScripts = true;
 		@:keep public function loadScripts(?enableScripts:Bool = false,?enableCallbacks:Bool = false,?force:Bool = false){
 			if((!enableScripts && !parseMoreInterps) || (!(SESave.data.menuScripts && ISMENU) && !force)) return;
 			parseMoreInterps = true;
+			if(!shouldLoadGlobalScripts) return;
 			if(scriptSubDirectory == "nil/") trace('Scriptable state ${Type.getClassName(cast this)} has no custom subdirectory, Using `nil/`!');
+			
 			try{
 
 				for (i in 0 ... SESave.data.scripts.length) {

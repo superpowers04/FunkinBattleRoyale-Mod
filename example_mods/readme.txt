@@ -85,19 +85,20 @@ MAKING CHARACTERS:
  	2:
  		Drag and drop the png onto the game, select the name you want and press continue
  Ingame:
-	Go to Options > Misc > Animation Debug and make sure it's on. 
-	Go to Options > Modifications > X Character > find your character(All invalid characters appear at the top) and then Press 2. 
+	Go to Options > Modifications > Content Creation Mode and make sure it's on. 
+	Go to Options > Modifications > Opponent Character > find your character(All invalid characters appear at the top) and then Press 2. 
 	You can press H for help with using animation debug.
-	Pressing M twice will allow you to open the animation binder and config editor. Saving after adding the animations is recommended.
+	Press M to open a menu for switching between offsetting, repositioning the camera and the add animations/config editor
+	Saving after adding animations is recommended.
 
 	If you want to edit a BF character, add the animations the character as an opponent. 
 	Upon exiting the animation binder, press 3 to save, then 7 to switch over to offsetting for BF
 
-	*BF uses inverted animations so BF NOTE RIGHT will be singLEFT and BF NOTE LEFT will be singRIGHT.
+	*BF characters usually use inverted animations so BF NOTE RIGHT will be singLEFT and BF NOTE LEFT will be singRIGHT.
  
  
  If there are things you'd like to do that aren't possible with the animation editor, editing the json manually might be a good idea.
- You can find the wiki page for character jsons here: https://github.com/superpowers04/Super-Engine/wiki/Character-JSON
+ You can find the older wiki page for character jsons here: https://github.com/superpowers04/Super-Engine/wiki/Character-JSON
  You can also provide a script.hscript to add custom scripting to your characters for things like custom animations, character position manipulation and more
  
 MAKING STAGES:
@@ -131,29 +132,3 @@ MAKING STAGES:
 		* "wallpaper.png" is the file the sprite will use as it's image. If you used a subfolder, you'll need to add it to the string, like `sprites/wallpaper.png` 
 		** The game's playspace/stage size is 1280x720, no matter the resolution of the device
 		This will load the sprite but we need to actually add it to the state, for that we can use `state.add(background);`
-
-
-
-
- 
-OLDER README:
- Characters work like FNF Multi, Check BF-faceanim for an example. You can also make custom animations using IfStates
- Heres an example that adds Garcellos "tight bars, little man" animation into Release:
- {
- 	"anim": "garTightBars",
- 	"name": "garcello coolguy",
- 	"fps": 15,
- 	"loop": false,
- 	"indices": [],
- 	"oneshot":true,"":"Allows your animation to override all other animations, loop will be forced of if this is true",
- 	"ifstate":{
- 		"variable":"curStep","":"The variable to check in PlayState.hx, curStep and curBeat might be all you need though",
- 		"type":"equals","":"valid types are 'equal', 'more','less' and 'contains', if you use contains then the value should be a list of values, like [480,838,521], etc. otherwise the value should always be the same type as the variable",
- 		"value":838,"":"The value to check variable against, if type is contains, then this should be a list. Otherwise use the same type as the variable in the game",
- 		"check":1,"":"1 = curStep, 0 = curBeat. this has to be the same as variable if you use curStep or curBeat, otherwise you should use the one that plays your animation at the most accurate time"
- 	},
- 	"":"If the below requirements aren't met, the animation won't be processed. Useful for animations that are locked to a specific stage or song, These are not required",
- 	"song":"release","":"The song to play the animation on",
- 	"char_side":1,"":"Only play on a specific side, 0 = BF, 1 = Dad, 2 = GF"
- }
- You can find this example on the mod repo under GARCELLO DEAD 

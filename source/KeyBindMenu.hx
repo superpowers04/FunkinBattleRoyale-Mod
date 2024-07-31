@@ -55,7 +55,7 @@ class KeyBindMenu extends FlxSubState
 		["KEY 1", "KEY 2", "KEY 3", "KEY 4", "KEY 5", "KEY 6", "KEY 7", "KEY 8", "KEY 9", "KEY 10", "KEY 11", "KEY 12","KEY 13","KEY 14","KEY 15","KEY 16","KEY 17","KEY 18"],
 	];
 	var keyModeText:Array<String> = [
-		'User Interface/Legacy Input',null,null,"4K"
+		'User Interface/Legacy Input',null,null,"4K(Seperate from UI/Legacy Input)"
 	];
 	var keyAlt:Array<String> = ["LEFT ARROW", "DOWN ARROW", "UP ARROW", "RIGHT ARROW"];
 	var defaultKeys:Array<String> = ["A", "S", "W", "D", "Z", "X", "N", "M", "R"];
@@ -122,7 +122,7 @@ class KeyBindMenu extends FlxSubState
 		FlxTween.tween(infoText, {alpha: 1}, 1.4, {ease: FlxEase.expoInOut});
 		FlxTween.tween(blackBox, {alpha: 0.7}, 1, {ease: FlxEase.expoInOut});
 		FlxTween.tween(selectorText, {alpha: 1}, 1, {ease: FlxEase.expoInOut});
-		// for (i in keyTextDisplay) FlxTween.tween(i, {alpha: 1}, 1, {ease: FlxEase.expoInOut});
+		for (i in keyTextDisplay) {i.alpha=0;FlxTween.tween(i, {alpha: 1}, 1, {ease: FlxEase.expoInOut});}
 		OptionsMenu.instance.acceptInput = false;
 
 		textUpdate();
@@ -194,7 +194,7 @@ class KeyBindMenu extends FlxSubState
 				if(FlxG.keys.justPressed.ESCAPE){
 					keys[keyMode][curSelected] = tempKey;
 					state = "select";
-					FlxG.sound.play(Paths.sound('confirmMenu'));
+					SELoader.playSound('assets/sounds/confirmMenu');
 				}else if(FlxG.keys.justPressed.ENTER){
 					addKey(KeyBinds.defaultKeys[keyMode][curSelected]);
 					save();
@@ -312,9 +312,13 @@ class KeyBindMenu extends FlxSubState
 		save();
 
 		OptionsMenu.instance.acceptInput = true;
-		for (i in keyTextDisplay.members) FlxTween.tween(i, {alpha: 0}, 1, {ease: FlxEase.expoInOut});
+		// for (i in keyTextDisplay.members) FlxTween.tween(i, {alpha: 0}, 1, {ease: FlxEase.expoInOut});
 		FlxTween.tween(blackBox, {alpha: 0}, 1.1, {ease: FlxEase.expoInOut, onComplete: function(flx:FlxTween){close();}});
 		FlxTween.tween(infoText, {alpha: 0}, 1, {ease: FlxEase.expoInOut});
+		keyTextDisplay.visible=false;
+
+		// FlxTween.tween(keyTextDisplay, {alpha: 0}, 1, {ease: FlxEase.expoInOut});
+
 	}
 
 	public var lastKey:String = "";
@@ -325,7 +329,7 @@ class KeyBindMenu extends FlxSubState
 		if (blacklist.contains(r)){
 			keys[keyMode][curSelected] = tempKey;
 			lastKey = r;
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			SELoader.playSound('assets/sounds/cancelMenu');
 			return;
 		}
 		
@@ -342,7 +346,7 @@ class KeyBindMenu extends FlxSubState
 
 		if(shouldReturn){
 			keys[keyMode][curSelected] = r;
-			FlxG.sound.play(Paths.sound('scrollMenu'));
+			SELoader.playSound('assets/sounds/scrollMenu');
 		}
 
 	}

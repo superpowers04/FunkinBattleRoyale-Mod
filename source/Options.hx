@@ -82,15 +82,12 @@ class DFJKOption extends Option
 		this.controls = controls;
 		description = 'Change your controls';
 		display = "Key Bindings >";
-		acceptValues = true;
+		// acceptValues = true;
 	}
 
 	public override function press():Bool{
 		OptionsMenu.instance.openSubState(new KeyBindMenu());
 		return false;
-	}
-	override function getValue():String {
-		return KeyBindMenu.getKeyBindsString();
 	}
 }
 

@@ -57,7 +57,7 @@ class GameplayCustomizeState extends PlayState
 	var objClicks:Map<FlxSprite,String> = [];
 	var rating:FlxSprite;
 	public override function create() {
-		SAVDATA = cast SESave.data.playStateObjectLocations;
+		// SAVDATA = cast SESave.data.playStateObjectLocations;
 		PlayState.SONG = {
 				song: SickMenuState.musicFileLoc,
 				notes: [{
@@ -123,7 +123,7 @@ class GameplayCustomizeState extends PlayState
 
 	}
 	inline function resetValues(){
-		SESave.data.playStateObjectLocations = new Map<String,ObjectInfo>();
+		// SESave.data.playStateObjectLocations = new Map<String,ObjectInfo>();
 		FlxG.resetState();
 	}
 	// override function generateSong(?dataPath:String = ""){
@@ -254,7 +254,7 @@ class GameplayCustomizeState extends PlayState
 		if (controls.BACK)
 		{
 			FlxG.mouse.enabled = false;
-			SESave.data.playStateObjectLocations = cast SAVDATA;
+			// SESave.data.playStateObjectLocations = cast SAVDATA;
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			FlxG.switchState(new OptionsMenu());
 		}

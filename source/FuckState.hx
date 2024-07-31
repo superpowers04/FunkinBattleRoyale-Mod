@@ -31,10 +31,12 @@ class FuckState extends FlxUIState {
 	public static var useOpenFL:Bool = false;
 	public static var lastERROR = "";
 	public static var allowLogWrite:Bool = true;
+	public static var errorCount = 0;
 	public static function generateReport(error:String = "UNKNOWN ERROR?",type:String = "CRASH"):Bool{
 
 		var dateNow:String = "";
 		var err = "";
+		errorCount++;
 		try{
 			var funnyQuip = "insert funny line here";
 			var _date = Date.now();
@@ -95,20 +97,20 @@ class FuckState extends FlxUIState {
 			try{
 				err +="\n\n # ---------- SYSTEM INFORMATION --------";
 				
-				err +='\n Operating System: ${Sys.systemName()}';
-				err +='\n Working Path: ${SELoader.absolutePath('')}';
-				err +='\n Current Working Directory: ${Sys.getCwd()}';
-				err +='\n Executable path: ${Sys.programPath()}';
-				err +='\n Arguments: ${Sys.args()}';
-				err +="\n # ---------- GAME INFORMATION ----------";
-				err +='\n Version: ${MainMenuState.ver}';
-				err +='\n Buildtype: ${MainMenuState.compileType}';
-				err +='\n Debug: ${SESave.data.animDebug}';
-				err +='\n Registered character count: ${TitleState.characters.length}';
-				err +='\n Scripts: ${SESave.data.scripts}';
-				err +='\n State: ${currentStateName}';
-				err +='\n Save: ${SESave.data}';
-				err +='\n # --------------------------------------';
+				err +='\n Operating System: ${Sys.systemName()}'
+					+'\n Working Path: ${SELoader.absolutePath('')}'
+					+'\n Current Working Directory: ${Sys.getCwd()}'
+					+'\n Executable path: ${Sys.programPath()}'
+					+'\n Arguments: ${Sys.args()}'
+					+"\n # ---------- GAME INFORMATION ----------"
+					+'\n Fatal, forced, Shown thru OpenFL, errorCount: ${FATAL}, ${forced}, ${useOpenFL}, ${errorCount}'
+					+'\n Version: ${MainMenuState.ver}'
+					+'\n Buildtype: ${MainMenuState.compileType}'
+					+'\n Debug: ${SESave.data.animDebug}'
+					+'\n Registered character count: ${TitleState.characters.length}'
+					+'\n Scripts: ${SESave.data.scripts}'
+					+'\n State: ${currentStateName}'
+					+'\n # --------------------------------------';
 				
 			}catch(e){
 				trace('Unable to get system information! ${e.message}');
@@ -352,6 +354,7 @@ class FuckState extends FlxUIState {
 				MainMenuState.firstStart = true;
 				FlxG.switchState(new MainMenuState());
 				useOpenFL = false;
+				errorCount=0;
 				return;
 			}
 			if (FlxG.keys.justPressed.ESCAPE){
