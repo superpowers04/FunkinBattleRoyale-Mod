@@ -253,6 +253,32 @@ class SELoader {
 	}
 
 
+	public static function loadStichedSparrowFrames(pngPath:String,?cache:Bool=false):FlxAtlasFrames{
+		pngPath = getPath(pngPath);
+		if(!exists('${pngPath}.png')){
+			handleError('${id}: SparrowFrame PNG "${pngPath}.png" doesn\'t exist!');
+			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
+		}
+		if(!exists('${pngPath}.xml')){
+			handleError('${id}: SparrowFrame XML "${pngPath}.xml" doesn\'t exist!');
+			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
+		}
+		var atlas = FlxAtlasFrames.fromSparrow(loadGraphic('$pngPath.png',cache),loadXML('${pngPath}',cache));
+		var i = 1;
+		while(exists('${pngPath}-$i.png') && exists('${pngPath}-$i.xml')){
+			var pngPath ='${pngPath}-$i' ;
+			trace(pngPath);
+			i++;
+			var nextAtlas = FlxAtlasFrames.fromSparrow(loadGraphic('$pngPath.png',cache),loadXML('${pngPath}',cache));
+			@:privateAccess{
+				if(!atlas.usedGraphics.contains(atlas.parent)){
+					atlas.usedGraphics.push(atlas.parent);
+				}
+			}
+			atlas.addAtlas(nextAtlas);
+		}
+		return atlas;
+	}
 	public static function loadSparrowFrames(pngPath:String,?cache:Bool=false):FlxAtlasFrames{
 		pngPath = getPath(pngPath);
 		if(!exists('${pngPath}.png')){
@@ -263,7 +289,7 @@ class SELoader {
 			handleError('${id}: SparrowFrame XML "${pngPath}.xml" doesn\'t exist!');
 			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
 		}
-		return FlxAtlasFrames.fromSparrow(loadGraphic('$pngPath.png',cache),loadText('${pngPath}.xml',cache));
+		return FlxAtlasFrames.fromSparrow(loadGraphic('$pngPath.png',cache),loadXML('${pngPath}',cache));
 	}
 	public static function loadSparrowSprite(x:Float,y:Float,pngPath:String,?anim:String = "",?loop:Bool = false,?fps:Int = 24,?useCache:Bool = false):FlxSprite{
 		pngPath = getPath(pngPath);

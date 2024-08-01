@@ -619,7 +619,7 @@ class CharAnimController extends FlxAnimationController{
 				var p = SELoader.getRawPath("assets/shared/images/")+charInfo.internalAtlas; // This is to prevent loading custom bf for internal bf
 				charXml = SELoader.loadXML(p+".xml",true);
 				// trace('$charXml $p');
-				if(frames == null) frames=tex=FlxAtlasFrames.fromSparrow(SELoader.loadGraphic('$p.png',true),charXml);
+				if(frames == null) frames=tex=SELoader.loadStichedSparrowFrames(p);
 				// trace('$frames');
 				charProperties = Json.parse(charPropJson = charInfo.internalJSON);
 			}catch(e){
@@ -678,7 +678,8 @@ class CharAnimController extends FlxAnimationController{
 					} else {
 						charXml = SELoader.loadXML(xmlName); // Loads the XML as a string. 
 						if (charXml == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's XML can't be loaded
-						tex = SEFlxFrames.fromSparrow(SELoader.loadGraphic(pngName), charXml);
+						frames=tex = SELoader.loadSparrowFrames(pngName.substring(0,pngName.length-4));
+						// SEFlxFrames.fromSparrow(SELoader.loadGraphic(pngName), charXml);
 					}
 					if (tex == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's texture can't be loaded
 				}
@@ -791,7 +792,9 @@ class CharAnimController extends FlxAnimationController{
 						// if(charXml.substr(2).replace(String.fromCharCode(0),'').contains('UTF-16')){ // Flash CS6 outputs a UTF-16 xml even though no UTF-16 characters are usually used. This reformats the file to be UTF-8 *hopefully*
 						// 	charXml = '<?' + charXml.substr(2).replace(String.fromCharCode(0),'').replace('UTF-16','utf-8');
 						// }
-						tex = SEFlxFrames.fromSparrow(SELoader.loadGraphic('${charLoc}/$curCharacter/${pngName}'), charXml);
+						// tex = SEFlxFrames.fromSparrow(SELoader.loadGraphic(), charXml);
+						if(pngName.endsWith('.png')) pngName = pngName.substring(0,pngName.length-4);
+						tex = SELoader.loadStichedSparrowFrames('${charLoc}/$curCharacter/${pngName}');
 					}
 					if (tex == null){throw('$curCharacter is missing their XML!');} // Boot to main menu if character's texture can't be loaded
 				}

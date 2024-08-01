@@ -191,6 +191,7 @@ class AnimationDebug extends MusicBeatState
 			try{
 				SELoader.importFile(file,'${chara.loadedFrom.substring(0,chara.loadedFrom.lastIndexOf('/'))}/healthicon.png');
 				showTempmessage('Imported health icon!');
+				if(uiMap["hi1"] != null) uiMap["hi1"].changeSprite(chara.charInfo.getNamespacedName());
 			}catch(e){
 				trace('Unable to import health icon! ${e.message}');
 				showTempmessage('Unable to import health icon! ${e.message}',FlxColor.RED);
