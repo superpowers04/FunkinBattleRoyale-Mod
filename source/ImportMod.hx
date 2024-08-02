@@ -88,7 +88,7 @@ class ImportModFromFolder extends MusicBeatState
 			var assumedType:String = "";
 			for(entry in entries){
 				if(entry.fileName.substring(entry.fileName.length-1)=='/'){
-					if(canBreakMeta || assumedType != "") continue;
+					if(canBreakMeta || !(assumedType == "" || assumedType == "script")) continue; 
 					var name = entry.fileName;
 					if(name.contains('/manifest') || name.contains('/mods')){
 						assumedType="exec";
@@ -98,12 +98,15 @@ class ImportModFromFolder extends MusicBeatState
 
 					continue;
 				}
-				if(!canBreakMeta && assumedType == ""){
+				if(!canBreakMeta && (assumedType == "" || assumedType == "script")){ // scripts can be provided in packs and shit so if we find another type, it's probably that and NOT a script
 					if(entry.fileName.endsWith('character.png')){
 						assumedType="char";
 					}
 					if(entry.fileName.endsWith('Inst.ogg')){
 						assumedType="chart";
+					}
+					if(entry.fileName.toLowerCase().endsWith('options.json') || entry.fileName.toLowerCase().endsWith('script.hscript') || entry.fileName.toLowerCase().endsWith('script.hx')){
+						assumedType="script";
 					}
 				}
 				if(entry.fileName.toLowerCase().endsWith("semetadata.txt")){
@@ -163,6 +166,12 @@ class ImportModFromFolder extends MusicBeatState
 					var charFolder = metaContent['pack'] != null ? './mods/packs/${metaContent["pack"]}/charts/$char' : './mods/charts/$char';
 					extractContent(input,entries,charFolder,subfolder);
 				}
+				case "script":{
+					var char = metaContent['name'] ?? subfolder ?? 'unlabelled-${Date.now().getTime()}';
+
+					var charFolder = metaContent['pack'] != null ? './mods/packs/${metaContent["pack"]}/scripts/$char' : './mods/scripts/$char';
+					extractContent(input,entries,charFolder,subfolder);
+				}
 				case "pack":{
 					var char = metaContent['name'] ?? subfolder ?? 'unlabelled-${Date.now().getTime()}';
 
@@ -184,17 +193,19 @@ class ImportModFromFolder extends MusicBeatState
 					throw('Unrecognised mod type ${metaContent['type']}');
 			}
 			Options.ReloadCharlist.RELOAD();
+			sys.FileSystem.deleteFile('./requestedFile'); // Hardcoded for now just so I don't have to worry about security
 		}catch(e){
 			input.close();
 			trace('${e}\n${e.stack}');
-			if(path != "" && SELoader.exists(path) && !SELoader.isDirectory(path)){
+			// if(path != "" && SELoader.exists(path) && !SELoader.isDirectory(path)){
 				try{
 					// sys.io.FileSystem.deleteFile(path);
+					sys.FileSystem.deleteFile('./requestedFile'); // Hardcoded for now just so I don't have to worry about security
 
 				}catch(e){
 					trace('Unable to delete file $path;$e');
 				}
-			}
+			// }
 			throw(e);
 		}
 	}

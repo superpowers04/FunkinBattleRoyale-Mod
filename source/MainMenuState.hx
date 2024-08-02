@@ -264,15 +264,17 @@ class MainMenuState extends SickMenuState {
 	// 	// if(char != null && char.animation.curAnim.finished) char.dance(true);
 	// }
 	var showedImportClipboard:Bool = false;
+	static var lastImported:String = "";
 	override function onFocus(){
 
 		var clip = lime.system.Clipboard.text;
-		if(clip.startsWith('https://') && clip.contains('.zip')){
+		if(clip != lastImported && clip.startsWith('https://') && clip.contains('.zip')){
 			if(showedImportClipboard) return;
 			showedImportClipboard = true;
 			if(!otherMenu){
 				otherSwitch();
 			}
+			lastImported=clip;
 			descriptions[0]= "Detected a link to a zip file in your clipboard. Press this to import it";
 
 			changeSelection();

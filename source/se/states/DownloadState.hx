@@ -46,7 +46,6 @@ class DownloadState extends MusicBeatState
 
 		this.callback = callback;
 		this.path = path;
-		trace(url);
 	}
 
 	override function create()
@@ -98,6 +97,8 @@ class DownloadState extends MusicBeatState
 		try{
 			output.close();
 		}catch(e){}
+		inError=true;
+		progress = 0;
 		fileSizeText.text = "";
 		loadingText.text = 'Error! Press any key to exit\n\n${e}';
 		trace('Error! ${e}');
@@ -112,6 +113,7 @@ class DownloadState extends MusicBeatState
 	// 	trace('Error! ${e.text}');
 	// 	canClose = true;
 	// }
+	public var inError:Bool =false;
 	public dynamic function onData(bytes:Bytes){
 
 		fileSizeText.text =  "Writing to file";
@@ -125,6 +127,8 @@ class DownloadState extends MusicBeatState
 		}catch(e){
 			fileSizeText.text = "";
 			loadingText.text = 'Error! Press any key to exit\n\n${e.details()}\n${e.stack}';
+			inError=true;
+			progress = 0;
 			trace('Error! ${e.details()}\n ${e.stack}');
 		}
 
@@ -145,11 +149,17 @@ class DownloadState extends MusicBeatState
 			fileSizeText.text =  Std.int(bytesReceived/10)/100 + "/" + Std.int(fileSize/10)/100 + "KB";
 		}
 	}
+	var errEl:Float = 0;
 	override function update(elapsed:Float) {
-		if(canClose){
+
+		if(canClose || inError){
 			if(FlxG.keys.justPressed.ANY){
 				FlxG.switchState(new MainMenuState());
 			}
+		}
+		if(inError && SESave.data.flashing){
+			errEl+=elapsed;
+			progress = (errEl % 1 > 0.5 ? 1 : 0);
 		}
 
 		super.update(elapsed);
