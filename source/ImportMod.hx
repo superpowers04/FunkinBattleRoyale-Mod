@@ -48,7 +48,7 @@ class ImportMod extends DirectoryListing
 	}
 }
 
-
+typedef ZipEntries = haxe.ds.List<haxe.zip.Entry>;
 class ImportModFromFolder extends MusicBeatState
 {
 	var loadingText:FlxText;
@@ -58,6 +58,7 @@ class ImportModFromFolder extends MusicBeatState
 	var songName:EReg = ~/.+\/(.*?)\//g;
 	var songsImported:Int = 0;
 	var importExisting:Bool = false;
+	var callback:()->Void;
 
 	var name:String;
 	var folder:String;
@@ -69,16 +70,166 @@ class ImportModFromFolder extends MusicBeatState
 	var songList:Array<SongInfo> = [];
 	var txt:String = '';
 	var acceptInput = false;
+	public static function fromZip(path:String = 'requestedFile',?_:Dynamic){
+		var input = SELoader.read(path);
+		try{
+
+			var entries:ZipEntries = null;
+			try{
+				entries = haxe.zip.Reader.readZip(input);
+				if(entries == null) throw('Zip entries are null. Invalid zip provided?');
+			}catch(e){
+				throw('Unable to read zip: $e');
+			}
+			var metadata:haxe.zip.Entry = null;
+			var subfolder:String = "";
+			var canBreakMeta=false;
+			var canBreakSubfolder=false;
+			var assumedType:String = "";
+			for(entry in entries){
+				if(entry.fileName.substring(entry.fileName.length-1)=='/'){
+					if(canBreakMeta || assumedType != "") continue;
+					var name = entry.fileName;
+					if(name.contains('/manifest') || name.contains('/mods')){
+						assumedType="exec";
+					}else if(!name.contains('assets/') && (name.contains('characters/') || name.contains('charts/') || name.contains('scripts/'))){
+						assumedType="pack";
+					}
+
+					continue;
+				}
+				if(!canBreakMeta && assumedType == ""){
+					if(entry.fileName.endsWith('character.png')){
+						assumedType="char";
+					}
+					if(entry.fileName.endsWith('Inst.ogg')){
+						assumedType="chart";
+					}
+				}
+				if(entry.fileName.toLowerCase().endsWith("semetadata.txt")){
+					metadata = entry;
+					if(canBreakSubfolder) break;
+					canBreakMeta=true;
+					assumedType="";
+					continue;
+				}
+				if(!canBreakSubfolder && entry.fileName.contains('/')){
+					var sub = entry.fileName.substring(0,entry.fileName.indexOf('/'));
+					if(subfolder == ""){
+						subfolder = sub;
+					}else if(subfolder != sub){
+						canBreakSubfolder = true;
+						subfolder = "";
+						
+					}
+				}else{
+					if(canBreakMeta) break;
+					canBreakSubfolder = true;
+				}
+
+			}
+
+			var metaContent:Map<String,String> = [];
+			if(metadata != null){
+
+				entries.remove(metadata);
+				var meta = haxe.zip.Reader.unzip(metadata).toString();
+				if(meta.contains('=')){
+					var metaList = meta.split('\n');
+					for(meta in metaList){
+						var index = meta.indexOf('=');
+						if(index > -1){
+							metaContent[meta.substring(0,index).toLowerCase()] = meta.substring(index+1);
+						}
+					}
+				}else{
+					metaContent['type'] = meta;
+				}
+			}else if(assumedType == ""){
+				throw('Unable to auto-detect zip type');
+			}else{
+				metaContent['type'] = assumedType;
+			}
+			switch(metaContent['type']){
+				case "character" | "char":{
+					var char = metaContent['charname'] ?? metaContent['name'] ?? subfolder ?? 'unlabelled-${Date.now().getTime()}';
+
+					var charFolder = metaContent['pack'] != null ? './mods/packs/${metaContent["pack"]}/characters/$char' : './mods/characters/$char';
+					extractContent(input,entries,charFolder,subfolder);
+				}
+				case "chart" | "song":{
+					var char = metaContent['songname'] ?? metaContent['name'] ?? subfolder ?? 'unlabelled-${Date.now().getTime()}';
+
+					var charFolder = metaContent['pack'] != null ? './mods/packs/${metaContent["pack"]}/charts/$char' : './mods/charts/$char';
+					extractContent(input,entries,charFolder,subfolder);
+				}
+				case "pack":{
+					var char = metaContent['name'] ?? subfolder ?? 'unlabelled-${Date.now().getTime()}';
+
+					var charFolder = './mods/packs/$char/';
+					extractContent(input,entries,charFolder,subfolder);
+				}
+				case "exec" | "psych":{
+					var char = metaContent['name'] ?? subfolder ?? 'unlabelled-${Date.now().getTime()}';
+
+					var charFolder = './mods/packs/$char/';
+					var newEntries:ZipEntries = new ZipEntries();
+					for(entry in entries){
+						if(!entry.fileName.contains('assets/') && !entry.fileName.contains('mods/')) continue;
+						newEntries.push(entry);
+					}
+					extractContent(input,newEntries,charFolder,subfolder);
+				}
+				default:
+					throw('Unrecognised mod type ${metaContent['type']}');
+			}
+			Options.ReloadCharlist.RELOAD();
+		}catch(e){
+			input.close();
+			trace('${e}\n${e.stack}');
+			if(path != "" && SELoader.exists(path) && !SELoader.isDirectory(path)){
+				try{
+					// sys.io.FileSystem.deleteFile(path);
+
+				}catch(e){
+					trace('Unable to delete file $path;$e');
+				}
+			}
+			throw(e);
+		}
+	}
+	public static function extractContent(input:sys.io.FileInput,entries:ZipEntries,startPath:String,subFolder:String){
+		startPath = SELoader.cleanPath(SELoader.getPath(startPath));
+		if(SELoader.exists(startPath) || SELoader.isDirectory(startPath)){
+			startPath+=Date.now().getTime();
+		}
+		if(SELoader.exists(startPath) || SELoader.isDirectory(startPath)){
+			throw('$startPath already exists, unable to extract!');
+		}
+		for(entry in entries){
+			var name = entry.fileName;
+			if(name.substring(name.length-1)=='/') continue;
+			if(subFolder!="") name=name.substring(subFolder.length+1);
+			name = startPath+'/'+name;
+			SELoader.createDirectory(name.substring(0,name.lastIndexOf('/')));
+			var output = SELoader.write(name);
+			var bytes = haxe.zip.Reader.unzip(entry);
+			output.writeBytes(bytes,0,bytes.length);
+			output.close();
+		}
+
+	}
+
 	function changeText(str){
 		txt = str;
 		// loadingText.screenCenter(X);
 		return;
 	}
 
-	public function new (folder:String,name:String,?importExisting:Bool = false)
+	public function new (folder:String,name:String,?importExisting:Bool = false,?callback:()->Void)
 	{
 		super();
-
+		this.callback = callback;
 		this.name = name;
 		this.folder = folder;
 		this.importExisting = importExisting;
@@ -169,7 +320,12 @@ class ImportModFromFolder extends MusicBeatState
 		if(acceptInput) {
 
 			if ((done && FlxG.keys.justPressed.ANY) || FlxG.keys.justPressed.ESCAPE) {
-				FlxG.switchState(new MainMenuState());
+				if(callback != null){
+					callback();
+				}else{
+					FlxG.switchState(new MainMenuState());
+				}
+
 			}
 			if(!selectedLength){
 				if(FlxG.keys.justPressed.ENTER){

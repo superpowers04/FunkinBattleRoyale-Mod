@@ -1,4 +1,4 @@
-24.07.31.2037;
+24.08.01.2221;
 * Better Psych character support(Still kinda experimental but should be more stable)
 * Fix some small errors
 * Fix characters not loading due to using ID instead of folderName
@@ -8,3 +8,4 @@
 * Options/Animation debug music
 * Remove FlxKey from being used in input
 * SaveIcon when game is saving
+* Add support for importing mod zips from clipboard

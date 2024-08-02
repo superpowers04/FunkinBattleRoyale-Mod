@@ -140,7 +140,10 @@ class AnimationDebug extends MusicBeatState
 	#else
 	public static function fileDrop(file:String){
 		// Normal filesystem/file is used here because we aren't working within the game's folder. We need absolute paths
-
+		if(file.startsWith('https://') || file.startsWith('https://')){
+			FlxG.switchState(new se.states.DownloadState(file,'./requestedFile',ImportMod.ImportModFromFolder.fromZip.bind(null,_)));
+			return;
+		}
 		#if windows
 		file = file.replace("\\","/"); // Windows uses \ at times but we use / around here
 		#end

@@ -5,6 +5,8 @@ package;
 
 
 import sys.io.File;
+import sys.io.FileOutput;
+import sys.io.FileInput;
 import sys.FileSystem;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.FlxGraphic;
@@ -547,6 +549,18 @@ class SELoader {
 	}
 	public static function isDirectory(path:String):Bool{
 		return FileSystem.isDirectory(getPath(path));
+	}
+	public static function write(path:String,binary:Bool=true):FileOutput{
+		return File.write(getPath(path));
+	}
+	public static function read(path:String,binary:Bool=true):FileInput{
+		return File.read(getPath(path));
+	}
+	public static function cleanPath(path:String):String{
+		return path.replace('..\\','').replace('../','');
+	}
+	public static function append(path:String,binary:Bool=true):FileOutput{
+		return File.append(getPath(path));
 	}
 	public static function createDirectory(path:String){
 		return FileSystem.createDirectory(getPath(path));

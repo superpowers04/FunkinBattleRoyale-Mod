@@ -548,6 +548,7 @@ class ConsoleInput extends TextField{
 
 		['-- Utilities --'],
 		["mainmenu",'Return to the main menu'],
+		["importurl",'Attempts to download and import a zip from a url'],
 		["reload",'Reloads current state'],
 		["switchstate",'Switch to a state, Case/path sensitive!'],
 		["defines",'Prints a bunch of defines, used for debugging purposes'],
@@ -608,8 +609,8 @@ class ConsoleInput extends TextField{
 				Console.showConsole = false;
 				FlxG.resetState();
 			case 'mainmenu':
-				Console.showConsole = false;
 				MainMenuState.handleError("");
+				Console.showConsole = false;
 			case 'getvalue':
 				try{
 					var ret = '${ConsoleUtils.getValueFromPath(null,args[1])}';
@@ -648,6 +649,16 @@ class ConsoleInput extends TextField{
 
 			// 		Console.print('PlayState:${cpp.Stdlib.sizeof(PlayState)}');
 				// }
+			case 'importurl' :
+				// Console.print(haxe.CallStack.exceptionStack(true));
+				Console.showConsole = false;
+				var url:String = args[1];
+				if(url == null || !url.startsWith('http://') && !url.startsWith('https://')) {
+					Console.print('Invalid URL');
+					return 'Invalid URL';
+				}
+				FlxG.switchState(new se.states.DownloadState(url,'./requestedFile',ImportMod.ImportModFromFolder.fromZip.bind(null,_)));
+				return null;
 			case 'trace' :
 				// Console.print(haxe.CallStack.exceptionStack(true));
 				text = text.substring(text.indexOf(' '));

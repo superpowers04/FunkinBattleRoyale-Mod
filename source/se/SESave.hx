@@ -171,6 +171,7 @@ typedef YourMother = Dynamic;
 	var animDebugMusic:Bool=true;
 	var optionsMusic:Bool=true;
 	var ignoreErrors:Bool=false;
+	var repoURL:String="";
 
 	public function new(){}
 }

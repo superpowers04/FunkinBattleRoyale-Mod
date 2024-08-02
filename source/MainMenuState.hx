@@ -263,24 +263,47 @@ class MainMenuState extends SickMenuState {
 	// 	super.beatHit();
 	// 	// if(char != null && char.animation.curAnim.finished) char.dance(true);
 	// }
+	var showedImportClipboard:Bool = false;
+	override function onFocus(){
+
+		var clip = lime.system.Clipboard.text;
+		if(clip.startsWith('https://') && clip.contains('.zip')){
+			if(showedImportClipboard) return;
+			showedImportClipboard = true;
+			if(!otherMenu){
+				otherSwitch();
+			}
+			descriptions[0]= "Detected a link to a zip file in your clipboard. Press this to import it";
+
+			changeSelection();
+		}else if(showedImportClipboard){
+			showedImportClipboard=false;
+			if(otherMenu){
+				options[0]= "import clipboard";
+				descriptions[0]= 'Treats the contents of your clipboard like you\'ve dragged and dropped it onto the game';
+				if(curSelected == 0) changeSelection();
+			}
+		}
+	}
 	override function changeSelection(change:Int = 0){
 		// if(char != null && change != 0) char.playAnim(Note.noteAnims[if(change > 0)1 else 2],true);
 		MainMenuState.errorMessage = "";
 		super.changeSelection(change);
 	}
-	#if(android) inline static #end var otherMenu:Bool = false;
-	#if !mobile
+	#if(mobile) 
+		inline static var otherMenu:Bool = false;
+		function otherSwitch(){}
+	#else
+	public var otherMenu:Bool = false;
 	function otherSwitch(){
-		options = ["deprecated freeplay","download charts","download characters","import charts from mods","changelog", 'credits'];
-		descriptions = ['Play any song from the main game or your assets folder',"Download charts made for or ported to Super Engine","Download characters made for or ported to Super Engine",'Convert charts from other mods to work here. Will put them in Modded Songs',"Read the latest changes for the engine","Check out the awesome people who helped with this engine in some way"];
+		options = ["import clipboard","deprecated freeplay","download charts","download characters","import charts from mods","changelog", 'credits'];
+		descriptions = ['Treats the contents of your clipboard like you\'ve dragged and dropped it onto the game','Play any song from the main game or your assets folder',"Download charts made for or ported to Super Engine","Download characters made for or ported to Super Engine",'Convert charts from other mods to work here. Will put them in Modded Songs',"Read the latest changes for the engine","Check out the awesome people who helped with this engine in some way"];
 		
 				// if (TitleState.osuBeatmapLoc != '') {options.push("osu beatmaps"); descriptions.push("Play osu beatmaps converted over to FNF");}
 		options.push("back"); descriptions.push("Go back to the main menu");
 		curSelected = 0;
 
-		#if(!mobile)
 			otherMenu = true;
-		#end
 		selected = false;
 		callInterp('otherSwitch',[]);
 		if(cancelCurrentFunction) return;
@@ -381,6 +404,8 @@ class MainMenuState extends SickMenuState {
 					loading = true;
 					MainMenuState.handleError('Offline songs have been moved to the modded songs list!');
 					// FlxG.switchState(new onlinemod.OfflineMenuState());
+				case "import clipboard":
+					AnimationDebug.fileDrop(lime.system.Clipboard.text);
 				case 'changelog' | 'update':
 					FlxG.switchState(new OutdatedSubState());
 				// case "Setup characters":
