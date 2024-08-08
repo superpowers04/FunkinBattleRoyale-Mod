@@ -37,7 +37,7 @@ import flixel.FlxCamera;
 import sys.thread.Thread;
 import Alphabet;
 import SELoader.SEDirectory;
-
+import tjson.Json;
 #if discord_rpc
 	import Discord.DiscordClient;
 #end

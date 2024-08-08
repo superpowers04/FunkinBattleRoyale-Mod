@@ -1,12 +1,12 @@
 class EtternaFunctions
 {
 	// erf constants
-	public static var a1 =  0.254829592;
-	public static var a2 = -0.284496736;
-	public static var a3 =  1.421413741;
-	public static var a4 = -1.453152027;
-	public static var a5 =  1.061405429;
-	public static var p  =  0.3275911;
+	inline public static var a1 =  0.254829592;
+	inline public static var a2 = -0.284496736;
+	inline public static var a3 =  1.421413741;
+	inline public static var a4 = -1.453152027;
+	inline public static var a5 =  1.061405429;
+	inline public static var p  =  0.3275911;
 
 	public static function erf(x:Float):Float
 	{

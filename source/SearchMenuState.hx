@@ -371,9 +371,13 @@ class SearchMenuState extends ScriptMusicBeatState {
 		return;
 	}
 	var curTween:FlxTween;
+	var showBeatBouncing(get,default):Bool = true;
+	function get_showBeatBouncing(){
+		return SESave.data.beatBouncing && showBeatBouncing;
+	}
 	override function beatHit(){
 		super.beatHit();
-		if(SESave.data.beatBouncing && grpSongs != null && grpSongs.members[curSelected] != null){
+		if(showBeatBouncing && grpSongs != null && grpSongs.members[curSelected] != null){
 			
 			grpSongs.members[curSelected].scale.set(1.1,1.1);
 			if(curTween != null)curTween.cancel();

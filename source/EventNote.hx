@@ -210,6 +210,16 @@ class EventNote implements flixel.util.FlxDestroyUtil.IFlxDestroyable{
 				hit = function(?charID:Int = 0,note){if(SESave.data.distractions) FlxG.camera.shake(info[0],info[1]);}; 
 				
 			}
+			case "setcamerabop" | "camerabop": {
+				try{
+					info = [Std.parseFloat(rawNote[3])];
+					if(Math.isNaN(info[0])) info[0] = 0; 
+					// if(Math.isNaN(info[1])) info[1] = 0; 
+				}catch(e){info = [1];}
+				// Replaces hit func
+				hit = function(?charID:Int = 0,note){PlayState.instance.camZoomAmount= 0.015 * info[0];}; 
+				
+			}
 			case "camera follow pos" | "camfollowpos" | "cam follow" | "cam follow position": {
 				try{
 					info = [Std.parseFloat(rawNote[3]),Std.parseFloat(rawNote[4])];
@@ -286,7 +296,7 @@ class EventNote implements flixel.util.FlxDestroyUtil.IFlxDestroyable{
 				hit = function(?charID:Int = 0,note){PlayState.instance.parseRun(rawNote[4]);}; 
 			}
 			default:{ // Don't trigger hit animation
-				hit = function(?charID:Int = 0,note){trace('Hit an empty event note ${note.type}.');return;};
+				hit = function(?charID:Int = 0,note){trace('Hit an empty event note ${note.type} ${note.rawNote}.');return;};
 			}
 		}
 		note.info = info;

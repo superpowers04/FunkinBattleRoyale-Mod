@@ -33,18 +33,22 @@ class DownloadState extends MusicBeatState
 	public var url:String= "";
 	public var path:String = "";
 	public var callback:Dynamic->Void;
+	public var exitCallback:Void->Void = function(){
+		FlxG.switchState(new MainMenuState());
+	};
 	public var socket:HTTPRequest<Bytes>;
 	public var file:File;
 	public var output:FileOutput;
 	public var canClose:Bool = true;
 
-	public function new(url:String, path:String, callback:Dynamic->Void)
+	public function new(url:String, path:String, callback:Dynamic->Void,?exitCallback:Void->Void)
 	{
 		super();
 
 		this.url = url;
 
 		this.callback = callback;
+		this.exitCallback = exitCallback;
 		this.path = path;
 	}
 
@@ -154,7 +158,7 @@ class DownloadState extends MusicBeatState
 
 		if(canClose || inError){
 			if(FlxG.keys.justPressed.ANY){
-				FlxG.switchState(new MainMenuState());
+				exitCallback();
 			}
 		}
 		if(inError && SESave.data.flashing){

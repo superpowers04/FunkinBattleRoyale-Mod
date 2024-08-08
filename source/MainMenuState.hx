@@ -298,8 +298,8 @@ class MainMenuState extends SickMenuState {
 	#else
 	public var otherMenu:Bool = false;
 	function otherSwitch(){
-		options = ["import clipboard","deprecated freeplay","download charts","download characters","import charts from mods","changelog", 'credits'];
-		descriptions = ['Treats the contents of your clipboard like you\'ve dragged and dropped it onto the game','Play any song from the main game or your assets folder',"Download charts made for or ported to Super Engine","Download characters made for or ported to Super Engine",'Convert charts from other mods to work here. Will put them in Modded Songs',"Read the latest changes for the engine","Check out the awesome people who helped with this engine in some way"];
+		options = ["import clipboard","deprecated freeplay","download assets","download characters","import charts from mods","changelog", 'credits'];
+		descriptions = ['Treats the contents of your clipboard like you\'ve dragged and dropped it onto the game','Play any song from the main game or your assets folder',"Download content made for or ported to Super Engine","Download characters made for or ported to Super Engine",'Convert charts from other mods to work here. Will put them in Modded Songs',"Read the latest changes for the engine","Check out the awesome people who helped with this engine in some way"];
 		
 				// if (TitleState.osuBeatmapLoc != '') {options.push("osu beatmaps"); descriptions.push("Play osu beatmaps converted over to FNF");}
 		options.push("back"); descriptions.push("Go back to the main menu");
@@ -428,6 +428,8 @@ class MainMenuState extends SickMenuState {
 					#elseif(macos)
 						Sys.command('open',[SELoader.fullPath('mods/')]);
 					#end
+				case "download assets":
+					FlxG.switchState(new se.states.ModRepoState());
 				case "download charts":
 					FlxG.switchState(new ChartRepoState());
 				case 'story mode':

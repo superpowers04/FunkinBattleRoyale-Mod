@@ -50,6 +50,8 @@ class VSliceUtils {
 			case "FocusCamera":
 				if(event.v.char == 2) return [event.t,-1,"followchar",event.v.char,true];
 				return [event.t,-1,"followchar",event.v.char];
+			case "SetCameraBop":
+				return [event.t,-1,"setcamerabop",event.v.intensity];
 			case "ZoomCamera":
 				return [event.t,-1,"camzoom",event.v.zoom];
 			default:

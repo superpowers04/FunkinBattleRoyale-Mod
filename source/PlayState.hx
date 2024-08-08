@@ -3584,7 +3584,7 @@ class PlayState extends ScriptMusicBeatState
 		// Zoooooooom
 		if (SESave.data.camMovement && controlCamera && camBeat && camZooming && curBeat % camBeatFreq == 0){
 			FlxG.camera.zoom += camZoomAmount;
-			camHUD.zoom -= 0.015;
+			camHUD.zoom -= camZoomAmount;
 		}
 		
 		iconP1.bounce(Conductor.crochetSecs);
