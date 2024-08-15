@@ -130,14 +130,14 @@ class AnimationDebug extends MusicBeatState
 	var quitHeldBG:FlxSprite;
 	var animDropDown:PsychDropDown;
 	var bf:Character;
-	#if mobile
-	public static function fileDrop(file:String){
-		if(MusicBeatState.instance.onFileDrop(file) == null || !FileSystem.exists(file)){
-			return;
-		}
-		throw("Importing isn't supported on mobile targets yet!");
-	}
-	#else
+	// #if mobile
+	// public static function fileDrop(file:String){
+	// 	if(MusicBeatState.instance.onFileDrop(file) == null || !FileSystem.exists(file)){
+	// 		return;
+	// 	}
+	// 	throw("Importing isn't supported on mobile targets yet!");
+	// }
+	// #else
 	public static function fileDrop(file:String){
 		// Normal filesystem/file is used here because we aren't working within the game's folder. We need absolute paths
 		if(file.startsWith('https://') || file.startsWith('https://')){
@@ -208,7 +208,7 @@ class AnimationDebug extends MusicBeatState
 		}
 		return null;
 	}
-	#end
+	// #end
 	public function new(?daAnim:String = 'bf',?isPlayer=false,?charType_:Int=1,?charSel:Bool = false,?dragDrop:Bool = false)
 	{
 		super();

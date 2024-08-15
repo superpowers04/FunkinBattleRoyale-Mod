@@ -36,11 +36,13 @@ typedef RepoAsset = {
 	var type:String;
 	var url:String;
 }
+
+// TODO: MAKE USABLE WITHOUT KEYBOARD
 @:publicFields class ModRepoState extends SearchMenuState {
 	var url:String = se.SESave.data.repoURL == "" ? "https://github.com/superpowers04/Super-Engine-Custom-Content/raw/meow/RepoListing.json" : se.SESave.data.repoURL;
 	var repoList:Array<RepoAsset> = [];
-	final categories:Array<String> = ['All','Songs','Characters','Packs','Ports'];
-	final categoryIDs:Array<Array<String>> = [[''],['song','chart','music'],['character','char'],['pack','mod'],['port']];
+	final categories:Array<String> = ['All',"Packs",'Songs','Characters','Scripts','Ports'];
+	final categoryIDs:Array<Array<String>> = [[''],['pack','mod'],['song','chart','music'],['character','char'],['script','plugin','state'],['port']];
 	var currentCat:Int = 0;
 	var loadingProgress:Float = 0;
 	var shouldReload = true;
@@ -176,7 +178,7 @@ typedef RepoAsset = {
 		changeSelection();
 	}
 	override function ret(){
-		
+
 		FlxG.sound.play(Paths.sound('cancelMenu'));
 		FlxG.switchState(new MainMenuState());
 	}
