@@ -30,6 +30,7 @@ using StringTools;
 typedef RepoAsset = {
 	var name:String;
 	var id:String;
+	var author:String;
 	var index:Int;
 	var description:String;
 	var blurb:String;
@@ -54,7 +55,7 @@ typedef RepoAsset = {
 	}
 	override function updateInfoText(str:String = ""){
 		if(infotext != null){
-			infotext.text = str;
+			infotext.setHTMLText(str);
 			infotext.wordWrap = true;
 			infotext.scrollFactor.set();
 			infotext.y = infoTextBorder.y + 100;
@@ -202,7 +203,8 @@ typedef RepoAsset = {
 		infoTextBorder.alpha=1;
 		var value = alpha.menuValue;
 
-		var text = (value.description ?? "No description provided")
+		var text = 'Author: ${value.author ?? "N/A"}\n'
+			+(value.description ?? "No description provided")
 			+'\n\nID: ${value.id}\nType: ${value.type}\n';
 		updateInfoText(text);
 		updateName(value.name ?? value.id);

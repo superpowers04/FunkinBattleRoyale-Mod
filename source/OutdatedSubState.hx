@@ -42,7 +42,7 @@ class OutdatedSubState extends MusicBeatState
 		kadeLogo.angle = 10;
 		add(kadeLogo);
 		var outdatedLMAO:FlxText = new FlxText(0, FlxG.height * 0.05, 0,if(TitleState.outdated) 'Super Engine is outdated, Your version: ${MainMenuState.ver} latest: ${needVer}' else 'Up to date: ${MainMenuState.ver}' , 32);
-		outdatedLMAO.setFormat(CoolUtil.font, 32, if(TitleState.outdated) FlxColor.RED else FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		outdatedLMAO.setFormat(CoolUtil.font, 32, TitleState.outdated ?  FlxColor.RED : FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		outdatedLMAO.scrollFactor.set();
 		outdatedLMAO.screenCenter(flixel.util.FlxAxes.X);
 		add(outdatedLMAO);
@@ -77,8 +77,8 @@ class OutdatedSubState extends MusicBeatState
 		
 		new FlxTimer().start(Conductor.crochet * 0.001, function(tmr:FlxTimer)
 		{
-			if(kadeLogo.alpha == 0.8) FlxTween.tween(kadeLogo, {alpha: 1}, Conductor.crochet * 0.001, {ease: FlxEase.quartInOut});
-			else FlxTween.tween(kadeLogo, {alpha: 0.8}, Conductor.crochet * 0.001, {ease: FlxEase.quartInOut});
+			FlxTween.tween(kadeLogo, {alpha: (kadeLogo.alpha == 0.8) ? 1 : 0.8}, Conductor.crochet * 0.001, {ease: FlxEase.quartInOut});
+			
 		}, 0);
 	}
 	var allowInput = true;

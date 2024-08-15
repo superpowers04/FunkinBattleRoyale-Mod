@@ -30,7 +30,6 @@ class BaseStage extends Stage{
 			tags.push('performance');
 			tags.push('simple');
 		}else {
-
 			var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('stageback'));
 			bg.antialiasing = true;
 			bg.scrollFactor.set(0.9, 0.9);

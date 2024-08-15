@@ -629,6 +629,16 @@ class FlxText extends FlxSprite
 		}
 		return Text;
 	}
+	public function setHTMLText(Text:String):String
+	{
+		if (textField != null)
+		{
+			var ot:String = textField.htmlText;
+			textField.htmlText = Text;
+			_regen = (textField.htmlText != ot) || _regen;
+		}
+		return Text;
+	}
 
 	inline function get_size():Int
 	{
