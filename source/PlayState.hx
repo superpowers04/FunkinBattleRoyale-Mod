@@ -243,7 +243,7 @@ class PlayState extends ScriptMusicBeatState
 		public var moveCamera(default,set):Bool = true;
 		public function set_moveCamera(v):Bool{
 			if(v){
-				FlxG.camera.follow(camFollow, LOCKON, 0.04 * (30 / (cast (Lib.current.getChildAt(0), Main)).getFPS()));
+				FlxG.camera.follow(camFollow, LOCKON, 0.25);
 			}else{
 				FlxG.camera.follow(null);
 			}
@@ -2164,10 +2164,9 @@ class PlayState extends ScriptMusicBeatState
 		}
 		vocals.update(elapsed);
 
+		var e = getDefaultCamPos();
 		if(SESave.data.animDebug && updateOverlay){
-			var vt = 0;
-			if(vocals != null) vt = Std.int(vocals.time);
-			var e = getDefaultCamPos();
+			var vt = (vocals == null) ? 0 : Std.int(vocals.time);
 			Overlay.debugVar += '\nResync count:${resyncCount}'
 				+'\nCond/Music/Vocals time:${Std.int(Conductor.songPosition)}/${Std.int(FlxG.sound.music.time)}/${vt}'
 				+'\nHealth:${health}'

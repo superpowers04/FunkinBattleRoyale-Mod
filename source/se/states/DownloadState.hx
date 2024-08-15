@@ -104,8 +104,8 @@ class DownloadState extends MusicBeatState
 		inError=true;
 		progress = 0;
 		fileSizeText.text = "";
-		loadingText.text = 'Error! Press any key to exit\n\n${e}';
-		trace('Error! ${e}');
+		loadingText.text = 'Error! Press any key to exit\n\n${e ?? "Unknown error??"}';
+		trace('Error! ${e} ${Type.typeof(e)}');
 		canClose = true;
 	}
 	// public dynamic function onIOError(e:IOErrorEvent){
