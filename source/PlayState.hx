@@ -240,10 +240,16 @@ class PlayState extends ScriptMusicBeatState
 		public var camBeat:Bool = true;
 		public var cachedChars:Array<Map<String,Character>> = [[],[],[]];
 		public var controlCamera:Bool = true;
+		public var camMoveSpeed(default,set):Float = 0.01;
+		public function set_camMoveSpeed(v):Float{
+			moveCamera = moveCamera;
+			return camMoveSpeed = v;
+		}
+
 		public var moveCamera(default,set):Bool = true;
 		public function set_moveCamera(v):Bool{
 			if(v){
-				FlxG.camera.follow(camFollow, LOCKON, 0.25);
+				FlxG.camera.follow(camFollow, LOCKON, camMoveSpeed);
 			}else{
 				FlxG.camera.follow(null);
 			}
@@ -1316,6 +1322,7 @@ class PlayState extends ScriptMusicBeatState
 			
 			FlxG.sound.music.pause();
 			vocals.pause();
+			vocals.group = FlxG.sound.music.group;
 			FlxG.sound.music.onComplete = endSong;
 
 			// Song duration in a float, useful for the time left feature

@@ -175,6 +175,11 @@ typedef RepoAsset = {
 		}
 		changeSelection();
 	}
+	override function ret(){
+		
+		FlxG.sound.play(Paths.sound('cancelMenu'));
+		FlxG.switchState(new MainMenuState());
+	}
 	override function select(i:Int = 0){
 		if(grpSongs.members[i] == null || grpSongs.members[i].menuValue == null){
 			showTempmessage('No asset associated with that menu item',0xFFFF0000);
