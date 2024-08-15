@@ -65,9 +65,8 @@ class SearchMenuState extends ScriptMusicBeatState {
 	function addTitleText(str:String = ""){
 		if (titleText != null) titleText.destroy();
 		if (str == "") return;
-		#if android
-			str = str + " - Tap here to go back";
-		#end
+		if(SESave.data.useTouch) str = str + " - Tap here to go back";
+		
 		titleText = new FlxText(FlxG.width * 0.5, 20, 0, str, 12);
 		titleText.scrollFactor.set();
 		titleText.setFormat(CoolUtil.font, 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -352,7 +351,7 @@ class SearchMenuState extends ScriptMusicBeatState {
 					// }
 				}
 			}
-			#if android
+			if(SESave.data.useTouch){
 				if(FlxG.swipes[0] != null){
 					var swipe = FlxG.swipes[0];
 					var distance = (swipe.startPosition.y - swipe.endPosition.y) / 100;
@@ -360,7 +359,7 @@ class SearchMenuState extends ScriptMusicBeatState {
 					trace(distance);
 					changeSelection(Std.int(distance));
 				}
-			#end
+			}
 			if(FlxG.mouse.wheel != 0){
 				var move = -FlxG.mouse.wheel;
 				changeSelection(Std.int(move));

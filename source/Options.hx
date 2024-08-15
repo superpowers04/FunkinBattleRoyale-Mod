@@ -410,7 +410,7 @@ class ReloadCharlist extends Option
 }
 class InputEngineOption extends Option
 {
-	var ies:Array<String> = ["Super Engine Legacy", #if mobile "Super Engine (Keyboard Needed!)" #else "Super Engine" #end];
+	var ies:Array<String> = ["Super Engine Legacy", "Super Engine (Keyboard only)"];
 	var iesDesc:Array<String> = ["Legacy input; A custom input engine based off of Kade 1.4/1.5.", "A new input engine that is based off of key events; Usually faster"];
 	public function new(desc:String)
 	{

@@ -347,6 +347,7 @@ class KeyBindMenu extends FlxSubState
 		if(shouldReturn){
 			keys[keyMode][curSelected] = r;
 			SELoader.playSound('assets/sounds/scrollMenu');
+			changeItem(1);
 		}
 
 	}

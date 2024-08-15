@@ -3,7 +3,7 @@ typedef YourMother = Dynamic;
 
 
 @:publicFields class SESave{
-	public static var data:SESave = new SESave();
+	static var data:SESave = new SESave();
 
 	// Performance
 	var fpsCap:Float = 120;

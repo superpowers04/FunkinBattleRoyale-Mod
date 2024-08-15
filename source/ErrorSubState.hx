@@ -80,11 +80,9 @@ class ErrorSubState extends MusicBeatSubstate {
 		var _errText_X = errText.x;
 		errText.x = FlxG.width;
 		contText = new FlxText(FlxG.width * 0.5,FlxG.height + 100,0,
-		#if android
-			'Tap the left of the screen to return to the main menu or the right of the screen to reload'
-		#else
-			'Press ENTER to return to the main menu,\n R to reload the state or O to open your options.'
-		#end );
+		(SESave.data.useTouch ? 'Tap the left of the screen to return to the main menu or the right of the screen to reload' 
+		 :'Press ENTER to return to the main menu,\n R to reload the state or O to open your options.'
+		));
 		contText.size = 24;
 		// contText.x -= contText.width * 0.5;
 		contText.screenCenter(X);
@@ -145,7 +143,8 @@ class ErrorSubState extends MusicBeatSubstate {
 
 
 			if (controls.ACCEPT) retMenu();
-			#if android
+			if(SESave.data.useTouch){
+
 				if(FlxG.mouse.justPressed){
 					trace(FlxG.mouse.screenX / FlxG.width);
 					if((FlxG.mouse.screenX / FlxG.width) <= .5){
@@ -154,7 +153,7 @@ class ErrorSubState extends MusicBeatSubstate {
 						if(win){FlxG.resetState();}else{restart();}
 					}
 				}
-			#end
+			}
 
 			if (FlxG.keys.justPressed.R){if(win){FlxG.resetState();}else{restart();}}
 			if (FlxG.keys.justPressed.O){

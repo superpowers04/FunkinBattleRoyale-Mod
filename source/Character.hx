@@ -211,7 +211,6 @@ class CharAnimController extends FlxAnimationController{
 
 	/* Internal identifier vars */
 		public var isPlayer:Bool = false;
-		public var hasAlts:Bool = false;
 		public var charType:Int = 0;
 		public var dance_idle:Bool = false;
 		public var amPreview:Bool = false;
@@ -411,9 +410,8 @@ class CharAnimController extends FlxAnimationController{
 					}
 					if (anima.anim == null) throw('HOW THE FUCK IS THE ANIM NULL');
 					if (anima.name == null) throw('HOW THE FUCK IS THE ANIM NAME NULL');
-					if (anima.anim.substr(-4) == "-alt") hasAlts=true; // Alt Checking
-					if (anima.stage != "" && anima.stage != null){if(PlayState.curStage.toLowerCase() != anima.stage.toLowerCase()){continue;}} // Check if animation specifies stage, skip if it doesn't match PlayState's stage
-					if (anima.song != "" && anima.song != null){if(PlayState.SONG.song.toLowerCase() != anima.song.toLowerCase()){continue;}} // Check if animation specifies song, skip if it doesn't match PlayState's song
+					if (anima.stage != "" && anima.stage != null && PlayState.curStage.toLowerCase() != anima.stage.toLowerCase())continue; // Check if animation specifies stage, skip if it doesn't match PlayState's stage
+					if (anima.song != "" && anima.song != null && PlayState.SONG.song.toLowerCase() != anima.song.toLowerCase())continue; // Check if animation specifies song, skip if it doesn't match PlayState's song
 					if (animCaseInsensitive[anima.anim] != null) anima.anim = animCaseInsensitive[anima.anim];
 					if (animation.getByName(anima.anim) != null) continue; // Skip if animation has already been defined
 					if (anima.char_side != null && anima.char_side != 3 && anima.char_side != charType){continue;} // This if statement hurts my brain
@@ -993,33 +991,33 @@ class CharAnimController extends FlxAnimationController{
 	override function update(elapsed:Float) {
 		// try{
 
-			if(amPreview || debugMode || animation.curAnim == null) return super.update(elapsed);
+		if(amPreview || debugMode || animation.curAnim == null) return super.update(elapsed);
 
 
-			if(animation.curAnim.finished || animation.curAnim.curFrame >= animation.curAnim.numFrames) 
-				animHasFinished = true;
-			if(animHasFinished){
-				if(loopAnimTo[animation.curAnim.name] != null) 
-					playAnim(loopAnimTo[animation.curAnim.name]);
-				else if(animLoops[animation.curAnim.name] == true) {
-					playAnim(animation.curAnim.name);
-					currentAnimationPriority = -1;
-				}
+		if(animation.curAnim.finished || animation.curAnim.curFrame >= animation.curAnim.numFrames) 
+			animHasFinished = true;
+		if(animHasFinished){
+			if(loopAnimTo[animation.curAnim.name] != null) 
+				playAnim(loopAnimTo[animation.curAnim.name]);
+			else if(animLoops[animation.curAnim.name] == true) {
+				playAnim(animation.curAnim.name);
+				currentAnimationPriority = -1;
 			}
-			if (currentAnimationPriority == 11 && isDonePlayingAnim()) {
-				// playAnim('idle', true, false, 10);
-				dance();
-			}
-			if(currentAnimationPriority == 10) holdTimer += elapsed;
-			else holdTimer = 0;
+		}
+		if (currentAnimationPriority == 11 && isDonePlayingAnim()) {
+			// playAnim('idle', true, false, 10);
+			dance();
+		}
+		if(currentAnimationPriority == 10) holdTimer += elapsed;
+		else holdTimer = 0;
 
-			if (!isPlayer && holdTimer >= Conductor.stepCrochet * singDuration * 0.001) {
-				holdTimer = 0;
-				dance();
-			}
-			callInterp("update",[elapsed]);
+		if (!isPlayer && holdTimer >= Conductor.stepCrochet * singDuration * 0.001) {
+			holdTimer = 0;
+			dance();
+		}
+		callInterp("update",[elapsed]);
 
-			super.update(elapsed);
+		super.update(elapsed);
 		// }catch(e:Dynamic){handleError('Caught character "update" crash: ${e}');}
 	}
 
@@ -1102,10 +1100,10 @@ class CharAnimController extends FlxAnimationController{
 		if(AnimName.contains('/')){
 			return playAnimAvailable(AnimName.split('/'),Force,Reversed,Frame);
 		}
-		if (PlayState.instance != null) PlayState.instance.callInterp("playAnim",[AnimName,this]);
-
-		if (PlayState.canUseAlts && !amPreview && !debugMode && animation.getByName(AnimName + '-alt') != null) AnimName = AnimName + '-alt'; // Alt animations
 		callInterp("playAnim",[AnimName]);
+		if (AnimName.endsWith('-alt')) if(animation.getByName(AnimName) == null) AnimName = AnimName.substring(0,AnimName.length-4);
+		else if (PlayState.canUseAlts && !amPreview && !debugMode && animation.getByName(AnimName + '-alt') != null) AnimName = AnimName + '-alt'; // Alt animations
+		if (PlayState.instance != null) PlayState.instance.callInterp("playAnim",[AnimName,this]);
 		if (skipNextAnim){
 			skipNextAnim = false;
 			return false;

@@ -14,6 +14,7 @@ import se.handlers.SELua;
 
 import hscript.Expr;
 import hscript.Interp;
+import flixel.util.FlxStringUtil;
 
 using StringTools;
 
@@ -83,19 +84,18 @@ class Overlay extends TextField {
 		var currentCount = times.length;
 		currentFPS = Math.round(currentCount);
 
-		var mem:Float = Math.round((
+		var mem:Float = (
 			#if cpp
 			cpp.NativeGc.memInfo(0)
 			#else
 			System.totalMemory
-			#end
-			/ 1024) / 1000);
+			#end);
 		if (mem > memPeak)
 			memPeak = mem;
 		text = "" + currentFPS + " FPS/" + deltaTime + 
-			" MS\nMemory Usage/Peak: " + mem + "MB/" + memPeak + "MB"
+			" MS\nMemory Usage/Peak: " + FlxStringUtil.formatBytes(mem) + "/" + FlxStringUtil.formatBytes(memPeak)
 			#if cpp
-			+"\nMemory Reserved/Current: " + Math.round((cpp.NativeGc.memInfo(3) / 1024) / 1000) + "MB/" + Math.round((cpp.NativeGc.memInfo(2) / 1024) / 1000) + "MB" 
+			+"\nMemory Reserved/Current: " + FlxStringUtil.formatBytes(cpp.NativeGc.memInfo(3)) + "/" + FlxStringUtil.formatBytes(cpp.NativeGc.memInfo(2))
 			#end
 			+ debugVar + SEProfiler.getString();
 		// }
@@ -128,14 +128,7 @@ class Console extends TextField
 		instance = this;
 		haxe.Log.trace = function(v, ?infos) {
 			var str = haxe.Log.formatOutput(v,infos);
-			#if js
-			if (js.Syntax.typeof(untyped console) != "undefined" && (untyped console).log != null)
-				(untyped console).log(str);
-			#elseif lua
-			untyped __define_feature__("use._hx_print", _hx_print(str));
-			#elseif sys
 			Sys.println(str);
-			#end
 			if(Console.instance != null) Console.instance.log(str);
 		}
 

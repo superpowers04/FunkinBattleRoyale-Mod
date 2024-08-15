@@ -44,7 +44,7 @@ import tjson.Json;
 
 using StringTools;
 
-typedef Scorekillme = {
+@:structInit @:publicFields class Scorekillme {
 	var scores:Array<Float>;
 	var songs:Array<String>;
 	var funniNumber:Float;
@@ -1084,12 +1084,10 @@ class TitleState extends MusicBeatState
 
 		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || skipBoth;
 
-		#if mobile
+		
 		for (touch in FlxG.touches.list) {
 			if (touch.justPressed) pressedEnter = true;
 		}
-		#end
-
 		#if (!FLX_NO_GAMEPAD)
 
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
@@ -1167,8 +1165,7 @@ class TitleState extends MusicBeatState
 						updatedVer = returnedData[0];
 						OutdatedSubState.needVer = updatedVer;
 						OutdatedSubState.currChanges = returnedData[1];
-						if (!MainMenuState.ver.contains(updatedVer.trim()) || (MainMenuState.nightly != ""))
-						{
+						if (MainMenuState.ver < updatedVer || (MainMenuState.nightly != "")) {
 							// trace('outdated lmao! ' + returnedData[0] + ' != ' + MainMenuState.ver);
 							outdated = true;
 							

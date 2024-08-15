@@ -528,6 +528,11 @@ class ScriptMusicBeatState extends MusicBeatState{
 				}
 				super.destroy();
 			}
+			override public function onFileDrop(file:String):Null<Bool>{
+				callInterp('onFileDrop',[file]);
+				if(cancelCurrentFunction) return false;
+				return super.onFileDrop(file);
+			}
 			override public function beatHit(){
 				if(useNormalCallbacks){
 					callInterp('beatHit',[]);

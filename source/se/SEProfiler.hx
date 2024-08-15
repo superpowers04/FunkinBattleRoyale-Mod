@@ -52,7 +52,7 @@ class SEProfiler{
 		var ret = "\nProfiler(Time/Max)";
 		for(index => profiler in list){
 			if(profiler == null) continue;
-			ret+='\n $index - ${profiler._end}/${profiler.max}';
+			ret+='\n $index - ${profiler._end}/${profiler.max}/${profiler.peak}';
 		}
 		return ret;
 
@@ -63,6 +63,7 @@ class SEProfiler{
 	var _start:Float = 0;
 	var _end:Float = 0;
 	var max:Float = 0;
+	var peak:Float = 0;
 	var ticks:Int = 0;
 	var keep = false;
 	// We use ticks instead of time, using time would make a lagspike invalidate every profiler
@@ -88,7 +89,8 @@ class SEProfiler{
 	@:keep inline function stamp(){
 		ticksSinceUpdate=0;
 		_end = Math.floor((Sys.cpuTime()-_start) * 100000)*0.00001;
-		if(max < _end) max=_end;
+		if(_end > max) max=_end;
+		if(_end > peak) peak = _end;
 		// average = Math.floor(FlxMath.lerp(average,_end,0.5)*10000)*0.0001;
 	}
 

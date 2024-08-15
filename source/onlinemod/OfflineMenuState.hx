@@ -53,14 +53,14 @@ class OfflineMenuState extends SearchMenuState
 	optionsButton.resize(150, 26);
 	sideButton = new FlxUIButton(1020, 65, "Session Options", chartOptions); 
 	// This is just so I don't have to remove any references to this button, else I'd remove it on android targets 
-	#if android
+	if(SESave.data.useTouch){
 		goBackButton.y = 30;
 		optionsButton.y = 65;
 		optionsButton.resize(150,30);
-	#else
+	}else{
 		sideButton.setLabelFormat(24, FlxColor.BLACK, CENTER);
 		sideButton.resize(250, 30);
-	#end
+	}
 	scriptSubDirectory = "/offlinemenu/";
 	useNormalCallbacks = true;
 	loadScripts(true);
@@ -68,9 +68,8 @@ class OfflineMenuState extends SearchMenuState
 	try{
 	add(optionsButton);
 	add(goBackButton);
-	#if !android
-		add(sideButton);
-	#end
+	if(!SESave.data.useTouch) add(sideButton);
+	
 	}catch(e){
 		if(attempted){
 			MainMenuState.handleError(e,"Error while trying to create state, " + e.message);

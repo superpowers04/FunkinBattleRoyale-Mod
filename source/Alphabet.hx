@@ -205,11 +205,7 @@ class Alphabet extends FlxSpriteGroup
 			border = new FlxSpriteLockScale(-10,-10);
 			border.makeGraphic(1,1,FlxColor.BLACK);
 			border.lockGraphicSize((Std.int(width) + 20),Std.int(height) + 20);
-			#if android
-			border.alpha = 0.1;
-			#else
-			border.alpha = 0.001;
-			#end
+			border.alpha = SESave.data.useTouch ? 0.1 : 0.001;
 			insert(0,border);
 		}catch(e){trace(e);}
 		

@@ -5,6 +5,7 @@ import haxe.Exception;
 import lime.app.Application;
 import haxe.Json;
 import Song;
+import Section;
 
 typedef Measure = {
 	var notes:Array<SMNote>;
@@ -156,12 +157,12 @@ class SMFile
 
 			// section declaration
 
-			var section = {
+			var section:SwagSection = {
 				sectionNotes: [],
 				lengthInSteps: 16,
 				typeOfSection: 0,
-				startTime: 0.0,
-				endTime: 0.0,
+				// startTime: 0.0,
+				// endTime: 0.0,
 				mustHitSection: false,
 				bpm: header.getBPM(0),
 				changeBPM: false,

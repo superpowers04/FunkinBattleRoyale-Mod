@@ -212,11 +212,8 @@ class FinishSubState extends MusicBeatSubstate
 				var _errText_X = errText.x;
 				errText.x = FlxG.width;
 				contText = new FlxText(FlxG.width * 0.5,FlxG.height + 100,0,
-				#if android
-					'Tap the left of the screen to exit or the right of the screen to restart'
-				#else
-					'Press ENTER to exit, R to reload, I to reload w/o song scripts\n or O to open options.'
-				#end );
+				(SESave.data.useTouch ? 'Tap the left of the screen to exit or the right of the screen to restart' : 'Press ENTER to exit, R to reload, I to reload w/o song scripts\n or O to open options.')
+				);
 				contText.size = 24;
 				contText.alignment=CENTER;
 				// contText.x -= contText.width * 0.5;
@@ -324,12 +321,8 @@ class FinishSubState extends MusicBeatSubstate
 
 
 
-				contText = new FlxText(comboText.x+comboText.width+20,FlxG.height - 90,0,
-				#if android
-					'Tap the left of the screen to exit or the right of the screen to restart'
-				#else
-					'Press ENTER to continue or R to restart.'
-				#end );
+				contText = new FlxText(comboText.x+comboText.width+20,FlxG.height - 90,0, (SESave.data.useTouch ?'Tap the left of the screen to exit or the right of the screen to restart' : 'Press ENTER to continue or R to restart.'
+				));
 				
 				contText.size = 28;
 				contText.setBorderStyle(FlxTextBorderStyle.OUTLINE,FlxColor.BLACK,4,1);
@@ -484,7 +477,7 @@ class FinishSubState extends MusicBeatSubstate
 			if (controls.ACCEPT){
 				retMenu();
 			}
-			#if android
+			if(SESave.data.useTouch){
 				if(FlxG.mouse.justPressed){
 					// trace(FlxG.mouse.screenX / FlxG.width);
 					if((FlxG.mouse.screenX / FlxG.width) <= .5){
@@ -493,7 +486,7 @@ class FinishSubState extends MusicBeatSubstate
 						if(win){FlxG.resetState();}else{restart();}
 					}
 				}
-			#end
+			}
 
 			if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.S){saveScore(true);}
 

@@ -168,6 +168,7 @@ class Song
 		var maxKeys = (swagShit.keyCount * 2) - 1;
 		for (sid => section in swagShit.notes) {
 			if(section.sectionNotes == null || section.sectionNotes[0] == null) continue;
+			if(section.bpm != null) section.bpm = Math.abs(section.bpm);
 
 			var sN:Array<Int> = [];
 			try{
@@ -213,10 +214,8 @@ class Song
 			// trace(rawJson);
 			var rawJson:VSliceChart = Json.parse(rawJson.substr(0, rawJson.lastIndexOf("}") + 1));
 			var song:SwagSong = getEmptySong();
-			// song.bpm = 
 			var noteList = song.notes[0].sectionNotes;
 			var meow:Array<VNote> = Reflect.getProperty(rawJson.notes,difficulty);
-			trace(difficulty);
 			if(meow == null) throw('$difficulty is an invalid difficulty!');
 			for(_ => n in meow){
 				var NOTE:Array<Dynamic> = [n.t,n.d,n.l,n.k];
@@ -260,14 +259,15 @@ class Song
 		try{
 		#end
 			var _json = rawJson;
+			if(_json.indexOf('"version"') > 0 && _json.indexOf('"playData"') > 0){
+				return fromVSlice(_json);
+			}
 			var rawJson:Dynamic = Json.parse(rawJson.substr(0, rawJson.lastIndexOf("}") + 1));
 
 			var swagShit:SwagSong = null;
 			if(rawJson == null){
 				swagShit = getEmptySong();
-			}else if(rawJson.version != null){
-				trace('Loading a VSlice song from parseJSONshit!?!?!?');
-				return fromVSlice(_json);
+			// }else if(rawJson.version != null){
 			}else if(rawJson.song == null){
 				swagShit = getEmptySong();
 			}else if(rawJson.song is String){

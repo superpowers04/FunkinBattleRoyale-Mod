@@ -1797,13 +1797,13 @@ class AnimHelpScreen extends FlxUISubState{
 	} 
 }
 
-typedef AnimSetting={
-	var ?max:Float;
-	var ?min:Float;
-	var ?type:Int; // 0 = bool, 1 = int, 2 = float
+@:publicFields @:structInit class AnimSetting{
+	@:optional var max:Float;
+	@:optional var min:Float;
+	@:optional var type:Int; // 0 = bool, 1 = int, 2 = float
 	var value:Dynamic;
 	var description:String;
-	var ?name:String;
+	@:optional var name:String;
 }
 
 class AnimSwitchMode extends se.substates.QuickList {

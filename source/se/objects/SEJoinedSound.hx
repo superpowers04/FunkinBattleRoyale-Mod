@@ -53,7 +53,17 @@ import flixel.FlxBasic;
 	function sync(){
 		if(length == 0) return;
 		final sound = sound;
-		if(!sound.playing) return;
+		if(!sound.playing) {
+			var i = sounds.length-1;
+			while(i > 0){
+				var s = sounds[i];
+				i--;
+				if(syncPlaying && s.playing){
+					s.pause();
+				}
+			}
+			return;
+		}
 		var i = sounds.length-1;
 		while(i > 0){
 			var s = sounds[i];

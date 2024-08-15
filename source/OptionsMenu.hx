@@ -93,8 +93,8 @@ class OptionsMenu extends MusicBeatState
 		],"Settings relating to online play"),
 		new OptionCategory("Gameplay", [
 			new DFJKOption(controls),
-			new HCBoolOption("Native Touch Buttons","Toggle the built-in taps for hitting notes(Legacy input only!)","useTouch"),
-			new HCBoolOption("Strum Buttons","Whether to split the screen into 4 buttons or use strums as buttons(Requires native Touch)","useStrumsAsButtons"),
+			new HCBoolOption("Touch controls","Toggle the built-in onscreen buttons for hitting notes(Legacy input only!).\nWill also adjust some other features for easier touch use","useTouch"),
+			new HCBoolOption("Strum Buttons","(Requires touch controls) Whether to split the screen into 4 buttons or use strums as buttons","useStrumsAsButtons"),
 			
 			new HCBoolOption('Scroll Type',"Change the scroll direction between upscroll and downscroll",'downscroll','downscroll',"upscroll"),
 			new HCIntOption('Rotate Strumline','Rotate the strumline. May break with some scripts','rotateScroll',0,360,1),
