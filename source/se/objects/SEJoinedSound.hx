@@ -3,10 +3,12 @@ package se.objects;
 import flixel.sound.FlxSound;
 import flixel.sound.FlxSoundGroup;
 import flixel.FlxBasic;
+import flixel.FlxG;
 
 // We literally only extend FlxObject so you can add this as a normal object to a FlxState/FlxGroup for updating
 @:publicFields class SEJoinedSound extends FlxBasic { 
 	var sounds:Array<FlxSound> = [];
+	var syncedSound:FlxSound;
 	var sound(get,set):FlxSound;
 
 	@:keep inline function get_sound(){
@@ -23,7 +25,7 @@ import flixel.FlxBasic;
 	var syncTime:Bool = true;
 	var maxTimeDifference:Int=5;
 	var syncPlaying:Bool = true;
-	var syncGroup:Bool = false;
+	var syncGroup:Bool = true;
 
 	function new(?initialSound:FlxSound = null){
 		super();
@@ -78,26 +80,23 @@ import flixel.FlxBasic;
 		}
 	}
 	function syncToSound(sound:FlxSound){
-		final s = this.sound;
+		final s = syncedSound ?? this.sound;
 		if(s == null) return;
 		if(syncVolume) s.volume = sound.volume;
-		if(syncPlaying && s.playing != sound.playing){
+		if(syncPlaying && s.playing != sound.playing && sound.time <= s.length){
 			if(sound.playing) s.play();
 			else s.pause();
 		}
 		if(s.playing && syncTime && sound.time <= s.length  && Math.abs(s.time-sound.time) > maxTimeDifference) s.time = sound.time;
 		sync();
 	}
-	function load(path:String):FlxSound{
-		var s = SELoader.loadFlxSound(path);
-		sounds.push(s);
-		if(syncGroup) s.group = sound.group;
-		sync();
-		return s;
+	@:keep inline function load(path:String):FlxSound{
+		return add(SELoader.loadFlxSound(path));
 	}
 	function add(s:FlxSound):FlxSound{
 		sounds.push(s);
 		if(syncGroup) s.group = sound.group;
+		if(!FlxG.sound.list.members.contains(s)) FlxG.sound.list.add(s);
 		sync();
 		return s;
 	}

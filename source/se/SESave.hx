@@ -27,9 +27,9 @@ typedef YourMother = Dynamic;
 	var songPosition:Bool = true;
 	var fps:Bool = false;
 	var flashing:Bool = true;
-	@:isVar var playStateObjectLocations(get,set):Dynamic = null;
-	function get_playStateObjectLocations() return null;
-	function set_playStateObjectLocations(v) return playStateObjectLocations = null;
+	// @:isVar var playStateObjectLocations(get,set):Dynamic = null;
+	// function get_playStateObjectLocations() return null;
+	// function set_playStateObjectLocations(v) return playStateObjectLocations = null;
 	var flashingLights(get,set):Bool;
 	@:keep inline function get_flashingLights() return flashing;
 	@:keep inline function set_flashingLights(v) return flashing = v;
@@ -102,7 +102,7 @@ typedef YourMother = Dynamic;
 	var debounce:Bool = false;
 	var legacyCharter:Bool = false;
 	var savedServers:Array<Array<Dynamic>> = [];
-	var favourites(get,default):Array<se.formats.SongInfo> = [];
+	var favourites(get,default):Array<Dynamic> = [];
 	function get_favourites() {
 		if(favourites == null){favourites = [];} 
 		return favourites;

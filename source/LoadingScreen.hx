@@ -112,7 +112,7 @@ import se.SEProfiler;
 		var loadingText = new Alphabet(0,0,txt,true);
 		loadingText.isMenuItem = false;
 		loadingText.visible = true;
-		if(SESave.data.doCoolLoading){
+		// if(SESave.data.doCoolLoading){
 			loadingIcon = new Sprite();
 			loadingIcon.x = 640;
 			loadingIcon.y = 300;
@@ -127,8 +127,8 @@ import se.SEProfiler;
 			loadingIcon.graphics.drawRect(0,0, note.width, note.height);
 			loadingIcon.graphics.endFill();
 			loadingIcon.scaleX = loadingIcon.scaleY= 0.5;
-			
-		}
+			// 
+		// }
 
 		var funniBitmap = new BitmapData(1290,730,false,0x100010);
 		var x = 1200;
@@ -210,9 +210,9 @@ import se.SEProfiler;
 	var elapsed = 0;
 	override function __enterFrame(e:Int){
 		try{
-			// if(textField.htmlText != loadingText){
-			// 	updateText();
-			// }
+			if(textField.htmlText != loadingText){
+				updateText();
+			}
 			if(SESave.data.doCoolLoading){
 				if(loadingIcon != null){
 					loadingIcon.rotation += e * vel;

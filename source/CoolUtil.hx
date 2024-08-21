@@ -140,4 +140,24 @@ class CoolUtil {
 	@:keep inline public static function cleanJSON(input:String):String{ // Haxe doesn't filter out comments?
 		return (~/\/\*[\s\S]*?\*\/|\/\/.*/g).replace(input.trim(),'');
 	}
+	public static function applyAnonToObject(obj:Dynamic,anon:Dynamic,?logErrors:Bool = false):Bool{
+		if(anon == null) return false;
+		var type = Type.typeof(obj);
+		var copied:Bool = false;
+		for(field in Reflect.fields(anon)){
+			// if(field.startsWith('set_')){
+			// 	field = field.substring(4);
+			// }
+			try{
+				if(Reflect.field(obj,field) == null) throw('$field is not present on $type');
+				var stuff:Dynamic = Reflect.field(anon,field);
+				if(stuff == null) throw('$field is not on the obj??');
+				Reflect.setProperty(obj,field,stuff);
+				if(!copied) copied = true;
+			}catch(e){
+				if(logErrors) trace('Unable to load field "$field": $e');
+			}
+		}
+		return copied;
+	}
 }

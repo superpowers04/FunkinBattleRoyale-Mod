@@ -242,7 +242,7 @@ class MainMenuState extends SickMenuState {
 		#if !mobile
 		if (otherMenu) {mmSwitch(true);FlxG.sound.play(Paths.sound('cancelMenu'));return;} else
 		#end
-			selected = false;
+			escapePress();
 		// FlxG.switchState(new TitleState());
 		// do nothing
 	}
@@ -297,6 +297,15 @@ class MainMenuState extends SickMenuState {
 		function otherSwitch(){}
 	#else
 	public var otherMenu:Bool = false;
+	function escapePress(){
+		callInterp('openExitPrompt',[]);
+		options = ["Main Menu","Exit Game"];
+		descriptions = ['Return to the main menu','Close out of the game'];
+		generateList();
+		curSelected=0;
+		selected = false;
+		changeSelection();
+	}
 	function otherSwitch(){
 		options = ["import clipboard","deprecated freeplay","download assets","download characters","import charts from mods","changelog", 'credits'];
 		descriptions = ['Treats the contents of your clipboard like you\'ve dragged and dropped it onto the game','Play any song from the main game or your assets folder',"Download content made for or ported to Super Engine","Download characters made for or ported to Super Engine",'Convert charts from other mods to work here. Will put them in Modded Songs',"Read the latest changes for the engine","Check out the awesome people who helped with this engine in some way"];
@@ -304,8 +313,9 @@ class MainMenuState extends SickMenuState {
 				// if (TitleState.osuBeatmapLoc != '') {options.push("osu beatmaps"); descriptions.push("Play osu beatmaps converted over to FNF");}
 		options.push("back"); descriptions.push("Go back to the main menu");
 		curSelected = 0;
-
+		#if !mobile
 			otherMenu = true;
+		#end
 		selected = false;
 		callInterp('otherSwitch',[]);
 		if(cancelCurrentFunction) return;
@@ -365,7 +375,7 @@ class MainMenuState extends SickMenuState {
 			}
 		}
 		
-		switch (daChoice){
+		switch (daChoice.toLowerCase()){
 
 			case 'open closed chart':
 				loading = true;
@@ -408,6 +418,8 @@ class MainMenuState extends SickMenuState {
 					// FlxG.switchState(new onlinemod.OfflineMenuState());
 				case "import clipboard":
 					AnimationDebug.fileDrop(lime.system.Clipboard.text);
+				case 'exit game' :
+					Sys.exit(0);
 				case 'changelog' | 'update':
 					FlxG.switchState(new OutdatedSubState());
 				// case "Setup characters":
@@ -446,7 +458,7 @@ class MainMenuState extends SickMenuState {
 					FlxG.switchState(new ImportMod());
 				case 'download characters':
 					FlxG.switchState(new RepoState());
-				case "back":
+				case "back", "main menu":
 					mmSwitch(true);
 			#end
 			default:

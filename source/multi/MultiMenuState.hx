@@ -120,7 +120,6 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		favButton.resize(250, 30);
 		searchField.text = lastSearch;
 		if(lastSearch != "") reloadList(true,lastSearch);
-
 		lastSearch = "";
 		curSelected = 0;
 		changeSelection(lastSel);
@@ -284,11 +283,24 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 
 			if(SESave.data.favourites != null && SESave.data.favourites.length > 0){
 				var containsSong = false;
-				var missingSongs:Array<SongInfo> = [];
+				var missingSongs:Array<Dynamic> = [];
 				_packCount++;
-				for (song in SESave.data.favourites){
-					if(!SELoader.exists(song.path)){
-						missingSongs.push(song);
+				for (osong in SESave.data.favourites){
+					var song:SongInfo = null;
+					var worked:Bool = false;
+					try{
+						song = new SongInfo(osong.name, osong.charts,osong.path,osong.namespace,osong.isCategory,osong.categoryID);
+						worked = CoolUtil.applyAnonToObject(song,osong);
+					}catch(e){
+						trace('$osong is an invalid song!');
+						missingSongs.push(osong);
+						continue;
+					}
+
+					if(!worked || song == null || song.path == "" || song.path == null || !SELoader.exists(song.path)){
+						trace('$osong is an invalid song!
+						${!worked} ${song == null} ${song.path == ""} ${song.path == null} ${!SELoader.exists(song.path)}');
+						missingSongs.push(osong);
 						continue;
 					}
 					if(search != "" && !query.match(song.name.toLowerCase())) continue;
@@ -765,26 +777,29 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 									voices = new FlxSound();
 									voices.loadEmbedded(SELoader.loadSound(songInfo.voices),true);
 									voices.volume = SESave.data.voicesVol;
-									voices.looped = true;
+									voices.looped = false;
 									voices.play(FlxG.sound.music.time);
 									FlxG.sound.list.add(voices);
 									songProgressText.text = "Playing Inst and Voices";
 								}else{
 									songProgressText.text = "Playing Inst. No Voices available";
 								}
+								shouldVoicesPlay = false;
 							}else{
-								if(!voices.playing){
+								shouldVoicesPlay = !(voices.volume == 0);
+								if(!voices.playing){voices.play();}
+								if(shouldVoicesPlay){
+
 									songProgressText.text = "Playing Inst and Voices";
 									voices.time = FlxG.sound.music.time = Conductor.songPosition;
-									voices.play();
 									voices.volume = SESave.data.voicesVol * FlxG.sound.volume;
-									voices.looped = true;
+									voices.looped = false;
 								}else{
 									songProgressText.text = "Playing Inst";
-									voices.stop();
+									voices.volume = 0;
+									// voices.stop();
 								}
 							}
-							shouldVoicesPlay = (voices != null && voices.playing);
 						}catch(e){
 							showTempmessage('Unable to play voices! ${e.message}',FlxColor.RED);
 						}
@@ -793,6 +808,14 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 						FlxG.sound.music.volume = SESave.data.instVol * FlxG.sound.volume;
 				
 						FlxG.sound.music.play();
+						FlxG.sound.music.onComplete = function(){
+							Conductor.songPosition=0;
+							if(this != null && voices != null){
+
+								voices.time = 0;
+								voices.play();
+							}
+						}
 					}
 					
 		

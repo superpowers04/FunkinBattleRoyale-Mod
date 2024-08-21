@@ -180,7 +180,7 @@ typedef RepoAsset = {
 	}
 	override function ret(){
 
-		FlxG.sound.play(Paths.sound('cancelMenu'));
+		SELoader.playSound('assets/sounds/cancelMenu');
 		FlxG.switchState(new MainMenuState());
 	}
 	override function select(i:Int = 0){

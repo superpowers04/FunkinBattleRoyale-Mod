@@ -2003,7 +2003,9 @@ class PlayState extends ScriptMusicBeatState
 	function resyncVocals():Void {
 		Conductor.songPosition = FlxG.sound.music.time;
 		FlxG.sound.music.play();
-		vocals.syncToSound(FlxG.sound.music);
+		vocals.syncedSound = FlxG.sound.music;
+		vocals.sync();
+		// FlxG.sound.music
 		resyncCount++;
 	}
 
@@ -3412,7 +3414,7 @@ class PlayState extends ScriptMusicBeatState
 		SEProfiler.qStart('StepHit');
 		super.stepHit();
 		// lastStep = curStep;
-		if (SESave.data.resyncVoices && handleTimes && (FlxG.sound.music.time > Conductor.songPosition + 5 || FlxG.sound.music.time < Conductor.songPosition - 5) && generatedMusic)
+		if (SESave.data.resyncVoices && handleTimes && (FlxG.sound.music.time > Conductor.songPosition + 10 || FlxG.sound.music.time < Conductor.songPosition - 10) && generatedMusic)
 			resyncVocals();
 		
 

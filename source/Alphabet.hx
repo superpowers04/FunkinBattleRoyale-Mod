@@ -160,17 +160,14 @@ class Alphabet extends FlxSpriteGroup
 			if(sprite == null) sprite = new FlxSprite();
 			trace('Loading alphabet sprites');
 			if(SESave.data.useFontEverywhere){
-				Frames =  new flixel.graphics.frames.FlxFramesCollection(FlxGraphic.fromRectangle(1,1,0x01000000,false,"blank.mp4"));
+				Frames = new flixel.graphics.frames.FlxFramesCollection(FlxGraphic.fromRectangle(1,1,0x01000000,false,"blank.mp4"));
 			}else{
-
-				if(SELoader.exists("mods/alphabet.png") && SELoader.exists("mods/alphabet.xml")){
-					try{
-						Frames = SELoader.loadSparrowFrames('mods/alphabet');
-					}catch(e){
-						Frames = Paths.getSparrowAtlas('alphabet');
-					}
-				}else{
-					Frames = Paths.getSparrowAtlas('alphabet');
+				try{
+					if(!SELoader.exists("mods/alphabet.png") || !SELoader.exists("mods/alphabet.xml")) throw('');
+					Frames = SELoader.loadSparrowFrames('mods/alphabet');
+				}catch(e){
+					Frames = SELoader.loadSparrowFrames('assets/images/alphabet');
+					// Paths.getSparrowAtlas('alphabet');
 				}
 			}
 		}
@@ -230,7 +227,7 @@ class Alphabet extends FlxSpriteGroup
 			currentLetter++;
 		},length);
 	}
-	function addLetter(character:String,bounce:Bool = false){
+	public function addLetter(character:String,bounce:Bool = false){
 		if (character == " " || removeDashes && ( character == "-" || character == "_")){ 
 			lastWasSpace = true;
 			return;
@@ -406,7 +403,7 @@ class AlphaCharacter extends FlxSprite {
 
 	@:keep inline public function createLetter(letter:String):Void
 	{
-		var letterCase:String = (if (letter.toLowerCase() == letter) "lowercase" else 'capital');
+		var letterCase:String = (letter.toLowerCase() == letter ? "lowercase" : 'capital');
 		if(forceFlxText){
 			useFLXTEXT(letter);
 		}else{
@@ -433,11 +430,8 @@ class AlphaCharacter extends FlxSprite {
 	@:keep inline public function useFLXTEXT(letter:String,bold:Bool = false) {
 
 		var cacheID = letter + '${if(bold) '-bold' else ''}';
-		var txt = textCache[cacheID];
-		if(txt == null){
-			cacheText(letter,bold);
-		}
-		txt = textCache[cacheID];
+		var txt = textCache[cacheID] ?? cacheText(letter,bold);
+		// txt = textCache[cacheID];
 		if(txt != null){
 			graphic = txt.graphic;
 			frames = txt.frames;
@@ -445,19 +439,18 @@ class AlphaCharacter extends FlxSprite {
 	}
 
 	public function createSymbol(letter:String) {
-		if(alphabetMap[letter] != null){
-			if(addAnim(letter, alphabetMap[letter])){
-				animation.play(letter);
-				updateHitbox();
-				return;
-			}
+		if(alphabetMap[letter] != null && addAnim(letter, alphabetMap[letter])){
+			animation.play(letter);
+			updateHitbox();
+			return;
+			
 		}
 		
 		if(addAnim(letter)){
 			animation.play(letter);
 			updateHitbox();
-		}else{
-			useFLXTEXT(letter);
-		};
+			return;
+		}
+		useFLXTEXT(letter);
 	}
 }
