@@ -42,7 +42,20 @@ class QuickNameSubState extends MusicBeatSubstate{
 		FlxG.mouse.visible = true;
 		
 		super();
+		buttonPress = function(){
+			var str:String = check(textBox.text);
+			if(str != ""){
+				shownText.text = str;
+				shownText.color = FlxColor.RED;
+				shownText.screenCenter(X);
 
+				return;
+			}
+			CoolUtil.toggleVolKeys(true);
+			args.insert(0,textBox.text);
+			Reflect.callMethod(null,funky,args);
+			destroy();
+		}
 		var box = new FlxSprite(20,20).loadGraphic(FlxGraphic.fromRectangle(1240,680,0xdd000000));
 		box.color = 0xdddddd;
 		// box.alpha = 0.2;
@@ -58,20 +71,7 @@ class QuickNameSubState extends MusicBeatSubstate{
 
 		// shownText.width = FlxG.width * 0.45;
 		add(shownText);
-		funniButton = new FlxButton(0,0,"Continue",function(){
-			var str:String = check(textBox.text);
-			if(str != ""){
-				shownText.text = str;
-				shownText.color = FlxColor.RED;
-				shownText.screenCenter(X);
-
-				return;
-			}
-			CoolUtil.toggleVolKeys(true);
-			args.insert(0,textBox.text);
-			Reflect.callMethod(null,funky,args);
-			destroy();
-		});
+		funniButton = new FlxButton(0,0,"Continue",buttonPress);
 		funniButton.x = textBox.x + textBox.width - (funniButton.width + 2);
 		funniButton.y = textBox.y + textBox.height + 5;
 		add(funniButton);
@@ -80,7 +80,7 @@ class QuickNameSubState extends MusicBeatSubstate{
 			
 				FlxG.state.persistentUpdate = befUpdate;
 				CoolUtil.toggleVolKeys(true);
-				destroy();
+				close();
 
 			});
 
@@ -89,11 +89,18 @@ class QuickNameSubState extends MusicBeatSubstate{
 			add(cancelButton);
 		}
 	}
+	dynamic function buttonPress(){}
 	override function update(e){
 		super.update(e);
 		if(FlxG.keys.justPressed.ESCAPE){
 			FlxG.mouse.visible = oldMVis;
+			FlxG.state.persistentUpdate = befUpdate;
+			CoolUtil.toggleVolKeys(true);
+			// destroy();
 			close();
+		}
+		if(FlxG.keys.justPressed.ENTER){
+			buttonPress();
 		}
 	}
 	var _grab:BitmapData;

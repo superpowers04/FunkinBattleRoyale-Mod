@@ -21,6 +21,7 @@ import flixel.FlxG;
 	@:keep inline function get_length(){
 		return sounds.length;
 	}
+
 	var syncVolume:Bool = false;
 	var syncTime:Bool = true;
 	var maxTimeDifference:Int=5;
@@ -104,14 +105,30 @@ import flixel.FlxG;
 		sounds.remove(sound);
 		return sound;
 	}
+	function setVolume(index:Int,volume:Float){
+		return (sounds[index] is FlxSound ? sounds[index] : sound).volume = volume;
+	}
+
+	function getVolume(index:Int){
+		return (sounds[index] is FlxSound ? sounds[index] : sound).volume;
+	}
 
 
 
 	// Shadowed Variables/Functions. This shit is dumb tbh
-	function stop() for(sound in sounds) sound.stop();
+	function stop() {
+		for(sound in sounds) sound.stop();
+		sync();
+	}
 	// function start() for(sound in sounds) sound.start();s
-	function play() for(sound in sounds) sound.play();
-	function pause() for(sound in sounds) sound.pause();
+	function play() {
+		for(sound in sounds) sound.play();
+		sync();
+	}
+	function pause() {
+		for(sound in sounds) sound.pause();
+		sync();
+	}
 	var volume(get,set):Float;
 	function get_volume() return sound?.volume;
 	function set_volume(v) {for(sound in sounds) {sound.volume=v;} return v;}

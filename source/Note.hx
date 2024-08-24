@@ -404,7 +404,7 @@ class Note extends FlxSprite
 					// prevNote.setGraphicSize();
 				}
 			}else{
-				animation.play(if(noteJSON == null) noteName + "Scroll" else "scroll");
+				animation.play(noteJSON == null ? noteName + "Scroll" : "scroll");
 			}
 		}else{
 			noteID = -40;
@@ -483,10 +483,8 @@ class Note extends FlxSprite
 		visible = showNote;
 		var dad = PlayState.opponentCharacter;
 		if (mustPress) {
-			if (shouldntBeHit) { 
-				updateCanHit();
-			}else{
-
+			updateCanHit();
+			if (!shouldntBeHit) { 
 				updateCanHit();
 
 				if (!wasGoodHit && strumTime < Conductor.songPosition - (Conductor.safeZoneOffset * Conductor.timeScale)){
@@ -495,15 +493,18 @@ class Note extends FlxSprite
 					skipNote = true;
 					if (!shouldntBeHit) {
 						PlayState.instance.health += PlayState.SONG.noteMetadata.tooLateHealth;
-						PlayState.instance.vocals.volume = 0;
+						PlayState.instance.vocals.setVolume(0,0);
 						PlayState.instance.noteMiss(noteData, this);
 					}
+					// color.saturation = 0;
 					// FlxTween.tween(this,{alpha:0},0.2,{onComplete:(_)->{
+					// PlayState.instance.notes.remove(this, true);
 					PlayState.instance.notes.remove(this, true);
-
 					destroy();
+					// destroy();
 					// }});
 				}
+				// }
 			}
 		}else if (aiShouldPress && (dad == null || !dad.isStunned) && PlayState.dadShow && !PlayState.p2canplay && strumTime <= Conductor.songPosition) {
 			dadNotePress();
@@ -521,9 +522,9 @@ class Note extends FlxSprite
 		if (dad.useVoices){
 			dad.voiceSounds[noteData].play(1);
 			dad.voiceSounds[noteData].time = 0;
-			PlayState.instance.vocals.volume = 0;
+			PlayState.instance.vocals.setVolume(1,0);
 		}else if (PlayState.instance.vocals != null){
-			PlayState.instance.vocals.volume = SESave.data.voicesVol;
+			PlayState.instance.vocals.setVolume(1,SESave.data.voicesVol);
 		}
 		if(kill){
 			PlayState.instance.notes.remove(this);

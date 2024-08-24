@@ -331,14 +331,14 @@ class AlphaCharacter extends FlxSprite {
 		// txt.destroy();
 		// trace('Cached Alpha Characters');
 	}
-	public static function cacheText(char:String = "",?bold:Bool = false,?txt:FlxText = null){
+	public static function cacheText(char:String = "",?bold:Bool = false,?txt:FlxText = null):FlxSprite{
+		if(char == "") return null;
 		var kill = false;
 		if(txt == null) {
 			txt = new FlxText(-10000,0,"",48);
 			kill = true;
 		}
-		if(char == "") return;
-		var charID = char + '${if(bold) '-bold' else ''}';
+		var charID = char + (bold ? "-bold" : "");
 		txt.text = char;
 		if(bold){
 			txt.color = 0xFFFFFF;
@@ -353,12 +353,13 @@ class AlphaCharacter extends FlxSprite {
 		// };
 		// _char.graphic.dump();
 		// _char.graphic.persist = true;
-		textCache[charID] = new FlxSprite();
-		textCache[charID].frames = txt.frames;
-		textCache[charID].graphic = txt.graphic;
-		textCache[charID].graphic.persist = true;
+		var spr = textCache[charID] = new FlxSprite();
+		spr.frames = txt.frames;
+		spr.graphic = txt.graphic;
+		spr.graphic.persist = true;
 
 		if(kill) txt.destroy();
+		return spr;
 	}
 
 	public var row:Int = 0;
@@ -411,7 +412,7 @@ class AlphaCharacter extends FlxSprite {
 				createSymbol(letter);
 			}else{
 				addAnim(letter,letter);
-				if(addAnim(letter,letter + " " + letterCase)){
+				if(addAnim(letter,'$letter $letterCase')){
 					animation.play(letter);
 					updateHitbox();
 				}else{
@@ -429,9 +430,8 @@ class AlphaCharacter extends FlxSprite {
 	}
 	@:keep inline public function useFLXTEXT(letter:String,bold:Bool = false) {
 
-		var cacheID = letter + '${if(bold) '-bold' else ''}';
+		var cacheID = letter + (bold ? '-bold' : '');
 		var txt = textCache[cacheID] ?? cacheText(letter,bold);
-		// txt = textCache[cacheID];
 		if(txt != null){
 			graphic = txt.graphic;
 			frames = txt.frames;
