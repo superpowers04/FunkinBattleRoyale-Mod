@@ -368,9 +368,12 @@ class MusicBeatState extends FlxUIState {
 	public static function switchState(nextState:FlxState){
 		return FlxG.switchState(nextState);
 	}
+	public var shouldTransitionIn:Bool = true;
+	public var shouldTransitionOut:Bool = true;
 
 	function tranIn(){ // Replace with empty functions to disable
-		
+		LoadingScreen.hide();
+		if(!shouldTransitionIn) return;
 		var oldY = FlxG.camera.x;
 		FlxG.camera.x -= 300;
 		FlxTween.tween(FlxG.camera, {x:oldY},0.7,{ease: FlxEase.expoOut});
@@ -378,12 +381,10 @@ class MusicBeatState extends FlxUIState {
 		FlxG.camera.zoom += 1;
 		FlxTween.tween(FlxG.camera, {zoom:oldZoom},0.7,{ease: FlxEase.expoOut});
 
-		LoadingScreen.hide();
 		
 	}
 	function tranOut(){
-		// active = false;
-		
+		if(!shouldTransitionOut) return;
 		if(loading) LoadingScreen.show();
 		
 		

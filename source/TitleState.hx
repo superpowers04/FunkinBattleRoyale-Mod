@@ -1143,7 +1143,7 @@ class TitleState extends MusicBeatState
 					android.widget.Toast.makeText('Update check skipped due to lack of internet permissions',20);
 				}
 				#end
-				FlxG.switchState(if(FlxG.keys.pressed.SHIFT) new OptionsMenu() else new MainMenuState());
+				FlxG.switchState(FlxG.keys.pressed.SHIFT ? new OptionsMenu() : new MainMenuState());
 			}else{
 				new FlxTimer().start(0.5,function(_){try{updateCheck = true;}catch(e){}});
 
@@ -1201,9 +1201,21 @@ class TitleState extends MusicBeatState
 		// if(superLogo != null && superLogo is FlxSprite)(cast superLogo).graphic.destroy();
 		if(superLogo != null) superLogo.destroy();
 		// FlxTween.tween(FlxG.camera.scroll,{y:-300},4,{ease:FlxEase.cubeOut});
-		FlxTween.tween(logoBl,{y:-300},4,{ease:FlxEase.cubeOut});
-		FlxTween.tween(titleText,{y:740},4,{ease:FlxEase.cubeOut});
-		FlxG.switchState(if(FlxG.keys.pressed.SHIFT) new OptionsMenu() else new MainMenuState());
+		if(FlxG.keys.pressed.SHIFT){
+			FlxG.switchState(new OptionsMenu());
+			return;
+		}
+		var state = new MainMenuState();
+		state.shouldTransitionIn = false;
+		FlxTween.tween(logoBl,{y:-300,alpha:0},0.5,{ease:FlxEase.cubeOut});
+		FlxTween.tween(titleText,{y:740,alpha:0},0.5,{ease:FlxEase.cubeOut,onComplete:(_)->{
+
+			FlxG.camera.alpha = 0;
+			FlxG.switchState(state);
+
+		}});
+
+		
 	}
 
 	function createCoolText(textArray:Array<String>,yOffset:Int = 200)
@@ -1238,6 +1250,8 @@ class TitleState extends MusicBeatState
 			textGroup.remove(textGroup.members[0], true);
 		}
 	}
+	var tweensy:FlxTween;
+	var tweenr:FlxTween;
 	var tweeny:FlxTween;
 	var ttBounce:FlxTween;
 	var cachingText:Alphabet;
@@ -1250,11 +1264,14 @@ class TitleState extends MusicBeatState
 		if(beatAmounts.exists(curBeat)) beatIntensity = beatAmounts[curBeat];
 		if (logoBl != null){
 			
+			if(tweensy != null)tweensy.cancel();
 			if(tweeny != null)tweeny.cancel();
+			if(tweenr != null)tweenr.cancel();
 			var amount = 0.9 + beatIntensity;
 			logoBl.scale.set(amount,amount);
 			// FlxTween.tween(logoBl.scale,{x:1,y:1},0.1);
-			tweeny = FlxTween.tween(logoBl.scale,{x:0.9,y:0.9},(60 / Conductor.bpm),{ease:FlxEase.expoOut});
+			tweensy = FlxTween.tween(logoBl.scale,{x:0.9,y:0.9},(60 / Conductor.bpm),{ease:FlxEase.expoOut});
+			tweenr = FlxTween.tween(logoBl,{angle:curBeat % 2 == 0 ? 15 : -15},(60 / Conductor.bpm),{ease:FlxEase.expoOut});
 			if(ttBounce != null)ttBounce.cancel();
 			titleText.scale.set(0.1 + amount,0.1 + amount);
 			ttBounce = FlxTween.tween(titleText.scale,{x:1,y:1},(60 / Conductor.bpm),{ease:FlxEase.expoOut});
@@ -1375,7 +1392,7 @@ class TitleState extends MusicBeatState
 		FlxG.camera.flash(FlxColor.WHITE, 2);
 		remove(credGroup);
 		skippedIntro = true;
-		FlxG.camera.scroll.x += 100;
+		// FlxG.camera.scroll.x += 100;
 		FlxG.camera.scroll.y += 100;
 		logoBl.screenCenter();
 		logoBl.y -= 100;
@@ -1390,7 +1407,7 @@ class TitleState extends MusicBeatState
 			titleText.color=0xffff8b0f;
 		}
 
-		FlxTween.tween(FlxG.camera.scroll,{x: 0,y:0},1,{ease:FlxEase.cubeOut});
+		FlxTween.tween(FlxG.camera.scroll,{y:0},1,{ease:FlxEase.cubeOut});
 		
 	}
 	override function stepHit(){
@@ -1418,9 +1435,8 @@ class TitleState extends MusicBeatState
 	function showHaxe(){
 		_times = [0.041, 0.184, 0.334, 0.495, 0.636,1];
 		_colors = [0x00b922, 0xffc132, 0xf5274e, 0x3641ff, 0x04cdfb,0xFFFFFF,0xFFFFFF];
-		_functions = [drawGreen, drawYellow, drawRed, drawBlue, drawLightBlue,function(){return;}];
-		_sprite = new Sprite();
-		FlxG.stage.addChild(_sprite);
+		_functions = [drawGreen, drawYellow, drawRed, drawBlue, drawLightBlue,()->{}];
+		FlxG.stage.addChild(_sprite = new Sprite());
 		_gfx = _sprite.graphics;
 		_sprite.filters = [new flash.filters.GlowFilter(0xFFFFFF,1,6,6,1,1)];
 

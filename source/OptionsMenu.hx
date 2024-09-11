@@ -219,6 +219,7 @@ class OptionsMenu extends MusicBeatState
 			new VolumeOption("se.options.volume.other","other"),  
 			new HCBoolOption("Animation debug Music","Whether to play music for animation debug or continue playing the current song","animDebugMusic"),
 			new HCBoolOption("Options Menu Music","Whether to play music for the options menu or continue playing the current song","optionsMusic"),
+			new HCBoolOption("Use current song for results","Loops the current playing song for results","resultsInst"),
 			new HCBoolOption("Miss Sounds","Play a sound when you miss",'playMisses'),
 			new HCBoolOption("Hit Sounds","Play a click when you hit a note. Uses osu!'s sounds or your mods/hitsound.ogg",'hitSound'),
 			new HCBoolOption("Play Character Voices","Plays the voices a character has when you press a note.","playVoices"),

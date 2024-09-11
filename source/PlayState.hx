@@ -2746,8 +2746,7 @@ class PlayState extends ScriptMusicBeatState
 	}
 
 
-	private function keyShit():Void
-		{try{doKeyShit();}catch(e){handleError('Error during keyshit: ${e.message}\n ${e.stack}');}}
+	private function keyShit():Void {try{doKeyShit();}catch(e){handleError('Error during keyshit: ${e.message}\n ${e.stack}');}}
 	public var doKeyShit:()->Void = function():Void{throw("I can't handle key inputs? Please report this!");};
 	public var noteShit:()->Void = function():Void{throw("I can't handle input for some reason, Please report this!");};
 	public var goodNoteHit:(Note, ?Bool)->Void = function(note:Note, ?resetMashViolation:Bool = true):Void{throw("I cant register any note hits!");};

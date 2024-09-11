@@ -173,27 +173,28 @@ class FinishSubState extends MusicBeatSubstate
 			pauseGame = true;
 			autoEnd = true;
 			FlxG.sound.pause();
-
-			if(endingMusic == null){
-				music = new FlxSound().loadEmbedded(SELoader.cache.loadSound( win ? 'assets/shared/music/resultsNORMAL.ogg' : 'assets/shared/music/resultsSHIT.ogg' ), true, true);
+			if(win && SESave.data.resultsInst){
+				FlxG.sound.music.play();
 			}else{
-				music = new FlxSound().loadEmbedded(endingMusic , true, true);
-			}
-			music.play(false);
+				music = new FlxSound().loadEmbedded(endingMusic ?? SELoader.cache.loadSound( win ? 'assets/shared/music/resultsNORMAL.ogg' : 'assets/shared/music/resultsSHIT.ogg' ), true, true);
+				music.play(false);
 
-			if(!win && endingMusic == null){
-				music.looped = false;
-				music.onComplete = function(){
-					music = new FlxSound().loadEmbedded(SELoader.cache.loadSound('assets/shared/music/breakfast.ogg'), true, true);
-					music.play(false);
-					FlxG.sound.list.add(music);
-				} 
-
+				if(!win && endingMusic == null){
+					music.looped = false;
+					music.onComplete = function(){
+						music = new FlxSound().loadEmbedded(SELoader.cache.loadSound('assets/shared/music/breakfast.ogg'), true, true);
+						music.play(false);
+						FlxG.sound.list.add(music);
+					} 
+				}
+				FlxG.sound.list.add(music);
 			}
+
+			
+
 			endingMusic = null;
 			shownResults = true;
 
-			FlxG.sound.list.add(music);
 			if(isError){
 				var finishedText:FlxText = new FlxText(20,-55,0, "Error caught!" );
 				finishedText.size = 32;

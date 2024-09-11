@@ -36,4 +36,5 @@ package se.formats;
 		this.isCategory = isCategory;
 		this.categoryID=categoryID;
 	}
+	var favouriteID:Int = 0;
 }

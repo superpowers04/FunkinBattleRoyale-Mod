@@ -158,9 +158,15 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 	function favChart(){
 		var songInfo = grpSongs.members[curSelected].menuValue;
 		if(songInfo == null) return showTempmessage('This is not a song!',FlxColor.RED);
-		if(!SESave.data.favourites.remove(songInfo)){
+		if(songInfo.favouriteID > 0){
+			SESave.data.favourites.remove(SESave.data.favourites[songInfo.favouriteID-1]);
+			curSelected = 0;
+		}else{
 			SESave.data.favourites.push(songInfo);
 		}
+		// if(!SESave.data.favourites.remove(songInfo)){
+		// 	SESave.data.favourites.push(songInfo);
+		// }
 		SEFlxSaveWrapper.save();
 		reloadList(false,'');
 		reloadList(true,searchField.text);
@@ -285,12 +291,13 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 				var containsSong = false;
 				var missingSongs:Array<Dynamic> = [];
 				_packCount++;
-				for (osong in SESave.data.favourites){
+				for (i => osong in SESave.data.favourites){
 					var song:SongInfo = null;
 					var worked:Bool = false;
 					try{
 						song = new SongInfo(osong.name, osong.charts,osong.path,osong.namespace,osong.isCategory,osong.categoryID);
 						worked = CoolUtil.applyAnonToObject(song,osong);
+						song.favouriteID = i+1;
 					}catch(e){
 						trace('$osong is an invalid song!');
 						missingSongs.push(osong);

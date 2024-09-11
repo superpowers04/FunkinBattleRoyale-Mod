@@ -163,30 +163,32 @@ class SickMenuState extends ScriptMusicBeatState
 			trace('${e.stack}');
 		}
 	} 
-
-	override function create() {
-		// if (ChartingState.charting) ChartingState.charting = false;
-		SearchMenuState.resetVars();
-		// if (SESave.data.songUnload && PlayState.SONG != null) {PlayState.SONG = null;}
-		// PlayState.songScript = "";PlayState.hsBrTools = null;
+	override function new(){
 		if(SearchMenuState.background == null){
 			try{
-
-			SearchMenuState.background = if(SELoader.exists("mods/bg.png")) SELoader.loadGraphic("mods/bg.png",true); else SELoader.loadGraphic("assets/images/menuDesat.png",true);
-			SearchMenuState.backgroundOver = if(SELoader.exists("mods/fg.png")) SELoader.loadGraphic("mods/fg.png",true); else FlxGraphic.fromRectangle(0,0,0x00000000);
+				SearchMenuState.background = SELoader.exists("mods/bg.png") ? SELoader.loadGraphic("mods/bg.png",true) : SELoader.loadGraphic("assets/images/menuDesat.png",true);
+				SearchMenuState.backgroundOver = SELoader.exists("mods/fg.png") ?  SELoader.loadGraphic("mods/fg.png",true) : FlxGraphic.fromRectangle(0,0,0);
 			}catch(e){trace('Unable to load background! ${e.message}');}
 			if(SearchMenuState.background == null) SearchMenuState.background = FlxGraphic.fromRectangle(0,0,0xff110015);
 			SearchMenuState.background.persist = SearchMenuState.backgroundOver.persist = true;
 			SearchMenuState.background.destroyOnNoUse = SearchMenuState.backgroundOver.destroyOnNoUse = false;
 		}
-
-
 		if(bg == null){
-			
 			bg = new FlxSprite().loadGraphic(SearchMenuState.background); 
 			bg.color = 0xFFFF6E6E;
 		}
 		bg.scrollFactor.set(0.01,0.01);
+		super();
+	}
+	override function create() {
+		// if (ChartingState.charting) ChartingState.charting = false;
+		SearchMenuState.resetVars();
+		// if (SESave.data.songUnload && PlayState.SONG != null) {PlayState.SONG = null;}
+		// PlayState.songScript = "";PlayState.hsBrTools = null;
+
+
+
+
 
 		add(bg);
 		if(SearchMenuState.backgroundOver != null){

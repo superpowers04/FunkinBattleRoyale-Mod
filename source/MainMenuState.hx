@@ -149,7 +149,7 @@ class MainMenuState extends SickMenuState {
 					32,(nightly==""?FlxColor.RED:FlxColor.WHITE),CENTER);
 	 			outdatedLMAO.screenCenter(FlxAxes.X);
 				add(outdatedLMAO);
-			}else 
+			}
 			//  Whole bunch of checks to prevent crashing
 			if (TitleState.retChar(SESave.data.playerChar) == "" && SESave.data.playerChar != "automatic"){
 				errorMessage += '\n${SESave.data.playerChar} is an invalid player! Reset back to BF!';

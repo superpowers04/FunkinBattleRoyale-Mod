@@ -105,11 +105,13 @@ import flixel.FlxG;
 		sounds.remove(sound);
 		return sound;
 	}
-	function setVolume(index:Int,volume:Float){
+	function setVolume(index:Int,volume:Float):Float{
+		if(length == 0) return 0;
 		return (sounds[index] is FlxSound ? sounds[index] : sound).volume = volume;
 	}
 
-	function getVolume(index:Int){
+	function getVolume(index:Int):Float{
+		if(length == 0) return 0;
 		return (sounds[index] is FlxSound ? sounds[index] : sound).volume;
 	}
 
@@ -117,15 +119,18 @@ import flixel.FlxG;
 
 	// Shadowed Variables/Functions. This shit is dumb tbh
 	function stop() {
+		if(length == 0) return;
 		for(sound in sounds) sound.stop();
 		sync();
 	}
 	// function start() for(sound in sounds) sound.start();s
 	function play() {
+		if(length == 0) return;
 		for(sound in sounds) sound.play();
 		sync();
 	}
 	function pause() {
+		if(length == 0) return;
 		for(sound in sounds) sound.pause();
 		sync();
 	}

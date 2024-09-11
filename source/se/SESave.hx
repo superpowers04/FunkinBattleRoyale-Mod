@@ -115,6 +115,7 @@ typedef YourMother = Dynamic;
 	var persistGF:Bool = false;
 	var menuScripts:Bool = false;
 	var easterEggs:Bool = true;
+	var resultsInst:Bool = false;
 
 	var profiler(default,set):Bool = false;
 	function set_profiler(v){
