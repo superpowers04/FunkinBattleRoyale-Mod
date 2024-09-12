@@ -362,10 +362,10 @@ class MainMenuState extends SickMenuState {
 		MainMenuState.errorMessage="";
 		if (selected){return;}
 		selected = true;
-		var daChoice:String = options[sel];
+		var daChoice:String = grpControls.members[sel].menuValue.toLowerCase();
 		SELoader.playSound('assets/sounds/confirmMenu',true);
 		triedChar = false;
-		if(daChoice != "other" && daChoice != 'back' && daChoice != 'open mods folder'){
+		if(daChoice != "other" && daChoice != 'mainmenu' && daChoice != 'back' && daChoice != 'open mods folder'){
 			var _obj = grpControls.members[sel];
 			FlxTween.tween(_obj,{x:500},0.4,{ease:FlxEase.quadIn});
 			// FlxTween.tween(_obj,{x:500},0.4,{ease:FlxEase.quadIn});
@@ -375,7 +375,7 @@ class MainMenuState extends SickMenuState {
 			}
 		}
 		
-		switch (daChoice.toLowerCase()){
+		switch (daChoice){
 
 			case 'open closed chart':
 				loading = true;
@@ -394,7 +394,7 @@ class MainMenuState extends SickMenuState {
 			case 'options':
 				FlxG.switchState(new OptionsMenu());
 			#if !mobile
-				case 'join FNF\'br server':
+				case 'join fnf\'br server':
 					#if android
 					if(!Main.grantedPerms.contains('android.permission.INTERNET')){
 						selected = false;
@@ -470,6 +470,7 @@ class MainMenuState extends SickMenuState {
 		if(cancelCurrentFunction) return;
 		var controlLabel:Alphabet = new Alphabet(0, (70 * i) + 30, options[i], true, false);
 		controlLabel.isMenuItem = true;
+		controlLabel.menuValue = options[i];
 		controlLabel.targetY = i;
 		if (i != 0) controlLabel.alpha = 0.6;
 		controlLabel.moveX = false;

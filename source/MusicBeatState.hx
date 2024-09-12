@@ -115,13 +115,13 @@ class MusicBeatState extends FlxUIState {
 	override function onFocus() {
 		super.onFocus();
 		CoolUtil.setFramerate(true);
-		mouseEnabledTmr = new FlxTimer().start(0.25,function(_){FlxG.mouse.enabled = true;});
+		// mouseEnabledTmr = new FlxTimer().start(0.25,function(_){FlxG.mouse.enabled = true;});
 	}
 	override function onFocusLost(){
 		super.onFocusLost();
 		CoolUtil.setFramerate(24,false,true);
 		if(mouseEnabledTmr != null)mouseEnabledTmr.cancel();
-		FlxG.mouse.enabled = false;
+		// FlxG.mouse.enabled = false;
 	}
 	@:keep inline function get_controls():Controls return PlayerSettings.player1.controls;
 	override function create()

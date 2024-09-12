@@ -49,7 +49,7 @@ jobs:
       - name: Compile
         run: haxelib run lime build linux --app-version="4.3.0-${{ github.run_id}}" -Dghaction
       - name: Publish Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: linuxBuild
           path: /tmp/fnfbrbin/linux/bin/      
@@ -98,7 +98,7 @@ jobs:
       - name: Compile
         run: haxelib run lime build windows --app-version="4.3.0-${{ github.run_id}}" -Dghaction
       - name: Publish Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: windowsBuild
           path: C:/fnfbrbin/windows/bin      

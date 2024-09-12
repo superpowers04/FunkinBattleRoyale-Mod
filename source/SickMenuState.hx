@@ -85,6 +85,7 @@ class SickMenuState extends ScriptMusicBeatState
 		if(cancelCurrentFunction) return;
 		var controlLabel:Alphabet = new Alphabet(0, (70 * i) + 30, options[i], true, false);
 		controlLabel.isMenuItem = true;
+		controlLabel.menuValue = options[i];
 		controlLabel.targetY = i;
 		if (i != 0) controlLabel.alpha = 0.6;
 		grpControls.add(controlLabel);
