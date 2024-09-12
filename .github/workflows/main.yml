@@ -54,7 +54,7 @@ jobs:
           name: linuxBuild
           path: /tmp/fnfbrbin/linux/bin/      
       - name: Publish without changed assets as Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: linuxBuild-Minimal
           path: |
@@ -103,7 +103,7 @@ jobs:
           name: windowsBuild
           path: C:/fnfbrbin/windows/bin      
       - name: Publish without changed assets as Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: windowsBuild-Minimal
           path: |
