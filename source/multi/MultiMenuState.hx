@@ -160,7 +160,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		if(songInfo == null) return showTempmessage('This is not a song!',FlxColor.RED);
 		if(songInfo.favouriteID > 0){
 			SESave.data.favourites.remove(SESave.data.favourites[songInfo.favouriteID-1]);
-			curSelected = 0;
+			curSelected = 0; 
 		}else{
 			SESave.data.favourites.push(songInfo);
 		}

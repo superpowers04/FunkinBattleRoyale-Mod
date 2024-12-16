@@ -1421,8 +1421,7 @@ class ChartingState extends ScriptMusicBeatState
 		updateVisualiser(elapsed);
 
 		if(FlxG.keys.pressed.CONTROL){
-
-			if(FlxG.keys.justPressed.R){
+			if(!disabledControls && FlxG.keys.justPressed.R){
 				sectionRestructure();
 				updateSectionUI();
 				updateGrid();
@@ -1436,7 +1435,7 @@ class ChartingState extends ScriptMusicBeatState
 			// if(controls.LEFT)
 		}
 
-		if(!pressingNote && (CoolUtil.activeObject == null || !disabledControls)){
+		if(!disabledControls && !pressingNote && CoolUtil.activeObject == null){
 			if(FlxG.keys.pressed.CONTROL && FlxG.keys.pressed.SHIFT && FlxG.keys.justPressed.D){
 				Conductor.songPosition = 0;
 				_song.notes = [];

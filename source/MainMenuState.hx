@@ -33,7 +33,7 @@ class MainMenuState extends SickMenuState {
 	
 	public static var firstStart:Bool = true;
 	public static var nightly(default,never):String = "X" + SEMacros.buildDate;
-	public static var ver(default,never):String = "1.0.0" + (if(nightly != "") "-" + nightly else "");
+	public static var ver(default,never):String = "1.0.0" + ((nightly != "") ? "-" + nightly : "");
 	// This should be incremented every update, this'll be sequential so you can just compare it to another version identifier
 	public static var versionIdentifier:Int = 3;
 	public static var lastVersionIdentifier:Int = 0;

@@ -39,7 +39,6 @@ class CharSelection extends SearchMenuState
 			charIDList = [];
 			charIDList[-1] = -1;
 			searchList = songs;
-
 			var i:Int = 0;
 			var query = new EReg((~/[-_ ]/g).replace(search.toLowerCase(),'[-_ ]'),'i');
 			for (i => char in chars){

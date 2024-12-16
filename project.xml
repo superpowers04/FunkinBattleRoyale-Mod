@@ -82,7 +82,7 @@
 	<haxelib name="flixel-ui" version="2.6.0" />
 
 	<haxedef name='usingcppia' if='cppia'/>
-	<define name='message.no-color'/>
+	<define  name='message.no-color'/>
 	<haxedef name="message.reporting" value="pretty" />
 
 
@@ -96,7 +96,7 @@
 
 	<!-- Expects https://github.com/superpowers04/linc_luajit, Nebula's fork will not work!-->
 	<haxelib name="linc_luajit" if="cpp" />
-	<haxelib name="discord_rpc" if="desktop cpp" />
+	<!-- <haxelib name="discord_rpc" if="desktop cpp" /> -->
 
 	<haxelib name="extension-androidtools" if="android" /> <!-- I am not reimplementing this shit myself -->
 
@@ -151,6 +151,7 @@
 		<haxedef name="HXCPP_STACK_LINE"/>
 		<haxedef name="HXCPP_STACK_TRACE"/>
 		<haxedef name="HXCPP_GC_GENERATIONAL"/>
+		<haxedef name="HXCPP_TELEMETRY"/>
 		<haxedef name="HXCPP_CATCH_SEGV"/>
 		<haxedef name='HXCPP_DEBUG_LINK' if='desktop'/>
 	</section>

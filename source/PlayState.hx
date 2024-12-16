@@ -2819,7 +2819,7 @@ class PlayState extends ScriptMusicBeatState
 							var swagRect = new FlxRect(0, 0, daNote.frameWidth, daNote.frameHeight);
 							swagRect.height = (strumNote.y + swagWidth - daNote.y) / daNote.scale.y;
 							swagRect.y = (daNote.height / daNote.scale.y) - swagRect.height;
-							if(daNote.mustPress && swagRect.height < 0 ) {goodNoteHit(daNote);continue;}
+							if(daNote.mustPress && swagRect.height <= 0 ) {goodNoteHit(daNote);continue;}
 
 							daNote.clipRect = swagRect;
 							daNote.susHit((daNote.mustPress) ? 0 : 1,daNote);
@@ -2846,7 +2846,7 @@ class PlayState extends ScriptMusicBeatState
 
 							}
 							swagRect.height -= swagRect.y;
-							if(daNote.mustPress && swagRect.height < 0 ) {goodNoteHit(daNote);continue;}
+							if(daNote.mustPress && swagRect.height <= 0 ) {goodNoteHit(daNote);continue;}
 
 							daNote.clipRect = swagRect;
 							daNote.susHit((daNote.mustPress) ? 0 : 1,daNote);

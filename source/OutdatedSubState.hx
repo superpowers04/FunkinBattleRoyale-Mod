@@ -50,7 +50,7 @@ class OutdatedSubState extends MusicBeatState
 		var txt:FlxText = new FlxText(0, 0, FlxG.width,
 			"\n\nChangelog:\n\n"
 			+ currChanges.substring(0,1000)
-			+ "\n\n\nPress Space to download latest update's zip, D to open a invite to the Discord server or Escape to close.\n\nYou can install it by downloading the zip and dragging the files\n into your game folder",
+			+ "\n\n\nPress Space to update, D to open a invite to the Discord server or Escape to close.\n\nYou can install it by downloading the zip and dragging the files\n into your game folder",
 			32);
 		
 		txt.setFormat(CoolUtil.font, 32, FlxColor.fromRGB(200, 200, 200), CENTER);
@@ -86,9 +86,15 @@ class OutdatedSubState extends MusicBeatState
 	{
 		if(allowInput){
 
-			if (controls.ACCEPT || FlxG.keys.justPressed.SPACE) {
+			// if (FlxG.keys.justPressed.SPACE) {
+			// 	FlxG.switchState(new se.states.DownloadState("https://nightly.link/superpowers04/Super-Engine/workflows/main/${MainMenuState.nightly == "" ? 'master' : 'nightly'}/${Sys.systemName}Build-Minimal.zip"),
+			// 		function(){
 
-				fancyOpenURL(if(MainMenuState.nightly == "")"https://nightly.link/superpowers04/Super-Engine/workflows/main/master/windowsBuild-Minimal.zip" else "https://nightly.link/superpowers04/Super-Engine/workflows/main/nightly/windowsBuild-Minimal.zip");
+			// 		}
+			// 	);
+			// }
+			if (controls.ACCEPT) {
+				fancyOpenURL("https://nightly.link/superpowers04/Super-Engine/workflows/main/${MainMenuState.nightly == '' ? 'master' : 'nightly'}/windowsBuild-Minimal.zip");
 			}
 			if (FlxG.keys.justPressed.D) {
 				fancyOpenURL("https://discord.gg/28GPGTRuuR");

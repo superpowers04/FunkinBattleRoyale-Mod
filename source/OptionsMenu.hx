@@ -248,8 +248,9 @@ class OptionsMenu extends MusicBeatState
 		if (titleText != null) titleText.destroy();
 		titleText = new FlxText(FlxG.width * 0.5 - (str.length * 10), 20, 0, se.translation.Lang.get(str), 12);
 		titleText.scrollFactor.set();
-		titleText.setFormat(CoolUtil.font, 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		add(titleText);
+		titleText.setFormat(CoolUtil.font, 32, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		titleText.screenCenter(X);
+		add(titleText);	
 	}
 	override function destroy(){
 		super.destroy();

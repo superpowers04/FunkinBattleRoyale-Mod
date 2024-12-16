@@ -180,6 +180,7 @@ class Main extends Sprite
 				super.__enterFrame(_);
 				// trace('h');
 			}
+
 		}catch(e){
 			FuckState.FUCK(e,"Main.onEnterFrame");
 		}
@@ -348,6 +349,7 @@ class FlxGameEnhanced extends FlxGame{
 					return;
 				}
 			#end
+
 			if(blockUpdate) _update(); else {
 				hasUpdated = true;
 				super.update();
