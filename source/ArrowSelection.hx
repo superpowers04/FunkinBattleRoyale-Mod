@@ -38,8 +38,11 @@ class ArrowSelection extends SearchMenuState
 	}
 	override function create()
 	{try{
+		bg.color = 0xFFFF6E6E;
 		{ // Looks for all notes, This will probably be rarely accessed, so loading like this shouldn't be a problem
+			
 			searchList = ["default"];
+
 			var dataDir:String = Sys.getCwd() + "mods/noteassets/";
 			var customArrows:Array<String> = [];
 			if (SELoader.exists(dataDir)) {
