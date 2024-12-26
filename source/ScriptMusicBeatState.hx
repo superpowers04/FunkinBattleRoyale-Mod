@@ -44,6 +44,7 @@ using StringTools;
 		isActive = false;
 }
 }
+/*TODO MOVE CALLINTERP INTO A THREAD*/
 
 class ScriptMusicBeatState extends MusicBeatState{
 	public static var instance:ScriptMusicBeatState;
@@ -122,7 +123,6 @@ class ScriptMusicBeatState extends MusicBeatState{
 					var method = _interp.variables.get(func_name);
 					if (method == null) {return null;}
 					// trace('$func_name:$id $args');
-					
 					var _ret = Reflect.callMethod(_interp,method,args);
 					currentInterp.reset();
 					return _ret;

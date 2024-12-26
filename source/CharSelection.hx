@@ -119,7 +119,7 @@ class CharSelection extends SearchMenuState
 			case 0: title="Change BF";bg.color = 0x007799;
 			case 1: title="Change Opponent";bg.color = 0x600060;
 			case 2: title="Change GF";bg.color = 0x771521;
-			default: title= "You found a 'secret',\n You should exit this menu to prevent further 'secret's";bg.color = 0xff0000;
+			default: title= "You found a 'secret',\n You should exit this menu to prevent further 'secrets'";bg.color = 0xff0000;
 		}
 
 
@@ -158,7 +158,7 @@ class CharSelection extends SearchMenuState
 		if (chars[curSelected] != null && chars[curSelected][1] != -1 && onlinemod.OnlinePlayMenuState.socket == null){
 			var _char = formatChar(chars[curSelected]);
 			if(chars[curSelected][4].type == 1 && (FlxG.keys.justPressed.ONE || FlxG.keys.justPressed.TWO || FlxG.keys.justPressed.THREE)){
-				FlxG.sound.play(Paths.sound('cancelMenu'));
+				SELoader.playSound('assets/sounds/cancelMenu.ogg');
 				FlxTween.tween(grpSongs.members[curSelected], {x: grpSongs.members[curSelected].x + 100}, 0.4, {ease: FlxEase.bounceInOut,onComplete: function(twn:FlxTween){return;}});
 				FlxTween.tween(infotext, {alpha:0}, 0.2, {ease: FlxEase.quadInOut,onComplete: function(twn:FlxTween){FlxTween.tween(infotext, {alpha:1}, 0.2, {ease: FlxEase.quadInOut,onComplete: function(twn:FlxTween){return;}});}});
 				
@@ -248,7 +248,8 @@ class CharSelection extends SearchMenuState
 		updateName((if(char == null || char[0] == null) "Unknown?!?!?" else char[0]));
 		if(!SESave.data.performance){
 			if(chars[curSelected][4] == null){
-				uiIcon.changeSprite(formatChar(chars[curSelected]),'face',false,((char == null || char[4] == null ) ? null : chars[curSelected][4].path));
+				// ((char == null || char[4] == null ) ? null : chars[curSelected][4].path)
+				uiIcon.changeSprite(formatChar(chars[curSelected]));
 
 			}else{
 				uiIcon.fromCharInfo(chars[curSelected][4]); 
@@ -268,14 +269,13 @@ class CharSelection extends SearchMenuState
 
 		if(curSelected == -1){
 			SESave.data.playerChar = 'automatic';
-
 			return;
 		}
 		if(chars[curSelected][1] == 1){
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			SELoader.playSound('assets/sounds/cancelMenu.ogg');
 			FlxTween.tween(grpSongs.members[curSelected], {x: grpSongs.members[curSelected].x + 100}, 0.4, {ease: FlxEase.bounceInOut,onComplete: function(twn:FlxTween){return;}});
 			FlxTween.tween(infotext, {alpha:0}, 0.2, {ease: FlxEase.quadInOut,onComplete: function(twn:FlxTween){FlxTween.tween(infotext, {alpha:1}, 0.2, {ease: FlxEase.quadInOut,onComplete: function(twn:FlxTween){return;}});}});
-			if(grpSongs.members[curSelected].x > 500){
+			if(grpSongs.members[curSelected].x > 300){
 				updateInfoText('This character\'s invalid dammit! To set them up now, press 1 for BF, 2 for dad, 3 for GF. If you need help please ask on my Discord, you can access it from the changelog screen');
 			}
 			retAfter = false;

@@ -473,25 +473,21 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 
 	public static function loadScriptsFromSongPath(selSong:String){
 		LoadingScreen.loadingText = "Finding scripts";
-		if(selSong.contains("mods/packs") || selSong.contains("mods/weeks")){
-			var packDirL = selSong.split("/"); // Holy shit this is shit but using substr won't work for some reason :<
-
-			if(packDirL[packDirL.length] == "")packDirL.pop(); // There might be an extra slash at the end, remove it
-			packDirL.pop();
-			if(packDirL.contains('packs')) 
-				while(packDirL[packDirL.length - 2] != null && packDirL[packDirL.length - 2] != 'packs' )packDirL.pop(); 
-
-			// Packs have a sub charts folder, weeks do not
-			
-			var packDir = packDirL.join("/");
-			if(SELoader.isDirectory('${packDir}/scripts')){
-				for (file in SELoader.readDirectory('${packDir}/scripts')) {
-					if((file.endsWith(".hscript") || file.endsWith(".hx") #if(linc_luajit) || file.endsWith(".lua") #end ) && !SELoader.isDirectory('${packDir}/scripts/$file')){
-						PlayState.scripts.push('${packDir}/scripts/$file');
-					}
-				}
+		if(!selSong.contains("mods/packs") && !selSong.contains("mods/weeks")) return;
+		var indexOfPacks = selSong.indexOf('packs/');
+		var packDir = indexOfPacks == -1 ? selSong : (selSong.substring(0,indexOfPacks+6+selSong.substring(indexOfPacks+6).indexOf('/')));
+		trace(packDir);
+		if(!SELoader.isDirectory('${packDir}/scripts')) return;
+		for (file in SELoader.readDirectory('${packDir}/scripts')) {
+			if(
+				(file.endsWith(".hscript") || file.endsWith(".hx") #if(linc_luajit) || file.endsWith(".lua") #end ) 
+				&& !SELoader.isDirectory('${packDir}/scripts/$file')
+			){
+				PlayState.scripts.push('${packDir}/scripts/$file');
 			}
 		}
+		
+		
 	}
 	/*TODO: REMOVE ALL INSTANCES OF SONGNAME*/
 	public static function gotoSong(?selSong:String = "",?songJSON:String = "",?songName:String = "",?charting:Bool = false,?blankFile:Bool = false,?voicesFile:String="",?instFile:String=""){
@@ -507,7 +503,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 			PlayState.isStoryMode = false;
 			// Set difficulty
 			PlayState.songDiff = songJSON;
-			PlayState.storyDifficulty = (songJSON.endsWith('-easy.json') ? 0 : (songJSON.endsWith('easy.json') ? 2 : 1));
+			PlayState.storyDifficulty = (songJSON.endsWith('-easy.json') ? 0 : (songJSON.endsWith('-hard.json') ? 2 : 1));
 			PlayState.actualSongName = songJSON;
 			onlinemod.OfflinePlayState.voicesFile = '';
 			PlayState.hsBrToolsPath = selSong;
@@ -550,8 +546,6 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 		}
 		var songLoc = songInfo.path;
 		if(charting){
-
-			
 			var chart = songInfo.charts[selMode];
 			var songName = songInfo.name;
 			if(chart == null){
@@ -568,7 +562,7 @@ class MultiMenuState extends onlinemod.OfflineMenuState {
 				PlayState.SONG = Song.parseJSONshit(SELoader.loadText(onlinemod.OfflinePlayState.chartFile),true);
 			}
 			trace('Loading $songName  $chart');
-			loadScriptsFromSongPath(songLoc);
+			inline loadScriptsFromSongPath(songLoc);
 			PlayState.hsBrTools = new HSBrTools('${songLoc}');
 			onlinemod.OfflinePlayState.voicesFile = (songInfo.voices ?? (SELoader.exists('${songLoc}/Voices.ogg') ? '${songLoc}/Voices.ogg' : ""));
 			onlinemod.OfflinePlayState.instFile = (songInfo.inst ?? '${songLoc}/Inst.ogg');

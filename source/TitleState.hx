@@ -348,8 +348,8 @@ class TitleState extends MusicBeatState
 	@:keep inline public static function checkCharacters(){
 		LoadingScreen.loadingText = 'Updating character list';
 		characters = [
-			{id:"bf",folderName:"bf",path:"assets/",nameSpace:"INTERNAL",internal:true,internalAtlas:"characters/BOYFRIEND",internalJSON:Character.BFJSON,description:"The funny rap guy"},
-			{id:"gf",folderName:"gf",path:"assets/",nameSpace:"INTERNAL",internal:true,internalAtlas:"characters/GF_assets",internalJSON:Character.GFJSON,description:"The funny boombox girl"},
+			{id:"bf",folderName:"bf",path:"assets/",nameSpace:"INTERNAL",internal:true,internalAtlas:"characters/BOYFRIEND",iconLocation:"assets/images/healthicons/bf.png",internalJSON:Character.BFJSON,description:"The funny rap guy"},
+			{id:"gf",folderName:"gf",path:"assets/",nameSpace:"INTERNAL",internal:true,internalAtlas:"characters/GF_assets",iconLocation:"assets/images/healthicons/gf.png",internalJSON:Character.GFJSON,description:"The funny boombox girl"},
 			{id:"lonely",folderName:"lonely",path:"assets/",nameSpace:"INTERNAL",internal:true,internalAtlas:"onlinemod/lonely",internalJSON:Character.BFJSON,description:"Not much is known about them besides their ability to mimic any voice, they're invisible and very shy"},
 		];
 		defaultChar = characters[0];
@@ -359,38 +359,7 @@ class TitleState extends MusicBeatState
 		
 		var customCharacters:Array<String> = [];
 
-
-		// if (SELoader.exists("assets/characters/")){
-		// 	var dir = new SEDirectory("assets/characters");
-		// 	trace('Checking ${dir} for characters');
-		// 	for (char in dir.readDirectory()) {
-		// 		if (!dir.isDirectory(char)) continue;
-		// 		var charPath = dir.newDirectory(char);
-		// 		if (charPath.exists("/config.json")) {
-		// 			customCharacters.push(char);
-		// 			var desc = 'Assets character';
-		// 			if (charPath.exists('description.txt'))
-		// 				desc += ";" + charPath.getContent('description.txt');
-		// 			characters.push({
-		// 				id:char.replace(' ','-').replace('_','-').toLowerCase(),
-		// 				folderName:char,
-		// 				path:"assets/characters/",
-		// 				nameSpace:"SEAssetsFolder",
-		// 				description:desc
-		// 			});
-
-		// 		}else if (charPath.exists("character.png") && (charPath.exists("character.xml") || charPath.exists("character.json"))){
-		// 			// invalidCharacters.push([char,dir]);
-		// 			invalidCharacters.push({
-		// 				id:char.replace(' ','-').replace('_','-').toLowerCase(),
-		// 				folderName:char,
-		// 				nameSpace:"SEAssetsFolder",
-		// 				path:'$dir'
-		// 			});
-		// 		}
-		// 	}
-		// }
-
+		// TODO: MOVE TO SELOADER
 		if (SELoader.exists("mods/characters/")){
 			var path = new SEDirectory("mods/characters/");
 			for (directory in path.readDirectory()) {

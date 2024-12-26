@@ -5,6 +5,7 @@ import flixel.graphics.FlxGraphic;
 import flash.display.BitmapData;
 import flixel.tweens.FlxTween;
 import TitleState.CharInfo;
+using StringTools;
 
 class HealthIcon extends FlxSprite
 {
@@ -12,18 +13,21 @@ class HealthIcon extends FlxSprite
 	var vanIcon:Bool = false;
 	var isPlayer:Bool = false;
 	var isMenuIcon:Bool = false;
-	var frameCount:Int = 2;
-	var hichar:String = "";
+	var hichar:String = "UNSET";
 	public var trackedSprite:FlxSprite = null;
 	public var isTracked:Bool = false;
 	public var trackingOffset:Float = 0;
 	// public var pathh = "mods/characters";
 
-	public function new(?char:String = 'face', ?isPlayer:Bool = false,?clone:String = "",?isMenuIcon:Bool = false,?path:String = "mods/characters") {
+	public function new(?char:String = 'face', ?isPlayer:Bool = false,?deprecated_clone:String = "",?isMenuIcon:Bool = false,?deprecated_path:Dynamic = null) {
 		super();
+		if(deprecated_clone != "") trace('HealthIcon.changeSprite: ARGUMENT "clone" IS DEPRECATED AND WILL BE IGNORED');
+		if(deprecated_path != null) trace('HealthIcon.changeSprite: ARGUMENT "path" IS DEPRECATED AND WILL BE IGNORED! USE loadCustomIcon INSTEAD');
 		this.isPlayer = isPlayer;
 		this.isMenuIcon = isMenuIcon;
-		changeSprite(char,"",path);
+		if(char == "DONTLOAD") return;
+		if(char == "face") return loadBlankIcon();
+		changeSprite(char);
 	}
 	public function updateTracking(Pos:Float = 0){
 		if(!isTracked) return;
@@ -41,154 +45,82 @@ class HealthIcon extends FlxSprite
 	}
 	var imgPath:String = "mods/characters/";
 	public function fromCharInfo(char:Dynamic) {
-		var charInfo:CharInfo = null;
-		if(char is String){
-			charInfo = TitleState.findChar(char);
-		}
-		if(char is CharInfo){
-			charInfo = cast(char);
-		}
-		if(charInfo == null){
-			trace('Invalid type passed, defaulting to vanilla');
-			changeSprite('face');
-			return;
-		}
-		if(charInfo.nameSpace == "INTERNAL"){
-			changeSprite(charInfo?.getNamespacedName() ?? "face");
-			return;
-		}
-
+		var charInfo:CharInfo = ( (char is String) ? TitleState.findChar(char) : ((char is CharInfo) ? cast(char) : null) );
 		if(char == hichar) return;
-		if(char == "lonely") char = "face";
-		var chars:Array<String> = ["INTERNAL|bf","INTERNAL|gf","face",'EVENTNOTE'];
-		var relAnims:Bool = true;
-		if(chars.contains(char.getNamespacedName())){
-			return changeSprite(char.getNamespacedName());
-			// if(_char == null){
-			// 	char = 'bf';
-			// 	imgPath = "mods/characters/";
-			// }else{
-			// 	imgPath = _char.iconLocation;
-			// 	char = _char.folderName;
-			// }
+		if(charInfo == null || char == null || charInfo.id == "lonely" || char == "lonely" || char == "face"){
+			trace('Empty icon provided, defaulting to face');
+			loadBlankIcon();
+			return;
 		}
 		imgPath = charInfo.iconLocation;
-		// trace(imgPath);
 		if (!SELoader.exists(imgPath)){
-			changeSprite(char.getNamespacedName());
+			imgPath = '${char.path}/healthicon.png';
+			if(!SELoader.exists(imgPath)){
+				loadBlankIcon();
+				return;
+			}
+		}
+		loadCustomIcon(imgPath);
+		hichar = char;
+		antialiasing = !hichar.contains('-pixel');
+
+
+		scrollFactor.set();
+		if(isMenuIcon) offset.set(75,75);
+		updateAnim(50);
+	}
+	public function changeSprite(char:String = 'face',?deprecated_clone:Dynamic = null,?deprecated_useClone:Dynamic = null,?deprecated_path:Dynamic = null) {
+		if(char == hichar) return;
+		if(char == "lonely" || char == "face") loadBlankIcon();
+		if(char == "EVENTNOTE") return loadCustomIcon('assets/images/healthicons/EVENTNOTE.png');
+		if(char.endsWith('.png')) {
+			loadCustomIcon(char);
+			char = char.substring(char.lastIndexOf('/'),char.lastIndexOf('.'));
+			scrollFactor.set();
+			if(isMenuIcon) offset.set(75,75);
+			updateAnim(50);
+			hichar = char;
 			return;
 		}
-			// trace('Custom character with custom icon! Loading custom icon.');
-		var bitmapData = SELoader.loadBitmap(imgPath);
-		var height:Int = 150;
-		var width:Int = 150;
-		frameCount = 1; // Has to be 1 instead of 2 due to how compooters handle numbers
-		if(bitmapData.width % 150 != 0 || bitmapData.height % 150 != 0){ // Invalid sized health icon! Split in half rather than error
-			height = bitmapData.height;
-			width = Std.int(bitmapData.width * 0.5);
-		}else{
-			frameCount = Std.int(bitmapData.width / 150) - 1; // If this isn't an integer, fucking run
-			if(frameCount < 1) updateAnim = function(health:Float){return;};
-			else if(frameCount == 1) updateAnim = function(health:Float){animation.curAnim.curFrame = ((health < 20) ? 1 : 0);};
-			else updateAnim = function(health:Float){animation.curAnim.curFrame = Math.round(animation.curAnim.numFrames * (health / 150));};
-		}
-		loadGraphic(FlxGraphic.fromBitmapData(bitmapData), true, bitmapData.height, bitmapData.height);
-		// char = "customChar";
-		vanIcon = false;
-		frameCount = frameCount + 1;
-		//  if(frameCount > 1)[for (i in 0 ... frameCount) i] else [0,1]
-		animation.add(char,(frameCount < 1) ? [0] : ((frameCount > 2) ? [for (i in 0 ... frameCount) i] : [0,1]), 0, false, isPlayer);
-	
-		antialiasing = true;
-		
-		animation.play(char);
+		if(deprecated_useClone != null) trace('HealthIcon.changeSprite: ARGUMENT "useClone" IS DEPRECATED AND WILL BE IGNORED');
+		if(deprecated_clone != null) trace('HealthIcon.changeSprite: ARGUMENT "clone" IS DEPRECATED AND WILL BE IGNORED');
+		if(deprecated_path != null) trace('HealthIcon.changeSprite: ARGUMENT "path" IS DEPRECATED AND WILL BE IGNORED! USE loadCustomIcon INSTEAD');
+		fromCharInfo(char);
 
-
-		scrollFactor.set();
-		if(isMenuIcon) offset.set(75,75);
-		updateAnim(50);
-		hichar = char;
 	}
-	public function changeSprite(?char:String = 'face',?clone:String = "face",?useClone:Bool = true,?pathh:String = "mods/characters") {
-		if(char == hichar) return;
-		if(char == "lonely") char = "face";
-		var chars:Array<String> = ["INTERNAL|bf","INTERNAL|gf","internal|bf","internal|gf",'bf',"face",'EVENTNOTE','gf'];
-		var relAnims:Bool = true;
-
-		var _path = "";
-		if(!chars.contains(char)){
-			var _char = TitleState.findChar(char);
-			if(_char == null){
-				char = 'bf';
-				imgPath = "mods/characters/";
-			}else{
-				imgPath = _char.path + "/";
-				char = _char.folderName;
-			}
-		}
-		
-		if (!chars.contains(char) && SELoader.exists(imgPath+char+"/healthicon.png")){
-			// trace('Custom character with custom icon! Loading custom icon.');
-			var bitmapData = SELoader.loadBitmap('${imgPath}$char/healthicon.png');
-			var height:Int = 150;
-			var width:Int = 150;
-			frameCount = 1; // Has to be 1 instead of 2 due to how compooters handle numbers
-			if(bitmapData.width % 150 != 0 || bitmapData.height % 150 != 0){ // Invalid sized health icon! Split in half rather than error
-				height = bitmapData.height;
-				width = Std.int(bitmapData.width * 0.5);
-			}else{
-				frameCount = Std.int(bitmapData.width / 150) - 1; // If this isn't an integer, fucking run
-				if(frameCount < 1) updateAnim = function(health:Float){return;};
-				else if(frameCount == 1) updateAnim = function(health:Float){animation.curAnim.curFrame = ((health < 20) ? 1 : 0);};
-				else updateAnim = function(health:Float){animation.curAnim.curFrame = Math.round(animation.curAnim.numFrames * (health / 150));};
-			}
-			loadGraphic(FlxGraphic.fromBitmapData(bitmapData), true, bitmapData.height, bitmapData.height);
-			// char = "customChar";
-			vanIcon = false;
-			frameCount = frameCount + 1;
-			animation.add(char, if(frameCount > 1)[for (i in 0 ... frameCount) i] else [0,1], 0, false, isPlayer);
-		}
-		// else if ((chars.contains(char) || chars.contains(clone)) && SELoader.exists(imgPath+char+"/icongrid.png")){
-		// 	// trace('Custom character with custom icongrid! Loading custom icon.');
-		// 	loadGraphic(SELoader.loadGraphic('${imgPath}$char/icongrid.png'), true, 150, 150);
-		// 	if (clone != "") char = clone;
-		// 	vanIcon = false;
-		// 	animation.add('bf', [0, 1], 0, false, isPlayer);
-		// }
-		else{
-			if (clone != "" && (useClone || !chars.contains(char))) char = clone; else if(!chars.contains(char.toLowerCase())) char = "bf";
-
-			if (!vanIcon) loadGraphic(SELoader.loadGraphic('assets/images/iconGrid.png',true), true, 150, 150); else relAnims = false;
-			vanIcon = true;
-			animation.add('face', [3, 4], 0, false, isPlayer);
-			animation.add('bf', [0, 1], 0, false, isPlayer);
-		}
-		
+	public function loadBlankIcon(){
+		updateAnim = function(health:Float){animation.curAnim.curFrame = ((health < 20) ? 1 : 0);};
+		loadGraphic(SELoader.loadGraphic(imgPath = 'assets/images/healthicons/NOICON.png'), true, 150, 150);
+		hichar = 'face';
+		animation.add("face", [0,1], 0, false, isPlayer);
+		animation.play("face");
 		antialiasing = true;
-		
-		
-		if(chars.contains(char.toLowerCase())){ // For vanilla characters
-			if (relAnims){
-				if(graphic.width > 451){ // Old icon grid
-					MainMenuState.errorMessage += ('You are using a really old iconGrid, this is usually caused by updating from a really old version of the game\nPlease reinstall the game');
-				}else{ // Based icon grid
-					animation.add('internal|bf', [0, 1], 0, false, isPlayer);
-					animation.add('internal|gf', [2], 0, false, isPlayer);
-					animation.add('gf', [2], 0, false, isPlayer);
-					animation.add('eventnote', [5, 5], 0, false, false);
-				}
-			}
-			animation.play(char.toLowerCase());
-		}else{
-			// animation.play('bf');
-			animation.play(char);
-		}
-
-
 		scrollFactor.set();
 		if(isMenuIcon) offset.set(75,75);
 		updateAnim(50);
-		hichar = char;
+	}
+	function updateAnimEmpty(health:Float){animation.curAnim.curFrame = ((health < 20) ? 1 : 0);}
+	function updateAnimTwo(health:Float){animation.curAnim.curFrame = ((health < 20) ? 1 : 0);}
+	function updateAnimDynamic(health:Float){animation.curAnim.curFrame = Math.round(animation.curAnim.numFrames * (health / 150));}
+	public function loadCustomIcon(path:String = ""){
+		if(path == "") {
+			trace('Attempted to load a health icon with no path. If this is intentional then use loadBlankIcon or change visibility');
+			return loadBlankIcon();
+		}
+		var bitmapData = SELoader.loadBitmap(path);
+		var height:Int = bitmapData.height;
+		var width:Int = bitmapData.width;
+		var frameCount = 1; // Has to be 1 instead of 2 due to how compooters handle numbers
+		if(width % 150 != 0 || height % 150 != 0){ // Invalid sized health icon! Split in half rather than error
+			width = Std.int(bitmapData.width * 0.5);
+			updateAnim = updateAnimTwo;
+		}else{
+			frameCount = Std.int(bitmapData.width / height)-1; // If this isn't an integer, fucking run
+			updateAnim = ((frameCount < 1) ? updateAnimEmpty : ((frameCount == 1) ? updateAnimTwo : updateAnimDynamic));
+		}
+		loadGraphic(FlxGraphic.fromBitmapData(bitmapData), true, height, height);
+		animation.add(hichar, (frameCount == 0) ?  [0] : [for (i in 0 ... frameCount) i], 0, false, isPlayer);
+		animation.play(hichar);
 	}
 
 	override function update(elapsed:Float) {

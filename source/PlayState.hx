@@ -1069,14 +1069,14 @@ class PlayState extends ScriptMusicBeatState
 
 		
 
-		iconP1 = new HealthIcon("face",true);
+		iconP1 = new HealthIcon("DONTLOAD",true);
 		iconP1.fromCharInfo(bf.charInfo);
 		iconP1.antialiasing = bf.antialiasing;
 		iconP1.y = healthBar.y - (iconP1.height / 2);
 		iconP1.trackedSprite = healthBar;
 		add(iconP1);
 
-		iconP2 = new HealthIcon("face",false);
+		iconP2 = new HealthIcon("DONTLOAD",false);
 		iconP2.fromCharInfo(dad.charInfo);
 		iconP2.antialiasing = dad.antialiasing;
 		iconP2.y = healthBar.y - (iconP2.height / 2);

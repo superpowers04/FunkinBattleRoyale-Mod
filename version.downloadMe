@@ -1,4 +1,4 @@
-24.12.16.0126;
+24.12.26.0354;
 * Better Psych character support(Still kinda experimental but should be more stable)
 * Fix some small errors
 * Fix characters not loading due to using ID instead of folderName
@@ -9,3 +9,4 @@
 * Remove FlxKey from being used in input
 * SaveIcon when game is saving
 * Add support for importing mod zips from clipboard
+* Change healthIcon internals to be more sane

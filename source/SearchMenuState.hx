@@ -40,7 +40,7 @@ class SearchMenuState extends ScriptMusicBeatState {
 	public var searchList:Array<String> = ["this should be replaced"];
 	var retAfter:Bool = true;
 	var bg:FlxSprite;
-	var titleText:FlxText;
+	var titleText:Alphabet;
 	var infotext:FlxText;
 	var overLay:FlxGroup = new FlxTypedGroup();
 	var infoTextBoxSize:Int = 2;
@@ -67,9 +67,10 @@ class SearchMenuState extends ScriptMusicBeatState {
 		if (str == "") return;
 		if(SESave.data.useTouch) str = str + " - Tap here to go back";
 		
-		titleText = new FlxText(FlxG.width * 0.5, 20, 0, str, 12);
+		titleText = Alphabet.newText(FlxG.width * 0.5, 20, str);
 		titleText.scrollFactor.set();
-		titleText.setFormat(CoolUtil.font, 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		// titleText.setFormat(CoolUtil.font, 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		titleText.setTextSize(24);
 		add(titleText);
 	}
 
