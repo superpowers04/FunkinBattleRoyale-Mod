@@ -61,10 +61,7 @@ class OptionsMenu extends MusicBeatState
 
 	var options:Array<OptionCategory> = [
 		new OptionCategory("Session/Temp Options", [
-			for (name => setting in QuickOptionsSubState.normalSettings)
-			{
-				new QuickOption(name);
-			}
+			for (name => setting in QuickOptionsSubState.normalSettings){new QuickOption(name);}
 		],"Chart options.\nTHESE ARE TEMPORARY AND RESET WHEN GAME IS CLOSED!"),
 		new OptionCategory("Modifications", [
 			new OpponentOption("Change the opponent character"),
@@ -122,7 +119,7 @@ class OptionsMenu extends MusicBeatState
 			new HCBoolOption("Debounce detection","Enables some simple debounce detection. Forces presses to be missed from one frame to another.","debounce"),
 			new Judgement("Customize your Hit Timings (LEFT or RIGHT)"),
 			
-			new HCFloatOption('Scroll Speed',"Change your scroll speed (1 = Chart dependent)","scrollSpeed",0.1,10,0.1),
+		new ScrollSpeedOption(),
 			// new HCFloatOption('Scroll Speed(OSU Chart)',"Change your scroll speed OSU charts","scrollOSUSpeed",0.1,10,0.1),
 		
 			new HCBoolOption("Accurate Note Sustain","Whether note sustains/holds are more accurate. If off then they act like early kade","accurateNoteSustain"),
@@ -231,7 +228,14 @@ class OptionsMenu extends MusicBeatState
 			}
 		],Lang.get('se.options.lang.desc')),
 	];
-
+	override public function draw(){
+		super.draw();
+		if(isCat){
+			currentSelectedCat.options[curSelected].draw();
+		}else if (options[curSelected] !=null){
+			options[curSelected].draw();
+		}
+	}
 	public var acceptInput:Bool = true;
 
 	private var currentDescription:String = "";
@@ -242,6 +246,7 @@ class OptionsMenu extends MusicBeatState
 	var currentSelectedCat:OptionCategory;
 	var blackBorder:FlxSprite;
 	var titleText:FlxText;
+
 	static public var bgMusic:FlxSound;
 	static public var lastMusic:FlxSound;
 	function addTitleText(str:String = "se.options.title"){
@@ -441,7 +446,11 @@ class OptionsMenu extends MusicBeatState
 				// updateOffsetText();
 			}
 		}
-		
+		if(isCat){
+			currentSelectedCat.options[curSelected].update(elapsed);
+		}else if (options[curSelected] != null){
+			options[curSelected].update(elapsed);
+		}
 	}
 	function updateAlphabet(obj:Alphabet,str:String = ""){
 

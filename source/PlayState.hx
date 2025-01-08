@@ -3007,10 +3007,9 @@ class PlayState extends ScriptMusicBeatState
 					i++;
 					if(daNote == null || !holdArray[daNote.noteData] || !daNote.mustPress || !daNote.isSustainNote || !daNote.updateCanHit()) continue;
 					if(!acns || daNote.strumTime <= Conductor.songPosition - (50 * Conductor.timeScale) || daNote.isSustainNoteEnd) {// Only destroy the note when properly hit
-							goodNoteHit(daNote);
-
-							continue;
-						}
+						goodNoteHit(daNote);
+						continue;
+					}
 					// Tell note to be clipped to strumline
 					daNote.isPressed = true;
 					hitArray[daNote.noteData] = true;
@@ -3018,10 +3017,8 @@ class PlayState extends ScriptMusicBeatState
 					callInterp("susHit",[daNote]);
 				}
 			}
-			{
-				var i = possibleNotes.length;
-				while(i > 0){possibleNotes.pop();i--;}
-			}
+			while(possibleNotes.pop() != null){}
+			
 			// var possibleNotes:Array<Note> = [null,null,null,null]; // notes that can be hit
 			var onScreenNote:Bool = false;
 			var members = notes.members;

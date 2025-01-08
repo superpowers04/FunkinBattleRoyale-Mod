@@ -45,6 +45,8 @@ class OptionCategory
 		this.options = options;
 		this.modded = mod;
 	}
+	public function update(e:Float){}
+	public function draw(){}
 }
 
 class Option
@@ -69,6 +71,8 @@ class Option
 	public function updateDisplay():String { return display; }
 	public function left():Bool { return false; }
 	public function right():Bool { return false; }
+	public function update(e:Float){}
+	public function draw(){}
 }
 
 
@@ -537,7 +541,61 @@ class SelScriptOption extends Option
 	}
 
 }
+class ScrollSpeedOption extends HCFloatOption{
+	public var note:Note;
+	public var strum:StrumArrow;
+	override public function new(){
+		try{
 
+			note = new Note(0,SESave.data.downscroll ? 1 : 2);
+			strum = new StrumArrow(SESave.data.downscroll ? 1 : 2);
+			note.parentSprite = strum;
+			note.inCharter = note.visible = note.showNote = true;
+			strum.init();
+			strum.playStatic();
+			strum.x = 1000;
+			note.x = strum.x + (strum.width * 0.5);
+		}catch(e){
+			trace('Failed to load note for Scroll Speed ${e}');
+		}
+		super('Scroll Speed',"Change your scroll speed (1 = Chart dependent)","scrollSpeed",0.1,10,0.1);
+	}
+	override public function update(e:Float){
+		// if(note == null || strum == null) return;
+		Conductor.update(e);
+
+		strum.update(e);
+		note.update(e);
+		// trace(dist);
+
+	}
+	override public function draw(){
+		// if(note == null || strum == null) return;
+		var dist = (Conductor.songPosition - note.strumTime);
+		var _scrollSpeed = SESave.data.scrollSpeed;
+		Conductor.update(e);
+
+		if(Math.abs(dist) < 50){
+			strum.confirm();
+		}
+
+		note.distanceToSprite = (0.45 * dist * _scrollSpeed);
+		if(SESave.data.downscroll){
+			strum.y = 680;
+			note.y = strum.y + note.distanceToSprite;
+		}else{
+			strum.y = 120;
+			note.y = strum.y - note.distanceToSprite;
+		}
+		if(dist > 500){
+			strum.playStatic();
+			note.strumTime = Conductor.songPosition + 500;
+		}
+		strum.draw();
+		note.draw();
+	}
+
+}
 class IntOption extends Option{
 	var min:Int = 0;
 	var max:Int;

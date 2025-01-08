@@ -25,7 +25,7 @@ class FakeNote extends Note
 	//Literally just copied flxsprite and flxobject's update
 	override public function update(elapsed:Float):Void
 	{
-
+		
 		updateAnimation(elapsed);
 	}
 }

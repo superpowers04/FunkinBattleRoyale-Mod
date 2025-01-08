@@ -37,6 +37,9 @@ class Conductor {
 	public static var bpmChangeMapSteps:Map<Int,BPMChangeEvent> = [];
 
 	public function new(){}
+	public static function update(e:Float){
+		songPosition = FlxG.sound.music.time;
+	}
 
 	@:keep inline public static function recalculateTimings() {
 		Conductor.safeFrames = SESave.data.frames;

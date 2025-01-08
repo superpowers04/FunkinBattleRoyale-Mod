@@ -293,7 +293,7 @@ class Note extends FlxSprite
 		type = _type;
 		x = y = 300;
 		this.inCharter = _inCharter;
-		this.rawNote = (if(_rawNote == null) [strumTime,_noteData,0] else _rawNote);
+		this.rawNote = (_rawNote ?? [strumTime,_noteData,0]);
 
 
 
