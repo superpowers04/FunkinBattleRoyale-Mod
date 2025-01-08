@@ -1,1 +1,0 @@
-Add's some effects to the Strumline. Prebundled as a sample script.

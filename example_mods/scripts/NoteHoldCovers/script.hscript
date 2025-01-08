@@ -1,0 +1,59 @@
+function initScript(){}
+var ids = ['Purple','Blue','Green','Red'];
+strumCovers = [];
+
+
+function strumNoteAdd(state,strum,player){
+	if(!player) return;
+	var _id = strum.id % 4;
+	var color = ids[_id];
+	// Load the sprite at the strum position
+	var sprite = BRtools.loadSparrowSprite(strum.x,strum.y,'holdCover'+color);
+	// Add the animations
+	sprite.animation.addByPrefix('holdCover', 'holdCover'+color, 24, true,false);
+	sprite.animation.addByPrefix('holdCoverEnd', 'holdCoverEnd'+color, 24, false,false);
+	sprite.centerOffsets(); 
+	// a surprise tool that'll help us later
+	strumCovers[_id] = (sprite);
+
+	// scale isn't correct by default
+	sprite.scale.set(0.9,0.9);
+	// Offsetting, otherwise they'll be in a weird location
+	sprite.x=strum.x-sprite.width*0.75;
+	sprite.y=strum.y-sprite.height*0.235;
+	// Add the sprite to playstate
+	state.add(sprite);
+}
+// Make sure all covers are actually on the right camera
+function startSong(){
+	for(i in 0...strumCovers.length){
+		var strum = state.playerStrums.members[i];
+		if(strum == null) continue;
+		strumCovers[i].cameras=[strum.cameras[0]];
+	}
+}
+function update(_,e){
+	for(cover in strumCovers){
+		// Hide if the animation is finished
+		cover.visible=!cover.animation.finished;
+		// Don't hide the cover if it's hidden, or the animation isn't the hold sprite
+		if(!cover.visible || cover.animation.curAnim == null || cover.animation.curAnim.name != "holdCover") continue;
+		// Hide the cover
+		cover.visible=false;
+
+	}
+}
+function susHit(_,n){
+	// Only works for player notes
+	if(!n.mustPress) return; 
+	// Grab the cover
+	var cover = strumCovers[n.noteData];
+	// idk maybe the note somehow is out of the range, no reason to crash if it is
+	if(cover == null) return; 
+	// Show the cover
+	cover.visible=true;
+	// Play the cover animation
+	cover.animation.play(n.isSustainNoteEnd ? 'holdCoverEnd' : 'holdCover');
+	// cover.x = n.x-(cover.width*.5);
+	// cover.y = state.playerStrums.members[n.noteData].y-(cover.height*0.25);
+}

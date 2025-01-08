@@ -1,0 +1,2 @@
+A recreation of the note hold covers from VSlice
+Prebundled as an example script.

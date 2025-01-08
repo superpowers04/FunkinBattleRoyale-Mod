@@ -1,0 +1,15 @@
+function initScript(){
+	// Loads the downscroll UI
+	game.downscroll = true;
+}
+function startSong(){
+	// Disable downscroll since we are going to fake it by inverting the strumline
+	game.downscroll = false;
+	game.playerNoteCamera.flashSprite.scaleY = -1;
+	for (i in game.playerStrums.members){
+		FlxTween.tween(i,{y:(game.downscroll ? FlxG.height - 165 : 50)},0.3);
+	}
+	for (i in game.cpuStrums.members){
+		FlxTween.tween(i,{y:50},0.3);
+	}
+}

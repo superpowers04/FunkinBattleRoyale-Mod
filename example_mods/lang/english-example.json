@@ -1,0 +1,18 @@
+{
+	"se.options.title":"< Options - Tap here to go back",
+	"se.options.audio":"Auditory",
+	"se.options.audio.desc":"Toggle some sounds and change the volume of things",
+	"se.options.lang":"Language",
+	"se.options.lang.desc":"Set the language of the game",
+	"se.options.volume.master":"Adjust the volume of the entire game",
+	"se.options.volume.inst":"Adjust the volume of the background music",
+	"se.options.volume.voices":"Adjust the volume of the vocals",
+	"se.options.volume.hit":"Adjust the volume of the hit sounds",
+	"se.options.volume.miss":"Adjust the volume of miss sounds",
+	"se.options.volume.other":"Adjust the volume of other sounds and the default script sound volume",
+	// A lot of stuff ingame doesn't actually have translatable text at the moment, 
+	//  in that case, you can probably just directly copy the text here instead of the id and it'll probably translate it. For best results, you can copy directly from the source code
+	"Performance":"Performance",
+
+
+}
