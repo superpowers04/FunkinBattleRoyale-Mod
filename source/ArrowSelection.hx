@@ -36,14 +36,12 @@ class ArrowSelection extends SearchMenuState
 			babyArrow.x += ((babyArrow.width + 20) * babyArrow.id - 2); 
 		}
 	}
-	override function create()
-	{try{
-		bg.color = 0xFFFF6E6E;
+	override function create(){
 		{ // Looks for all notes, This will probably be rarely accessed, so loading like this shouldn't be a problem
 			
 			searchList = ["default"];
 
-			var dataDir:String = Sys.getCwd() + "mods/noteassets/";
+			var dataDir:String = "mods/noteassets/";
 			var customArrows:Array<String> = [];
 			if (SELoader.exists(dataDir)) {
 				for (file in SELoader.readDirectory(dataDir)) {
@@ -89,12 +87,12 @@ class ArrowSelection extends SearchMenuState
 
 		generateStaticArrows(1,'skin');
 		super.create();
+		bg.color = 0xFFFF6E6E;
 		infotext.text = "Hold shift to scroll faster, Press CTRL to toggle viewing the entire note asset";
 		add(playerStrums);
 
 		changeSelection();
-
-	}catch(e) MainMenuState.handleError('Error with notesel "create" ${e.message}');}
+	}
 	override function addToList(char:String,i:Int = 0){
 		songs.push(char);
 		if(char.indexOf('packs/') != -1){
