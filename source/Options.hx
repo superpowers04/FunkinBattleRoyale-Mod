@@ -582,7 +582,7 @@ class ScrollSpeedOption extends HCFloatOption{
 		Conductor.update();
 		if(dist > 1000 || pressed){
 			pressed = false;
-			note.strumTime = Conductor.songPosition + ((_scrollSpeed < 3) ? (500/_scrollSpeed) : 500);
+			note.strumTime = Conductor.songPosition + 500;
 		}
 		if(!pressed && dist > -20 && dist < 100){
 			strum.confirm();
