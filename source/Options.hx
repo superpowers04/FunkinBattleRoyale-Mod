@@ -545,7 +545,7 @@ class ScrollSpeedOption extends HCFloatOption{
 	public var note:Note;
 	public var strum:StrumArrow;
 	var hasLoaded:Bool = false;
-	var pressed:Bool = false;
+	var pressed:Bool = true;
 	override public function new(){
 		super('Scroll Speed',"Change your scroll speed (1 = Chart dependent)","scrollSpeed",0.1,10,0.1);
 	}
@@ -571,6 +571,7 @@ class ScrollSpeedOption extends HCFloatOption{
 
 		strum.update(e);
 		note.update(e);
+		note.y = 1920;
 		// trace(dist);
 
 	}
@@ -579,7 +580,10 @@ class ScrollSpeedOption extends HCFloatOption{
 		var dist = (Conductor.songPosition - note.strumTime);
 		var _scrollSpeed = SESave.data.scrollSpeed;
 		Conductor.update();
-
+		if(dist > 1000 || pressed){
+			pressed = false;
+			note.strumTime = Conductor.songPosition + ((_scrollSpeed < 3) ? (500/_scrollSpeed) : 500);
+		}
 		if(!pressed && dist > -20 && dist < 100){
 			strum.confirm();
 			note.alpha = 0.5;
@@ -597,10 +601,7 @@ class ScrollSpeedOption extends HCFloatOption{
 			strum.y = 120;
 			note.y = strum.y - note.distanceToSprite;
 		}
-		if(pressed && (note.y < -20 || note.y > 1300)){
-			pressed = false;
-			note.strumTime = Conductor.songPosition + (500/_scrollSpeed);
-		}
+
 		strum.draw();
 		note.draw();
 	}
