@@ -577,7 +577,7 @@ class ScrollSpeedOption extends HCFloatOption{
 	}
 	override public function draw(){
 		if(note == null || strum == null) return;
-		var dist = (Conductor.songPosition - note.strumTime);
+		var dist = ((Conductor.songPosition+FlxG.elapsed*0.001) - note.strumTime);
 		var _scrollSpeed = SESave.data.scrollSpeed;
 		Conductor.update();
 		if(dist > 1000 || pressed){

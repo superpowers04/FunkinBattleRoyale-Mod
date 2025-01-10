@@ -374,7 +374,7 @@ class PlayState extends ScriptMusicBeatState
 				isFunc:true,
 				value:value,
 				check:type,
-				variable:(if(variable == "def") (if(check == 0) "curBeat" else "curStep") else variable),
+				variable:((variable == "def") ? ((check == 0) ? "curBeat" : "curStep") : variable),
 				func:func,
 				type:type
 			};
@@ -732,7 +732,6 @@ class PlayState extends ScriptMusicBeatState
 		}
 		
 		//dialogue shit
-		loadDialog();
 		LoadingScreen.loadingText = "Loading stage";
 		// Stage management
 		var bfPos:Array<Float> = [0,0]; 
@@ -861,9 +860,6 @@ class PlayState extends ScriptMusicBeatState
 		}
 
 		if(loadChars && (SESave.data.gfShow || _dadShow || SESave.data.bfShow)){
-
-
-
 			LoadingScreen.loadingText = "Loading GF";
 			if(gf== null || !SESave.data.persistGF || (!SESave.data.gfShow && !Std.isOfType(gf,EmptyCharacter)) || gf.getNamespacedName() != player2){
 				if (SESave.data.gfShow && gfShow)
@@ -1164,33 +1160,6 @@ class PlayState extends ScriptMusicBeatState
 	}
 	#end
 	}
-	function loadDialog(){		
-		// dialogue = [];
-		// switch (SONG.song.toLowerCase())
-		// {
-		// 	case 'tutorial':
-		// 		dialogue = CoolUtil.coolFormat("4*");
-		// 	case 'bopeebo':
-		// 		dialogue = CoolUtil.coolFormat(
-		// 			'dad:HEY!\n' +
-		// 			'bf:Beep?\n' +
-		// 			"dad:You think you can just sing\\nwith my daughter like that?\n" +
-		// 			'bf:Beep' +
-		// 			"dad:If you want to date her...\\n" +
-		// 			"dad:You're going to have to go \\nthrough ME first!\n" +
-		// 			'bf:Beep bop!'
-		// 		);
-		// 	case 'fresh':
-		// 		dialogue = CoolUtil.coolFormat("dad:Not too shabby $BF.\ndad:But I'd like to see you\\n keep up with this!");
-		// 	case 'dad battle':
-		// 		dialogue = CoolUtil.coolFormat(
-		// 			"dad:Gah, you think you're hot stuff?\n"+
-		// 			"dad:If you can beat me here...\n"+
-		// 			"dad:Only then I will even CONSIDER letting you\\ndate my daughter!"+
-		// 			'bf:Beep!'
-		// 		);
-		// }
-	}
 
 
 
@@ -1279,7 +1248,6 @@ class PlayState extends ScriptMusicBeatState
 				}
 			}
 			if(underlay != null && SESave.data.undlaSize == 0){
-
 				underlay.x = playerStrums.members[0].x -2;
 			}
 		}
@@ -1289,10 +1257,7 @@ class PlayState extends ScriptMusicBeatState
 	public static var introAudio:Array<Dynamic> = [];
 	public static var introGraphics:Array<flixel.system.FlxAssets.FlxGraphicAsset> = [];
 	public function startCountdown():Void{
-
 		dialogue = [];
-
-
 		inCutscene = false;
 
 		if(!songStarted){
@@ -1306,13 +1271,11 @@ class PlayState extends ScriptMusicBeatState
 			playerStrums.visible = cpuStrums.visible = true;
 			FlxG.camera.zoom = FlxMath.lerp(0.90, FlxG.camera.zoom, 0.95);
 			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, 0.95);
-			// camFollow.setPosition(720, 500);
 
 
 			
 			startedCountdown = true;
 			Conductor.songPosition = (introAudio.length + 1) * -500;
-			// Conductor.changeBPM(2);
 
 
 			if(errorMsg != "") {
@@ -1381,7 +1344,6 @@ class PlayState extends ScriptMusicBeatState
 						}catch(e){
 							showTempmessage('Unable to play ${sound} at $swagCounter',0xFFFF0000);
 						}
-
 					}
 				}
 			}
@@ -2121,11 +2083,11 @@ class PlayState extends ScriptMusicBeatState
 		
 		if(iconP1.isTracked){
 			iconP1.trackingOffset = -26;
-			iconP1.updateTracking(if(healthBar.fillDirection == LEFT_TO_RIGHT) health * 0.5 else 1 - (health * 0.5));
+			iconP1.updateTracking((healthBar.fillDirection == LEFT_TO_RIGHT) ? health * 0.5 : 1 - (health * 0.5));
 		}
 		if(iconP2.isTracked){
 			iconP2.trackingOffset = -(iconP2.width - 26);
-			iconP2.updateTracking(if(healthBar.fillDirection == LEFT_TO_RIGHT) health * 0.5 else 1 - (health * 0.5));
+			iconP2.updateTracking((healthBar.fillDirection == LEFT_TO_RIGHT) ? health * 0.5 : 1 - (health * 0.5));
 		}
 
 		// else{
@@ -2153,13 +2115,7 @@ class PlayState extends ScriptMusicBeatState
 			}else{
 				if(FlxG.sound.music != null){
 					recalcSpeed();
-					
-					if(FlxG.sound.music.time == lastFrameTime){
-						Conductor.songPosition += elapsed * 1000 * speed;
-					}else{
-						Conductor.songPosition = FlxG.sound.music.time;
-					}
-					lastFrameTime = FlxG.sound.music.time;
+					inline Conductor.updateElapsed(elapsed*speed);
 					if(Conductor.songPosition > FlxG.sound.music.length - 100 && !endingSong && FlxG.sound.music.onComplete != null){
 						var complete = FlxG.sound.music.onComplete;
 						FlxG.sound.music.onComplete = null;
@@ -3403,7 +3359,7 @@ class PlayState extends ScriptMusicBeatState
 			callInterp("noteMiss",[player,daNote,direction,calcStats]);
 			player.callInterp('noteMiss',[daNote,direction,calcStats]);
 		}
-		onlineNoteHit(if(daNote == null) -1 else daNote.noteID,direction + 1);
+		onlineNoteHit((daNote == null) ? -1 : daNote.noteID,direction + 1);
 
 
 
@@ -3497,22 +3453,28 @@ class PlayState extends ScriptMusicBeatState
 
 		restartTimes++;
 
-		bf.currentAnimationPriority = -10;
-		dad.currentAnimationPriority = -10;
-		gf.currentAnimationPriority = -10;
-		if(bf != null) bf.dance();
-		if(dad != null) dad.dance();
-		if(gf != null) gf.dance();
+		
+		
+		
+		if(bf != null) {
+			bf.currentAnimationPriority = -10;
+			bf.dance();
+		}
+		if(dad != null) {
+			dad.currentAnimationPriority = -10;
+			dad.dance();
+		}
+		if(gf != null) {
+			gf.currentAnimationPriority = -10;
+			gf.dance();
+		}
 		health=1;
 
 		Conductor.songPosition = -5000;
 		vocals.time = FlxG.sound.music.time = 0;
 		vocals.volume = SESave.data.voicesVol;
-		startingSong=true;
-		songStarted = false;
-		startedCountdown = false;
-		handleHealth=true;
-		finished=false;
+		songStarted = startedCountdown = finished=false;
+		startingSong = handleHealth = true;
 		for (i=>v in notes.members){
 			if(v == null) continue;
 			v.acceleration.y = FlxG.random.int(200, 300);

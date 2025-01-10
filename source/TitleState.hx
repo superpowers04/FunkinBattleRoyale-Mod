@@ -1266,22 +1266,18 @@ class TitleState extends MusicBeatState
 				
 			// 	destHaxe();
 			case 1:
-				addMoreText(FlxG.random.float() < 0.1 ? 'Friday Night Fucking\' by' :'Friday Night Funkin\' by');
-				credTextShit.y -= 600;
+				addMoreText(FlxG.random.float() < 0.1 ? "ef en ef' by" : FlxG.random.float() < 0.1 ? 'Friday Night Fucking\' by' :'Friday Night Funkin\' by',0);
 
 				// addMoreText('ninjamuffin99').startTyping(0.015,Conductor.crochetSecs);
 				// addMoreText('phantomArcade').startTyping(0.015,Conductor.crochetSecs);
 				// addMoreText('kawaisprite').startTyping(0.02,Conductor.crochetSecs);
 				// addMoreText('evilsk8er').startTyping(0.022,Conductor.crochetSecs);
 			case 2:
-				addMoreText('ninjamuffin99');
-				addMoreText('phantomArcade');
-				addMoreText('kawaisprite');
-				addMoreText('evilsk8er');
-				credTextShit.x -= 130;
-				
+				addMoreText('ninjamuffin99',50);
+				addMoreText('phantomArcade',50);
+				addMoreText('kawaisprite',50);
+				addMoreText('evilsk8er',50);
 			case 7:
-				credTextShit.y += 200;
 				deleteCoolText();
 			case 10:
 				// if (Main.watermarks)  You're not more important than fucking newgrounds

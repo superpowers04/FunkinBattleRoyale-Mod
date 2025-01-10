@@ -37,8 +37,16 @@ class Conductor {
 	public static var bpmChangeMapSteps:Map<Int,BPMChangeEvent> = [];
 
 	public function new(){}
+	public static var lastFrameTime:Float = 0;
 	public static function update(){
-		songPosition = FlxG.sound.music.time;
+		inline updateElapsed(FlxG.elapsed);
+	}
+	public static function updateElapsed(elapsed:Float){
+		if(lastFrameTime == FlxG.sound.music.time){
+			songPosition += elapsed * 1000;
+		}else{
+			lastFrameTime = songPosition = FlxG.sound.music.time;
+		}
 	}
 
 	@:keep inline public static function recalculateTimings() {

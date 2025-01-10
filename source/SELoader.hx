@@ -84,10 +84,10 @@ class SELoader {
 	public static var namespace = "";
 
 	inline public static function handleError(e:String){
+		e = '${id}: '+e;
 		trace(e);
 		throw(e);
 		// if((cast (FlxG.state)).handleError != null) (cast (FlxG.state)).handleError(e); else MainMenuState.handleError(e);
-		
 	}
 	// Basically clenses paths and returns the base path with the requested one. Used heavily for the Android port
 	@:keep inline public static function getPath(path:String="",allowModded:Bool = true):String{
@@ -141,14 +141,14 @@ class SELoader {
 		var packsFolder = modsFolder.newDirectory('packs/');
 		if(namespace=="") namespace=SELoader.namespace;
 		if(namespace!=""){ // We always want to check the namespace first, It has top priority
-			var e = (namespace == "INTERNAL" || namespace == "assets") ? getPath() : packsFolder+namespace;
+			var packFolder = (namespace == "INTERNAL" || namespace == "assets") ? getPath() : packsFolder+namespace;
 			SELoader.ignoreMods = true;
 			var the = SELoader.anyExists([
-				e+'/'+path,
-				e+'/shared/'+path,
-				e+'/assets/'+path,
-				e+'/assets/shared/'+path,
-				e+'/assets/preload/'+path
+				packFolder+'/'+path,
+				packFolder+'/shared/'+path,
+				packFolder+'/assets/'+path,
+				packFolder+'/assets/shared/'+path,
+				packFolder+'/assets/preload/'+path
 			]);
 			SELoader.ignoreMods = false;
 			if(the!=null) return the;
@@ -174,11 +174,11 @@ class SELoader {
 		if(!exists(p)){ // I am honestly too lazy at the moment to add a proper mods menu
 			AssetPathCache[path]=null;
 			{
-				var e = getRawPath('assets/');
+				var rawAssets = getRawPath('assets/');
 				rawMode=defaultRawMode=true;
 				var the = SELoader.anyExists([
-					e+'/'+path,
-					e+'/shared/'+path,
+					rawAssets+'/'+path,
+					rawAssets+'/shared/'+path,
 				]);
 				rawMode=defaultRawMode=false;
 				if(the!=null) return AssetPathCache[path]=the;
@@ -186,13 +186,13 @@ class SELoader {
 			if(!SESave.data.HDDMode){
 				if(SELoader.exists(modsFolder + path)) return AssetPathCache[path]=modsFolder+path;
 				for (directory in orderList(SELoader.readDirectory(packsFolder.toString()))){
-					var e = packsFolder+directory;
+					var packFolder = packsFolder+directory;
 					var the = SELoader.anyExists([
-						e+'/'+path,
-						e+'/shared/'+path,
-						e+'/assets/'+path,
-						e+'/assets/shared/'+path,
-						e+'/assets/preload/'+path
+						packFolder+'/'+path,
+						packFolder+'/shared/'+path,
+						packFolder+'/assets/'+path,
+						packFolder+'/assets/shared/'+path,
+						packFolder+'/assets/preload/'+path
 					]);
 					if(the!=null) return AssetPathCache[path]=the;
 				}
@@ -208,7 +208,7 @@ class SELoader {
 			return cache.loadText(textPath);
 		}
 		if(!exists(textPath)){
-			handleError('${id}: Text "${textPath}" doesn\'t exist!');
+			handleError(' Text "${textPath}" doesn\'t exist!');
 			return "";
 		}
 		return File.getContent(textPath);
@@ -230,7 +230,7 @@ class SELoader {
 
 	public static function loadFlxSprite(x:Float = 0,y:Float = 0,pngPath:String,?useCache:Bool = false):FlxSprite{
 		if(!SELoader.exists('${pngPath}')){
-			handleError('${id}: Image "${pngPath}" doesn\'t exist!');
+			handleError(' Image "${pngPath}" doesn\'t exist!');
 			return new FlxSprite(x, y); // Prevents the script from throwing a null error or something
 		}
 		return new FlxSprite(x, y).loadGraphic(loadGraphic(pngPath,useCache));
@@ -248,7 +248,7 @@ class SELoader {
 			return cache.loadBitmap(pngPath);
 		}
 		if(!exists('${pngPath}')){
-			handleError('${id}: "${pngPath}" doesn\'t exist!');
+			handleError(' "${pngPath}" doesn\'t exist!');
 			return new BitmapData(0,0,false,0xFF000000); // Prevents the script from throwing a null error or something
 		}
 		return BitmapData.fromFile(pngPath);
@@ -258,11 +258,11 @@ class SELoader {
 	public static function loadStichedSparrowFrames(pngPath:String,?cache:Bool=false):FlxAtlasFrames{
 		pngPath = getPath(pngPath);
 		if(!exists('${pngPath}.png')){
-			handleError('${id}: SparrowFrame PNG "${pngPath}.png" doesn\'t exist!');
+			handleError(' SparrowFrame PNG "${pngPath}.png" doesn\'t exist!');
 			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
 		}
 		if(!exists('${pngPath}.xml')){
-			handleError('${id}: SparrowFrame XML "${pngPath}.xml" doesn\'t exist!');
+			handleError(' SparrowFrame XML "${pngPath}.xml" doesn\'t exist!');
 			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
 		}
 		var atlas = FlxAtlasFrames.fromSparrow(loadGraphic('$pngPath.png',cache),loadXML('${pngPath}',cache));
@@ -284,11 +284,11 @@ class SELoader {
 	public static function loadSparrowFrames(pngPath:String,?cache:Bool=false):FlxAtlasFrames{
 		pngPath = getPath(pngPath);
 		if(!exists('${pngPath}.png')){
-			handleError('${id}: SparrowFrame PNG "${pngPath}.png" doesn\'t exist!');
+			handleError(' SparrowFrame PNG "${pngPath}.png" doesn\'t exist!');
 			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
 		}
 		if(!exists('${pngPath}.xml')){
-			handleError('${id}: SparrowFrame XML "${pngPath}.xml" doesn\'t exist!');
+			handleError(' SparrowFrame XML "${pngPath}.xml" doesn\'t exist!');
 			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
 		}
 		return FlxAtlasFrames.fromSparrow(loadGraphic('$pngPath.png',cache),loadXML('${pngPath}',cache));
@@ -381,7 +381,7 @@ class SELoader {
 		// }
 		textPath = getPath(textPath);
 		if(!exists(textPath)){
-			handleError('${id}: Text "${textPath}" doesn\'t exist!');
+			handleError(' Text "${textPath}" doesn\'t exist!');
 			return null;
 		}
 		return File.getBytes(getPath(textPath));
@@ -411,7 +411,7 @@ class SELoader {
 			return cache.loadSound(rawPath);
 		}
 		if(!exists(soundPath)){
-			handleError('${id}: Sound "$soundPath" > "$rawPath" doesn\'t exist!');
+			handleError(' Sound "$soundPath" > "$rawPath" doesn\'t exist!');
 			// return null;
 		}
 		return Sound.fromFile(getPath(rawPath));
@@ -421,10 +421,10 @@ class SELoader {
 	}
 
 
-	static public function playSound(soundPath:String,?volume:Dynamic = null,?cache:Bool = false):FlxSound{
-		if(soundPath == null || soundPath == ""){
+	static public function playSound(soundPath:String = "",?volume:Dynamic = null,?cache:Bool = false):FlxSound{
+		if(soundPath == ""){
 			try{
-				throw('Tried to play a "" sound');
+				throw('Tried to play an empty sound!');
 			}catch(e){
 				trace('UNABLE TO PLAY SOUND: ${e.details()}');
 			}
@@ -459,6 +459,7 @@ class SELoader {
 	public static function fullPath(path:String):String{
 		return FileSystem.fullPath(getPath(path));
 	}
+
 	public static function anyExists(paths:Array<String>,?returnOriginal:Bool = false,?defaultValue:String = null):String{
 		for(i in paths) {
 			var path = getPath(i);
@@ -478,10 +479,10 @@ class SELoader {
 		for(i in paths) {
 			var path = getPath(i);
 			var folder = path.substring(0,path.lastIndexOf('/'));
-			var file = path.substring(path.lastIndexOf('/')+1);
+			var file = path.substring(path.lastIndexOf('/')+1).toLowerCase();
 
 			for(FILE in readDirectory(folder)){
-				if(FILE.toLowerCase() != file.toLowerCase()) continue;
+				if(FILE.toLowerCase() != file) continue;
 				return folder+"/"+FILE;
 				
 			}
@@ -784,8 +785,11 @@ class InternalCache{
 		soundArray = [];
 		openfl.system.System.gc();
 	}
-	inline function handleError(e:String){
-		SELoader.handleError(e);
+	inline public function handleError(e:String){
+		e = '${id}: '+e;
+		trace(e);
+		throw(e);
+		// if((cast (FlxG.state)).handleError != null) (cast (FlxG.state)).handleError(e); else MainMenuState.handleError(e);
 	}
 
 
@@ -797,7 +801,7 @@ class InternalCache{
 	}
 	public function loadGraphic(pngPath:String):FlxGraphic{
 		if(!exists('${pngPath}')){
-			handleError('${id}: "${pngPath}" doesn\'t exist!');
+			handleError(' "${pngPath}" doesn\'t exist!');
 			return FlxGraphic.fromRectangle(0,0,0); // Prevents the script from throwing a null error or something
 		}
 		if(spriteArray[pngPath] == null) cacheGraphic(pngPath);
@@ -805,7 +809,7 @@ class InternalCache{
 	}
 	public function loadBitmap(pngPath:String):BitmapData{
 		if(!exists('${pngPath}')){
-			handleError('${id}: "${pngPath}" doesn\'t exist!');
+			handleError(' "${pngPath}" doesn\'t exist!');
 			return new BitmapData(0,0,false,0xFF000000); // Prevents the script from throwing a null error or something
 		}
 		if(bitmapArray[pngPath] == null) cacheBitmap(pngPath);
@@ -814,14 +818,14 @@ class InternalCache{
 
 	public function loadSparrowFrames(pngPath:String):FlxAtlasFrames{
 		// if(!exists('${pngPath}.png')){
-		// 	handleError('${id}: SparrowFrame PNG "${pngPath}.png" doesn\'t exist!');
+		// 	handleError(' SparrowFrame PNG "${pngPath}.png" doesn\'t exist!');
 		// 	return FlxAtlasFrames.fromSparrow(FlxGraphic.fromRectangle(1,1,0),""); // Prevents the script from throwing a null error or something
 		// }
 		var _txt = "";
 		if(exists('${pngPath}.xml')){
 			_txt = loadText(pngPath + ".xml");
 		}else{
-			handleError('${id}: SparrowFrame XML "${pngPath}.xml" doesn\'t exist!');
+			handleError(' SparrowFrame XML "${pngPath}.xml" doesn\'t exist!');
 			// return FlxAtlasFrames.fromSparrow(FlxGraphic.fromRectangle(1,1,0),""); // Prevents the script from throwing a null error or something
 		}
 

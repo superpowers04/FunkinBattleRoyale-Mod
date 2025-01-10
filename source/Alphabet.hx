@@ -167,13 +167,7 @@ class Alphabet extends FlxSpriteGroup
 			if(SESave.data.useFontEverywhere){
 				Frames = new flixel.graphics.frames.FlxFramesCollection(FlxGraphic.fromRectangle(1,1,0x01000000,false,"blank.mp4"));
 			}else{
-				try{
-					if(!SELoader.exists("mods/alphabet.png") || !SELoader.exists("mods/alphabet.xml")) throw('');
-					Frames = SELoader.loadSparrowFrames('mods/alphabet');
-				}catch(e){
-					Frames = SELoader.loadSparrowFrames('assets/images/alphabet');
-					// Paths.getSparrowAtlas('alphabet');
-				}
+				Frames = SELoader.loadSparrowFrames((SELoader.exists("mods/alphabet.png") && SELoader.exists("mods/alphabet.xml")) ? 'mods/alphabet' : 'assets/images/alphabet');
 			}
 		}
 		this.text = text;
