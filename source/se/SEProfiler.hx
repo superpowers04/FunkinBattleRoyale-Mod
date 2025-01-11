@@ -73,7 +73,7 @@ class SEProfiler{
 		keep=_keep;
 	}
 	@:keep inline function start(){
-		_start = Sys.cpuTime();
+		_start = Sys.time();
 		ticksSinceUpdate=0;
 	}
 	// TODO If this doesn't do anything extra soon, i'll remove the useless if and just make it return the check
@@ -88,7 +88,7 @@ class SEProfiler{
 	}
 	@:keep inline function stamp(){
 		ticksSinceUpdate=0;
-		_end = Math.floor((Sys.cpuTime()-_start) * 100000)*0.00001;
+		_end = Math.floor((Sys.time()-_start) * 100000)*0.00001;
 		if(_end > max) max=_end;
 		if(_end > peak) peak = _end;
 		// average = Math.floor(FlxMath.lerp(average,_end,0.5)*10000)*0.0001;
