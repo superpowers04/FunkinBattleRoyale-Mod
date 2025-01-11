@@ -675,8 +675,8 @@ class PlayState extends ScriptMusicBeatState
 		SEProfiler.qStart('Playstate loading');
 		scriptSubDirectory = "";
 		SELoader.gc();
-		LoadingScreen.loadingText = 'Loading playstate variables';
 		LoadingScreen.profiling=SESave.data.profiler;
+		LoadingScreen.loadingText = 'Loading playstate variables';
 		parseMoreInterps = (QuickOptionsSubState.getSetting("Song hscripts") || isStoryMode);
 		instance?.destroy();
 		ScriptMusicBeatState.instance=cast(instance=this);
