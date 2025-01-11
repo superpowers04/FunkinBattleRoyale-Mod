@@ -1,0 +1,22 @@
+# Do not use this for compiling, this is just so haxe autocompletion can find the right packages
+-cpp source
+-cp source
+-lib openfl
+-lib flixel
+-lib lime
+-lib openfl
+-lib flixel:5.6.2
+-lib flixel-addons:3.2.2
+-lib flixel-ui:2.6.0
+-lib hscript-improved
+-lib hscript-ex
+-lib flxanimate
+-lib linc_luajit
+-lib discord_rpc
+-lib extension-androidtools
+-lib hxCodec
+-lib newgrounds
+-lib hxcpp-debug-server
+-lib markdown
+-lib HtmlParser
+-lib nape-haxe4

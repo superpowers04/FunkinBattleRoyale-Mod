@@ -73,8 +73,6 @@
 
 
 	<!--In case you want to use the addons package-->
-<!-- 	<haxelib name="openfl" if="mobile"/>
-	<haxelib name="flixel" if="mobile" /> -->
 	<haxelib name="lime"/>
 	<haxelib name="openfl"/>
 	<haxelib name="flixel" version="5.6.2"/>
@@ -104,31 +102,7 @@
 	<!-- <haxelib name="hxCodec" if="desktop || android"/> -->
 
 	<!-- <haxelib name="newgrounds"/> -->
-	<haxelib name="faxe" if='switch'/>
-	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
 
-	<!-- <haxelib name="markdown" /> -->
-	<!-- <haxelib name="HtmlParser" /> -->
-
-	<!--In case you want to use nape with flixel-->
-	<!--<haxelib name="nape-haxe4" />-->
-
-	<!-- ______________________________ Haxedefines _____________________________ -->
-
-	<!--Enable the Flixel core recording system-->
-	<!-- <haxedef name="FLX_RECORD" /> -->
-
-	<!--Disable the right and middle mouse buttons-->
-	<!-- <haxedef name="FLX_NO_MOUSE_ADVANCED" /> -->
-
-	<!--Disable the native cursor API on Flash-->
-	<!--<haxedef name="FLX_NO_NATIVE_CURSOR" />-->
-
-	<!--Optimise inputs, be careful you will get null errors if you don't use conditionals in your game-->
-	<!-- <haxedef name="FLX_NO_MOUSE" if="mobile" /> -->
-	<!-- <haxedef name="FLX_NO_KEYBOARD" if="mobile" /> -->
-
-	
 	<haxedef name="FLX_NO_GAMEPAD" />
 
 	<!--Disable the Flixel core sound tray-->
@@ -180,7 +154,5 @@
 	<config:android permission="android.permission.READ_EXTERNAL_STORAGE"/>
 
 
-	<!-- <haxedef name="SKIP_TO_PLAYSTATE" if="debug" /> -->
-	<!-- <haxedef name="NG_LOGIN" if="newgrounds" /> -->
 	
 </project>
