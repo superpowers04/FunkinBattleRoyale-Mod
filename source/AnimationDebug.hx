@@ -1370,21 +1370,16 @@ class AnimationDebug extends MusicBeatState
 
 
 
-	override function update(elapsed:Float)
-	{
+	override function update(elapsed:Float) {
 		// textAnim.text = chara.animation.curAnim.name;
-		if (FlxG.sound.music != null)
-			Conductor.songPosition = FlxG.sound.music.time;
+		Conductor.updateElapsed(elapsed);
 		if (quitHeldBar.visible && quitHeld <= 0){
-			quitHeldBar.visible = false;
-			quitHeldBG.visible = false;
-    		}
-		if (FlxG.keys.pressed.ESCAPE)
-		{
+			quitHeldBar.visible = quitHeldBG.visible = false;
+		}
+		if (FlxG.keys.pressed.ESCAPE){
 			quitHeld += 5;
-			quitHeldBar.visible = true;
-			quitHeldBG.visible = true;
-			if (quitHeld > 1000) exit(); 
+			quitHeldBar.visible = quitHeldBG.visible = true;
+			if (quitHeld > 1000) exit();
 		}else if (quitHeld > 0){
 			quitHeld -= 10;
 		}
@@ -1414,7 +1409,6 @@ class AnimationDebug extends MusicBeatState
 
 						var mx = Std.int(FlxG.mouse.screenX);
 						var my = Std.int(FlxG.mouse.screenY);
-
 						camFollow.x+=lastRMouseX - mx;
 						camFollow.y+=lastRMouseY - my;
 						lastRMouseX = mx;
@@ -1448,26 +1442,26 @@ class AnimationDebug extends MusicBeatState
 				if(shiftPress){
 					// Offset adjustment
 					if ((FlxG.keys.pressed.UP) || (FlxG.keys.pressed.LEFT) || (FlxG.keys.pressed.DOWN) || (FlxG.keys.pressed.RIGHT)){
-						moveOffset((if((FlxG.keys.pressed.LEFT)) 1 else if(FlxG.keys.pressed.RIGHT) -1 else 0)
-						           ,(if((FlxG.keys.pressed.UP)) 1 else if(FlxG.keys.pressed.DOWN) -1 else 0)
+						moveOffset((FlxG.keys.pressed.LEFT ? 1 : FlxG.keys.pressed.RIGHT ? -1 : 0)
+						           ,(FlxG.keys.pressed.UP ? 1 : FlxG.keys.pressed.DOWN ? -1 : 0)
 						           ,false,ctrlPress);
 					}
 					// Char position
 					if ((FlxG.keys.pressed.I) || (FlxG.keys.pressed.J) || (FlxG.keys.pressed.K) || (FlxG.keys.pressed.L)){
-						updateCharPos((if((FlxG.keys.pressed.J)) 1 else if(FlxG.keys.pressed.L) -1 else 0)
-						           ,(if((FlxG.keys.pressed.I)) 1 else if(FlxG.keys.pressed.K) -1 else 0)
+						updateCharPos((FlxG.keys.pressed.J ? 1 : FlxG.keys.pressed.L ? -1 : 0)
+						           ,(FlxG.keys.pressed.I ? 1 : FlxG.keys.pressed.K ? -1 : 0)
 						           ,false,ctrlPress);
 					}
 				}else{
 					if ((FlxG.keys.justPressed.UP) || (FlxG.keys.justPressed.LEFT) || (FlxG.keys.justPressed.DOWN) || (FlxG.keys.justPressed.RIGHT)){
-						moveOffset((if((FlxG.keys.justPressed.LEFT)) 1 else if(FlxG.keys.justPressed.RIGHT) -1 else 0)
-						           ,(if((FlxG.keys.justPressed.UP)) 1 else if(FlxG.keys.justPressed.DOWN) -1 else 0)
+						moveOffset((FlxG.keys.justPressed.LEFT ? 1 : FlxG.keys.justPressed.RIGHT ? -1 : 0)
+						           ,(FlxG.keys.justPressed.UP ? 1 : FlxG.keys.justPressed.DOWN ? -1 : 0)
 						           ,false,ctrlPress);
 					}
 					// Char position
 					if ((FlxG.keys.justPressed.I) || (FlxG.keys.justPressed.J) || (FlxG.keys.justPressed.K) || (FlxG.keys.justPressed.L)){
-						updateCharPos((if((FlxG.keys.justPressed.J)) 1 else if(FlxG.keys.justPressed.L) -1 else 0)
-						           ,(if((FlxG.keys.justPressed.I)) 1 else if(FlxG.keys.justPressed.K) -1 else 0)
+						updateCharPos((FlxG.keys.justPressed.J ? 1 : FlxG.keys.justPressed.L ? -1 : 0)
+						           ,(FlxG.keys.justPressed.I ? 1 : FlxG.keys.justPressed.K ? -1 : 0)
 						           ,false,ctrlPress);
 					}
 				}
@@ -1476,19 +1470,13 @@ class AnimationDebug extends MusicBeatState
 				if(FlxG.keys.pressed.V){animToPlay = 'Idle';}
 				if(FlxG.keys.pressed.LBRACKET){
 					var id:Int = animationList.indexOf(chara.animName);
-					if(id == -1){
-						animToPlay = animationList[0];
-					}else{
-						animToPlay = animationList[Std.int(Math.abs((id - 1) % animationList.length))];
-					}
+					animToPlay = animationList[id == -1 ? 0 :Std.int(Math.abs((id - 1) % animationList.length))];
+					
 				}
 				if(FlxG.keys.pressed.RBRACKET){
 					var id:Int = animationList.indexOf(chara.animName);
-					if(id == -1){
-						animToPlay = animationList[0];
-					}else{
-						animToPlay = animationList[Std.int(Math.abs((id + 1) % animationList.length))];
-					}
+					animToPlay = animationList[id == -1 ? 0 :Std.int(Math.abs((id + 1) % animationList.length))];
+					
 				}
 				// if(FlxG.keys.justPressed.M){editMode = 1; toggleOffsetText(false);} // Switch modes
 				// if(FlxG.keys.justPressed.TWO){outputCharOffsets();}
@@ -1520,14 +1508,14 @@ class AnimationDebug extends MusicBeatState
 				// Camera position
 				if(shiftPress){
 					if ((FlxG.keys.pressed.UP) || (FlxG.keys.pressed.LEFT) || (FlxG.keys.pressed.DOWN) || (FlxG.keys.pressed.RIGHT)){
-						updateCameraPos(true,(if((FlxG.keys.pressed.LEFT)) 1 else if(FlxG.keys.pressed.RIGHT) -1 else 0)
-						           ,(if((FlxG.keys.pressed.UP)) 1 else if(FlxG.keys.pressed.DOWN) -1 else 0)
+						updateCameraPos(true,(FlxG.keys.pressed.LEFT ? 1 : FlxG.keys.pressed.RIGHT ? -1 : 0)
+						           ,(FlxG.keys.pressed.UP ? 1 : FlxG.keys.pressed.DOWN ? -1 : 0)
 						           ,false,ctrlPress);
 					}
 				}else{
 					if ((FlxG.keys.justPressed.UP) || (FlxG.keys.justPressed.LEFT) || (FlxG.keys.justPressed.DOWN) || (FlxG.keys.justPressed.RIGHT)){
-						updateCameraPos(true,(if((FlxG.keys.justPressed.LEFT)) 1 else if(FlxG.keys.justPressed.RIGHT) -1 else 0)
-						           ,(if((FlxG.keys.justPressed.UP)) 1 else if(FlxG.keys.justPressed.DOWN) -1 else 0)
+						updateCameraPos(true,(FlxG.keys.justPressed.LEFT ? 1 : FlxG.keys.justPressed.RIGHT ? -1 : 0)
+						           ,(FlxG.keys.justPressed.UP ? 1 : FlxG.keys.justPressed.DOWN ? -1 : 0)
 						           ,false,ctrlPress);
 					}
 					
@@ -1640,10 +1628,7 @@ class AnimationDebug extends MusicBeatState
 				}
 				if(FlxG.keys.justPressed.Q){
 					var e = (chara.animation.curAnim.curFrame - 1);
-					if(e < 0){
-						e = chara.animation.curAnim.frames.length - 1;
-					}
-					chara.animation.curAnim.curFrame = e;
+					chara.animation.curAnim.curFrame = (e < 0) ? chara.animation.curAnim.frames.length - 1 : e;
 					updateOffsetText(true);
 
 				}
@@ -1714,7 +1699,7 @@ class AnimHelpScreen extends FlxUISubState{
 				+"\n\nUtilities:\n"
 				+'\n1 - Unloads all offsets from the game or json file, including character position.\n'
 				// +'\n2 - Write offsets to offsets.txt in FNFBR\'s folder for easier copying'
-				+(if(canEditJson)'\n3/Ctrl+Shift+S - Save Character' else '\n3/Ctrl+Shift+S - Write character to output.json in Super Engine folder')
+				+(canEditJson ? '\n3/Ctrl+Shift+S - Save Character' :'\n3/Ctrl+Shift+S - Write character to output.json in Super Engine folder')
 				// +'\n4 - Unloads character position from json file.(Useful if the game refuses to save the character\'s pos)\n'	
 				+'\n7 - Reloads Animation debug with the character\'s side swapped\n'
 				+"\nB - Hide/Show offset text";

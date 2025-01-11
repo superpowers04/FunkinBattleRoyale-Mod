@@ -42,10 +42,12 @@ class Conductor {
 		inline updateElapsed(FlxG.elapsed);
 	}
 	public static function updateElapsed(elapsed:Float){
-		if(lastFrameTime == FlxG.sound.music.time){
-			songPosition += elapsed * 1000;
-		}else{
-			lastFrameTime = songPosition = FlxG.sound.music.time;
+		if(FlxG.sound.music != null){
+			if(lastFrameTime == FlxG.sound.music.time){
+				songPosition += elapsed * 1000;
+			}else{
+				lastFrameTime = songPosition = FlxG.sound.music.time;
+			}
 		}
 	}
 

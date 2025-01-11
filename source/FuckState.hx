@@ -33,7 +33,10 @@ class FuckState extends FlxUIState {
 	public static var allowLogWrite:Bool = true;
 	public static var errorCount = 0;
 	public static function generateReport(error:String = "UNKNOWN ERROR?",type:String = "CRASH"):Bool{
-
+		var callstack = "UNSET";
+		try{
+			callstack = Std.string(CallStack.callStack());
+		}catch(e){}
 		var dateNow:String = "";
 		var err = "";
 		errorCount++;
@@ -95,15 +98,15 @@ class FuckState extends FlxUIState {
 				currentStateName = haxe.rtti.Rtti.getRtti(cast FlxG.state).path;
 			}catch(e){}
 			try{
-				err +="\n\n # ---------- SYSTEM INFORMATION --------";
-				
-				err +='\n Operating System: ${Sys.systemName()}'
+				err +="\n\n # ---------- SYSTEM INFORMATION --------"
+					+'\n Operating System: ${Sys.systemName()}'
 					+'\n Working Path: ${SELoader.absolutePath('')}'
 					+'\n Current Working Directory: ${Sys.getCwd()}'
 					+'\n Executable path: ${Sys.programPath()}'
 					+'\n Arguments: ${Sys.args()}'
 					+"\n # ---------- GAME INFORMATION ----------"
 					+'\n Fatal, forced, Shown thru OpenFL, errorCount: ${FATAL}, ${forced}, ${useOpenFL}, ${errorCount}'
+					+'\n Callstack: $callstack'
 					+'\n Version: ${MainMenuState.ver}'
 					+'\n Buildtype: ${MainMenuState.compileType}'
 					+'\n Debug: ${SESave.data.animDebug}'
@@ -167,10 +170,8 @@ class FuckState extends FlxUIState {
 		var exception = "Unable to grab exception!";
 		if(e != null && e.message != null){
 			try{
-
 				exception = 'Message:${e.message}\nStack:${e.stack}\nDetails: ${e.details()}';
 			}catch(_e){
-
 				try{
 					exception = '${e.details()}';
 				}catch(_e){
@@ -229,7 +230,7 @@ class FuckState extends FlxUIState {
 					var textFieldTop = new TextField();
 					addChild(textFieldTop);
 					textFieldTop.width = 1280;
-					textFieldTop.text = "A fatal error occurred!";
+					textFieldTop.text = "An unrecoverable fatal error occurred!";
 					textFieldTop.textColor = 0xFFFF0000;
 					textFieldTop.y = 30;
 					var textFieldBot = new TextField();
