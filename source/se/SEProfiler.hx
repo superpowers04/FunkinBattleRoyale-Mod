@@ -88,7 +88,7 @@ class SEProfiler{
 	}
 	@:keep inline function stamp(){
 		ticksSinceUpdate=0;
-		_end = Math.floor((Sys.time()-_start) * 100000)*0.00001;
+		_end = Math.floor((Sys.time()-_start) * 1000)*0.001;
 		if(_end > max) max=_end;
 		if(_end > peak) peak = _end;
 		// average = Math.floor(FlxMath.lerp(average,_end,0.5)*10000)*0.0001;
