@@ -15,8 +15,3 @@
 -lib discord_rpc
 -lib extension-androidtools
 -lib hxCodec
--lib newgrounds
--lib hxcpp-debug-server
--lib markdown
--lib HtmlParser
--lib nape-haxe4

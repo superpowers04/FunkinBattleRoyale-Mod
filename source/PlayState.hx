@@ -1801,12 +1801,9 @@ class PlayState extends ScriptMusicBeatState
 
 			babyArrow.ID = i;
 
-			switch (player){
-				case 0: 
-					cpuStrums.add(babyArrow);
-				case 1:
-					playerStrums.add(babyArrow);
-			}
+
+			(player == 0 ? cpuStrums : playerStrums).add(babyArrow);
+			
 
 			babyArrow.animation.play('static'); 
 			// Todo, clean this shitty code up
