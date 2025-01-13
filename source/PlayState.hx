@@ -1070,6 +1070,7 @@ class PlayState extends ScriptMusicBeatState
 		iconP1.antialiasing = bf.antialiasing;
 		iconP1.y = healthBar.y - (iconP1.height / 2);
 		iconP1.trackedSprite = healthBar;
+		iconP1.trackMusic = true;
 		add(iconP1);
 
 		iconP2 = new HealthIcon("DONTLOAD",false);
@@ -1077,6 +1078,7 @@ class PlayState extends ScriptMusicBeatState
 		iconP2.antialiasing = dad.antialiasing;
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		iconP2.trackedSprite = healthBar;
+		iconP2.trackMusic = true;
 		// iconP2.offset.set(0,iconP2.width);
 
 		add(iconP2);
@@ -3562,8 +3564,8 @@ class PlayState extends ScriptMusicBeatState
 			camHUD.zoom -= camZoomAmount;
 		}
 		
-		iconP1.bounce(Conductor.crochetSecs);
-		iconP2.bounce(Conductor.crochetSecs);
+		// iconP1.bounce(Conductor.crochetSecs);
+		// iconP2.bounce(Conductor.crochetSecs);
 
 		try{
 			for (i => v in beatAnimEvents) {

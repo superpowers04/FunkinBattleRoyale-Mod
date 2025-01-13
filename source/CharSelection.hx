@@ -134,6 +134,7 @@ class CharSelection extends SearchMenuState
 		uiIcon.x = uiIconPosX;
 		uiIcon.y = uiIconPosY;
 		if(!SESave.data.performance){
+			uiIcon.trackMusic = true;
 			uiIcon.centerOffsets();
 			overLay.add(uiIcon);
 		}
@@ -303,9 +304,5 @@ class CharSelection extends SearchMenuState
 	var _iconTween:FlxTween;
 	override function beatHit(){
 		super.beatHit();
-		if(SESave.data.performance) return;
-		uiIcon.scale.set(1.1,1.1);
-		if(_iconTween != null)_iconTween.cancel();
-		_iconTween = FlxTween.tween(uiIcon.scale, {x: 1,y: 1}, Conductor.stepCrochet * 0.003, {ease: FlxEase.quadOut});
 	}
 }

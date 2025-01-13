@@ -561,7 +561,7 @@ class ScrollSpeedOption extends HCFloatOption{
 				strum.playStatic();
 				strum.x = 1000;
 				note.x = strum.x + (strum.width * 0.5);
-				strum.y = SESave.data.downscroll ? 680 : 120;
+				strum.y = SESave.data.downscroll ? 500 : 120;
 			}catch(e){
 				trace('Failed to load note for Scroll Speed ${e}');
 			}

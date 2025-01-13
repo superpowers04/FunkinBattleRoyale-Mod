@@ -16,6 +16,7 @@ class HealthIcon extends FlxSprite
 	var hichar:String = "UNSET";
 	public var trackedSprite:FlxSprite = null;
 	public var isTracked:Bool = false;
+	public var trackMusic:Bool = false;
 	public var trackingOffset:Float = 0;
 	// public var pathh = "mods/characters";
 
@@ -123,9 +124,14 @@ class HealthIcon extends FlxSprite
 		animation.play(hichar);
 	}
 
-	override function update(elapsed:Float) {
-		super.update(elapsed);
+	override function draw() {
+		if (trackMusic) scale.x = scale.y = (1.3 - (((Conductor.songPosition / Conductor.crochet) % 1)*0.2));
 
+		super.draw();
+	}
+	override function update(elapsed:Float) {
+		// if (trackMusic) scale.x = scale.y = (1.3 - ((Conductor.songPosition / Conductor.crochet) % 1));
 		if (sprTracker != null) setPosition(sprTracker.x + sprTracker.width + 10, sprTracker.y - 30);
+		super.update(elapsed);
 	}
 }
