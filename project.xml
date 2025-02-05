@@ -22,13 +22,13 @@
 	<!-- ____________________________ Window Settings ___________________________ -->
 
 	<!--These window settings apply to all targets-->
-	<window width="1280" height="720" fps="" background="#100010" hardware="true" vsync="false" allowShaders="true" />
+	<window width="1280" orientation="landscape" height="720" background="#100010" hardware="true" vsync="false" allowShaders="true" />
 
 	<!--Desktop-specific-->
-	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
+	<window if="desktop" fullscreen="false" resizable="true" vsync="false"/>
 
 	<!--Mobile-specific-->
-	<window if="mobile" orientation="landscape" fullscreen="true" resizable="false"/>
+	<window if="mobile" fullscreen="true" resizable="false"/>
 
 
 	<!-- _____________________________ Path Settings ____________________________ -->
@@ -143,6 +143,8 @@
 	<config:android permission="android.permission.WRITE_EXTERNAL_STORAGE"/>
 	<config:android permission="android.permission.READ_EXTERNAL_STORAGE"/>
 
+
+	<assets path="alsoft.ini"/>
 
 	
 </project>

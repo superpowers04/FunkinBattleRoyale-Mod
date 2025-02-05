@@ -79,10 +79,14 @@ class FuckState extends FlxUIState {
 					'you\'re mother',
 					'sex pt 2: electric boobaloo',
 					'sex pt 3: gone wrong',
+					'sex pt 4: on the run',
+					'sex pt 5: in hell',
+					'sex pt 6: im seeing blue',
 					'the stalemate button was boobytrapped',
 					'mf shoulda just stayed with psych engine :sob:',
 					'super engine moment',
 					'Another one bites the dust',
+					"https://www.youtube.com/watch?v=dQw4w9WgXcQt",
 					"It's fine, everything is good. What do you mean this is a crash report?"
 					
 				];
