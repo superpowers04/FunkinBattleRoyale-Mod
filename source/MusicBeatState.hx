@@ -285,7 +285,7 @@ class MusicBeatState extends FlxUIState {
 			}
 		}
 		if(SESave.data.animDebug){
-			Overlay.debugVar = '\nBPM:${Conductor.bpm}/${HelperFunctions.truncateFloat(Conductor.crochet,2)}MS(S:${HelperFunctions.truncateFloat(Conductor.stepCrochet,2)}MS)\ncurBeat:${curBeat}\ncurStep:${curStep}';
+			Overlay.debugVar = '\nBPM:${Conductor.bpm}/${HelperFunctions.truncateFloat(Conductor.crochet,2)}MS(S:${HelperFunctions.truncateFloat(Conductor.stepCrochet,2)}MS)\nBeat/Step/Time:${curBeat},${curStep},${Conductor.songPosition}';
 		}
 
 		super.update(elapsed);

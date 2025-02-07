@@ -456,6 +456,9 @@ class SELoader {
 	public static function absolutePath(path:String):String{
 		return FileSystem.absolutePath(getPath(path));
 	}
+	public static function absoluteRawPath(path:String):String{
+		return FileSystem.absolutePath(getRawPath(path));
+	}
 	public static function fullPath(path:String):String{
 		return FileSystem.fullPath(getPath(path));
 	}
@@ -845,6 +848,10 @@ class InternalCache{
 		cacheText(textPath);
 		return textArray[textPath];
 	}
+	public function loadXML(textPath:String):String{
+		cacheXML(textPath);
+		return xmlArray[textPath];
+	}
 	// public function saveText(textPath:String,text:String):Bool{
 	// 	File.saveContent('${textPath}',text);
 	// 	return true;
@@ -856,11 +863,12 @@ class InternalCache{
 		cacheSound(soundPath);
 		return soundArray[soundPath];
 	}
-
+	@:keep inline public function loadFlxSound(soundPath:String):FlxSound{
+		return new FlxSound().loadEmbedded(loadSound(soundPath));
+	}
 	public function playSound(soundPath:String,?volume:Dynamic = null):FlxSound{
 		var _vol = SESave.data.otherVol;
 		if(volume != null){
-
 			if(volume is String){
 				switch(volume.toLowerCase()){
 					case "inst": _vol = SESave.data.instVol;
@@ -897,6 +905,16 @@ class InternalCache{
 		trace('Unloading $pngPath');
 		spriteArray[pngPath].destroy();
 		spriteArray[pngPath] = null;
+	}
+
+	public function cacheXML(textPath:String){
+		if(xmlArray[textPath] == null){
+			if(!exists('${textPath}')){
+				trace('${id} : CacheText: "${textPath}" doesn\'t exist!');
+				return;
+			}
+			xmlArray[textPath] = SELoader.cleanXML(SELoader.getContent(textPath));
+		}
 	}
 
 	public function cacheText(textPath:String){

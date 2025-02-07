@@ -77,13 +77,25 @@ import se.formats.SongInfo;
 
 using StringTools;
 
-typedef OutNote = {
-	var time:Float;
-	var strumTime:Float;
-	var direction:Int;
-	var rating:String;
-	var isSustain:Bool;
+@:structInit class OutNote {
+	@:optional public var time:Float;
+	@:optional public var strumTime:Float;
+	@:optional public var direction:Int;
+	@:optional public var rating:String;
+	@:optional public var isSustain:Bool;
 }
+@:structInit class QueuedNote {
+	public var time:Null<Float> = null;
+	public var direction:Null<Int> = null;
+	public var hitState:Null<Bool> = null;
+	public var note:Note = null;
+}
+
+/* TODO
+
+MOVE NOTE HIT REGISTRATION TO UPDATE
+
+*/
 
 class PlayState extends ScriptMusicBeatState
 {
@@ -202,6 +214,7 @@ class PlayState extends ScriptMusicBeatState
 		public var cpuStrums:FlxTypedGroup<StrumArrow> = null;
 		public var grpNoteSplashes:FlxTypedGroup<NoteSplash>;
 		public var eventLog:Array<OutNote> = [];
+		public var queuedNotes:Array<QueuedNote> = [];
 		var notesHitArray:Array<Float> = [];
 
 
@@ -425,6 +438,11 @@ class PlayState extends ScriptMusicBeatState
 			}else{showTempmessage('Unable to load $v for $nameSpace: Script doesn\'t exist');}
 			return ((interps['${nameSpace}-${v}'] == null));
 		}
+		public override function callSingleInterp(func_name:String, args:Array<Dynamic>,id:String,?_interp:Dynamic = null):Dynamic {
+			var e = super.callSingleInterp(func_name,args,id,_interp);
+			if(e is FakeException) throw e;
+			return e;
+		}
 		public override function callInterp(func_name:String, args:Array<Dynamic>,?id:String = "") { // Modified from Modding Plus, I am too dumb to figure this out myself
 			
 			try{
@@ -461,7 +479,11 @@ class PlayState extends ScriptMusicBeatState
 						#end
 					}
 				}else callSingleInterp(func_name,args,id);
-			}catch(e:hscript.Expr.Error){handleError('${func_name} for "${id}":\n ${e.toString()}');}
+			}catch(e:hscript.Expr.Error){
+				handleError('${func_name} for "${id}":\n ${e.toString()}');
+			}catch(e:FakeException){
+				resetInterps();
+			}
 
 		}
 
@@ -474,15 +496,15 @@ class PlayState extends ScriptMusicBeatState
 		return 'PlayState';
 	}
 	public function handleError(?error:String = "",?forced:Bool = false){
-		generatedMusic = persistentUpdate = false;
-		canPause=true;
 		try{
 
 			if(error == "") error = 'No error passed!';
 			// else if(error == "Null Object Reference") error = 'Null Object Reference;\nInterp info: ${currentInterp}';
-			if(currentInterp.isActive) error += '\nInterp info: ${currentInterp}';
+			error += '\nInterp info: ${currentInterp}';
 			trace('Error!\n ${error}');
-			if(currentInterp.isActive) trace('Current Interpeter: ${currentInterp}');
+			generatedMusic = persistentUpdate = false;
+			canPause=true;
+			// if(currentInterp.isActive) trace('Current Interpeter: ${currentInterp}');
 			resetInterps();
 			parseMoreInterps = false;
 			if(!songStarted && !forced && playCountdown){
@@ -499,18 +521,8 @@ class PlayState extends ScriptMusicBeatState
 			try { playerNoteCamera.visible=false; } catch(e){}
 			try { opponentNoteCamera.visible=false; } catch(e){}
 
-			var _forced = (!songStarted && !forced && playCountdown);
 			generatedMusic = persistentUpdate = false;
 			persistentDraw = true;
-			// if(FinishSubState.instance != null){
-			// 	// showTempmessage('Error! ${error}',FlxColor.RED);
-			// 	FinishSubState.instance.destroy();
-			// 	doUpdate=false;
-			// 	openSubState(new ErrorSubState(0,0,error,true));
-			// 	canPause = true;
-			// 	return;
-			// }
-			// _forced
 			Main.game.blockUpdate = Main.game.blockDraw = false;
 			doUpdate=false;
 			openSubState(new ErrorSubState(0,0,error,true));
@@ -2549,8 +2561,8 @@ class PlayState extends ScriptMusicBeatState
 
 		var currentTimingShown:FlxText=null;
 		if(SESave.data.showTimings){
-			var _dist = (Conductor.songPosition - daNote.strumTime);
-			currentTimingShown = new FlxText(0,0,100,Std.string(Math.floor(noteDiff * 1000) * 0.001) + "ms " + ((_dist == 0) ? "=" :((downscroll && _dist < 0 || !downscroll && _dist > 0) ? "^" : "v")));
+			var _dist = Math.round(Conductor.songPosition - daNote.strumTime);
+			currentTimingShown = new FlxText(0,0,100,Std.string(noteDiff) + "ms " + ((_dist == 0) ? "=" :((downscroll && _dist < 0 || !downscroll && _dist > 0) ? "^" : "v")));
 			timeShown = 0;
 			switch(daRating){
 				case 'shit': currentTimingShown.color = FlxColor.RED;
@@ -2704,7 +2716,7 @@ class PlayState extends ScriptMusicBeatState
 	private function keyShit():Void {try{doKeyShit();}catch(e){handleError('Error during keyshit: ${e.message}\n ${e.stack}');}}
 	public var doKeyShit:()->Void = function():Void{throw("I can't handle key inputs? Please report this!");};
 	public var noteShit:()->Void = function():Void{throw("I can't handle input for some reason, Please report this!");};
-	public var goodNoteHit:(Note, ?Bool)->Void = function(note:Note, ?resetMashViolation:Bool = true):Void{throw("I cant register any note hits!");};
+	public var goodNoteHit:(Note, ?Bool, ?Float)->Void = function(note:Note, ?resetMashViolation:Bool = true, ?timeHit:Float):Void{throw("I cant register any note hits!");};
 
 
 
@@ -2872,6 +2884,14 @@ class PlayState extends ScriptMusicBeatState
 				callInterp("susHit",[daNote]);
 			}
 		}
+		var queuedNote:QueuedNote = null;
+		while((queuedNote = queuedNotes.pop()) != null){
+			if(queuedNote.hitState){
+				goodNoteHit(queuedNote.note,queuedNote.time);
+				continue;
+			}
+			noteMiss(queuedNote.direction,queuedNote.note);
+		}
 		var player = playerCharacter;
  		callInterp("holdShitAfter",[holdArray]);
  		charCall("holdShitAfter",[holdArray],true);
@@ -2954,23 +2974,23 @@ class PlayState extends ScriptMusicBeatState
 			}
 			if(holdArray.contains(true)){
 				playerCharacter.isPressingNote = true;
-				var daNote = null;
-				var i = notes.members.length;
-				var acns = SESave.data.accurateNoteSustain;
-				while(i < notes.members.length){
-					daNote = notes.members[i];
-					i++;
-					if(daNote == null || !holdArray[daNote.noteData] || !daNote.mustPress || !daNote.isSustainNote || !daNote.updateCanHit()) continue;
-					if(!acns || daNote.strumTime <= Conductor.songPosition - (50 * Conductor.timeScale) || daNote.isSustainNoteEnd) {// Only destroy the note when properly hit
-						goodNoteHit(daNote);
-						continue;
-					}
-					// Tell note to be clipped to strumline
-					daNote.isPressed = true;
-					hitArray[daNote.noteData] = true;
-					daNote.susHit(0,daNote);
-					callInterp("susHit",[daNote]);
-				}
+				// var daNote = null;
+				// var i = notes.members.length;
+				// var acns = SESave.data.accurateNoteSustain;
+				// while(i < notes.members.length){
+				// 	daNote = notes.members[i];
+				// 	i++;
+				// 	if(daNote == null || !holdArray[daNote.noteData] || !daNote.mustPress || !daNote.isSustainNote || !daNote.updateCanHit()) continue;
+				// 	if(!acns || daNote.strumTime <= Conductor.songPosition - (50 * Conductor.timeScale) || daNote.isSustainNoteEnd) {// Only destroy the note when properly hit
+				// 		goodNoteHit(daNote);
+				// 		continue;
+				// 	}
+				// 	// Tell note to be clipped to strumline
+				// 	daNote.isPressed = true;
+				// 	hitArray[daNote.noteData] = true;
+				// 	daNote.susHit(0,daNote);
+				// 	callInterp("susHit",[daNote]);
+				// }
 			}
 			while(possibleNotes.pop() != null){}
 			
@@ -3008,12 +3028,24 @@ class PlayState extends ScriptMusicBeatState
 				possibleNotes[i]=null;
 				if(daNote == null && pressArray[i] && timeSinceOnscreenNote > 0){
 					ghostTaps += 1;
-					if(!ghostTapping) noteMiss(i, null);
+					if(!ghostTapping) {
+						queuedNotes.push({
+							// time:(Conductor.songPosition + ((Sys.time() * 1000) - lastMusicUpdate)),
+							direction:i,
+							hitState:false
+							// ,
+							// note:daNote
+						});
+					}
 					continue;
 				}
 				if(daNote == null) continue;
 				hitArray[daNote.noteData] = true;
-				goodNoteHit(daNote);
+				queuedNotes.push({
+					time:(Conductor.songPosition + ((Sys.time() * 1000) - lastMusicUpdate)),
+					hitState:true,
+					note:daNote
+				});
 			}
 			callInterp('keyShitAfter',[pressArray,holdArray,hitArray]);
 			charCall("keyShitAfter",[pressArray,holdArray,hitArray]);
@@ -3242,8 +3274,8 @@ class PlayState extends ScriptMusicBeatState
 
 	}
 
-	function kadeBRGoodNote(note:Note, ?resetMashViolation = true):Void {
-		var noteDiff:Float = Math.abs(note.strumTime - (Conductor.songPosition + ((Sys.time() * 1000) - lastMusicUpdate)));
+	function kadeBRGoodNote(note:Note, ?resetMashViolation = true, ?time:Float = -1):Void {
+		var noteDiff:Float = Math.abs(note.strumTime - (time == -1 ? (Conductor.songPosition + ((Sys.time() * 1000) - lastMusicUpdate)) : time)) ;
 		note.hitDistance = Ratings.getDistanceFloat(noteDiff);
 		note.rating = Ratings.ratingFromDistance(note.hitDistance);
 

@@ -1180,9 +1180,8 @@ class CharAnimController extends FlxAnimationController{
 	}
 	public function playAnimAvailable(animList:Array<String>,forced:Bool = false,reversed:Bool = false,frame:Float = 0):Bool{
 		for (i in animList) {
-			if(animation.getByName(i) != null){
-				if(playAnim(i,forced,reversed,frame)) return true;
-			}
+			if(animation.getByName(i) == null || !playAnim(i,forced,reversed,frame)) continue;
+			return true;
 		}
 		return false;
 	}
@@ -1290,7 +1289,7 @@ class CharAnimController extends FlxAnimationController{
 			charType:charType,
 			isPlayer:isPlayer,
 			name:curCharacter,
-			currentAnimation:animation.curAnim,
+			currentAnimation:animation.curAnim.name,
 			hasInterp:interp != null,
 			color:definingColor
 		});

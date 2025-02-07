@@ -32,6 +32,7 @@ class Main extends Sprite
 	public static var errorMessage = "";
 	public static var instance:Main;
 	public static var funniSprite:Sprite;
+	public static var ALSOFTCONF:String = {Sys.putEnv("ALSOFT_CONF", SELoader.absoluteRawPath(#if windows 'assets/alsoft.ini' #else "assets/alsoft.conf" #end)); trace(Sys.getEnv("ALSOFT_CONF"));Sys.getEnv("ALSOFT_CONF");};
 	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var initialState:Class<FlxState> = TitleState; // The FlxState the game starts with.
@@ -54,7 +55,6 @@ class Main extends Sprite
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
 	public static function main():Void {
-
 		// quick checks 
 		FuckState.hook();
 		SEProfiler.init();
@@ -352,12 +352,16 @@ class FlxGameEnhanced extends FlxGame{
 
 			if(blockUpdate) _update(); else {
 				hasUpdated = true;
-				super.update();
+				try{
+					super.update();
+				}catch(e:FakeException){}
+
 
 				if (FlxG.keys.justPressed.F11) SESave.data.fullscreen = (FlxG.fullscreen = !FlxG.fullscreen);
 			}
 			SEProfiler.stamp('update');
 		}catch(e){
+			if(e is FakeException) return;
 			FuckState.FUCK(e,"FlxGame.Update");
 		}
 	}

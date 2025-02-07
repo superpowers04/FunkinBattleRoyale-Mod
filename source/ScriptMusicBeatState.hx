@@ -29,11 +29,17 @@ using StringTools;
 	function toString():String{
 		if(!isActive) return "No Interp Active";
 		var ret = 'Name:$name\n Type:${type}\n Current Function:${currentFunction}';
-		@:privateAccess if(interp != null && interp is hscript.Interp && interp.curExpr != null){
+		if(interp != null && interp is hscript.Interp && interp.curExpr != null){
 			var interp:Interp = interp;
 			ret+='\n  Line Number:${interp.curExpr.line}\n  Characters:${interp.curExpr.pmin} - ${interp.curExpr.pmax}';
 		}
-		ret+='\n  Args:${args}';
+		var newArgs:Array<String> = []; // Game was crashing trying to display some types apparently
+		for (item in args) {
+			if( item is String || item is Bool || item is Int || item is Float) {newArgs.push(Std.string(item)); continue;}
+			newArgs.push(Std.string(Type.typeof(item)));
+		}
+		ret+='\n  Args:${newArgs}';
+
 		return ret;
 	}
 	function reset(){
@@ -42,9 +48,8 @@ using StringTools;
 		args = [];
 		type = "";
 		isActive = false;
+	}
 }
-}
-/*TODO MOVE CALLINTERP INTO A THREAD*/
 
 class ScriptMusicBeatState extends MusicBeatState{
 	public static var instance:ScriptMusicBeatState;
@@ -59,6 +64,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 				if(currentInterp.args[0] == this) currentInterp.args.shift();
 				if(error == "") error = 'No error passed!\nInterp info: ${currentInterp}';
 				if(error == "Null Object Reference") error = 'Null Object Reference;\nInterp info: ${currentInterp}';
+				trace(error);
 				resetInterps();
 				parseMoreInterps = false;
 				if(!created && !forced){
@@ -90,8 +96,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 					return;
 				}
 				openSubState(new ErrorSubState(0,0,error));
-			}catch(e){trace('${e.message}\n${e.stack}');MainMenuState.handleError(error);
-			}
+			}catch(e){trace('${e.message}\n${e.stack}');MainMenuState.handleError(error);}
 		}
 		// Interp or SELua
 		public var interps:Map<String,Dynamic> = new Map(); 
@@ -145,6 +150,8 @@ class ScriptMusicBeatState extends MusicBeatState{
 					errorHandle(HscriptUtils.genErrorMessage(e,func_name,id));
 				}else if(e == "Null Object Reference"){ errorHandle('Null Object Reference');}
 				else {errorHandle('Type:${Type.typeof(e)}, native:${Type.typeof(e.native)}, $e - ${e.stack}');}
+				currentInterp.reset();
+				return new FakeException();
 			}
 			currentInterp.reset();
 			return null;
@@ -186,7 +193,7 @@ class ScriptMusicBeatState extends MusicBeatState{
 			#end
 			interps = new Map();
 			interpCount=0;
-			HSBrTools.shared.clear();
+			HSBrTools.shared = new Map<String,Dynamic>();
 		}
 		@:keep inline public function unloadInterp(?id:String){
 			#if linc_luajit

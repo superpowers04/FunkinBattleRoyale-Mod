@@ -29,8 +29,6 @@ class SEMacrosBuild{
 				var content = File.getContent('version.downloadMe').split(';');
 				if(content[1] == null)
 					trace('Unable to edit version.downloadMe!');
-				// }else if(content[0] == _buildTime)
-					// trace('version.downloadMe has same date as today, not updating');
 				else
 					File.saveContent('version.downloadMe','${_buildTime};${content[1]}');
 			}

@@ -78,7 +78,7 @@ class Interp {
 
 	var __instanceFields:Array<String> = [];
 	#if hscriptPos
-	var curExpr:Expr;
+	public var curExpr:Expr;
 	#end
 
 	public function new() {

@@ -37,6 +37,7 @@ class HSBrTools {
 	public var cache:InternalCache;
 	// public var dumpGraphics:Bool = false; // If true, All FlxGraphics will be dumped upon creation, trades off bitmap editability for less memory usage
  
+	public var cachedSounds:Array<String> = [];
 	
 
 	public var optionsMap:Map<String,Dynamic> = new Map<String,Dynamic>();
@@ -69,7 +70,7 @@ class HSBrTools {
 	}
 
 
-	public function getPath(?str:String = ""){
+	@:keep inline public function getPath(?str:String = ""){
 		return SELoader.getPath(path + str);
 	}
 	public function loadFlxSprite(x:Float,y:Float,pngPath:String):FlxSprite{
@@ -80,7 +81,7 @@ class HSBrTools {
 		if(!pngPath.endsWith('.png')) pngPath+=".png";
 		return cache.loadFlxSprite(x,y,'${path}${pngPath}');
 	}
-	public function loadGraphic(pngPath:String):FlxGraphic{
+	@:keep inline public function loadGraphic(pngPath:String):FlxGraphic{
 		// if(!SELoader.exists('${path}${pngPath}')){
 		// 	handleError('${id}: "${path}${pngPath}" doesn\'t exist!');
 		// 	return FlxGraphic.fromRectangle(0,0,0); // Prevents the script from throwing a null error or something
@@ -90,16 +91,40 @@ class HSBrTools {
 	}
 
 	public function loadSparrowFrames(pngPath:String):FlxAtlasFrames{
-		if(!SELoader.exists('${path}${pngPath}.png')){
+		if(!exists('${pngPath}.png')){
 			handleError('${id}: SparrowFrame PNG "${path}${pngPath}.png" doesn\'t exist!');
 			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
 		}
-		if(!SELoader.exists('${path}${pngPath}.xml')){
+		if(!exists('${pngPath}.xml')){
 			handleError('${id}: SparrowFrame XML "${path}${pngPath}.xml" doesn\'t exist!');
 			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
 		}
 
 		return FlxAtlasFrames.fromSparrow(loadGraphic(pngPath + ".png"),loadXML(pngPath + ".xml"));
+	}
+	public function loadStitchedSparrowFrames(pngPath:String,?cache:Bool=false):FlxAtlasFrames{
+		if(!exists('${pngPath}.png')){
+			handleError(' SparrowFrame PNG "${pngPath}.png" doesn\'t exist!');
+			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
+		}
+		if(!exists('${pngPath}.xml')){
+			handleError(' SparrowFrame XML "${pngPath}.xml" doesn\'t exist!');
+			return new FlxAtlasFrames(FlxGraphic.fromRectangle(0,0,0)); // Prevents the script from throwing a null error or something
+		}
+		var atlas = FlxAtlasFrames.fromSparrow(loadGraphic('$pngPath.png'),loadXML('${pngPath}'));
+		var i = 1;
+		while(exists('${pngPath}-$i.png') && exists('${pngPath}-$i.xml')){
+			var pngPath ='${pngPath}-$i';
+			i++;
+			var nextAtlas = FlxAtlasFrames.fromSparrow(loadGraphic('$pngPath.png'),loadXML('${pngPath}'));
+			@:privateAccess{
+				if(!atlas.usedGraphics.contains(atlas.parent)){
+					atlas.usedGraphics.push(atlas.parent);
+				}
+			}
+			atlas.addAtlas(nextAtlas);
+		}
+		return atlas;
 	}
 	public function loadAtlasSprite(x:Int,y:Int,pngPath:String,?anim:String = "",?loop:Bool = false,?fps:Int = 24):FlxSprite{
 		var spr = new FlxSprite(x, y);
@@ -110,10 +135,10 @@ class HSBrTools {
 		}
 		return spr;
 	}
-	public function loadSparrowSprite(x:Int,y:Int,pngPath:String,?anim:String = "",?loop:Bool = false,?fps:Int = 24):FlxSprite{
+	@:keep inline public function loadSparrowSprite(x:Int,y:Int,pngPath:String,?anim:String = "",?loop:Bool = false,?fps:Int = 24):FlxSprite{
 		return loadAtlasSprite(x,y,pngPath,anim,loop,fps);
 	}
-	public function reset(){
+	@:keep inline public function reset(){
 		cache.clear();
 		// spriteArray = [];
 		// bitmapArray = [];
@@ -122,14 +147,16 @@ class HSBrTools {
 		// soundArray = [];
 	}
 
-	public function exists(textPath:String):Bool{
+	@:keep inline public function exists(textPath:String):Bool{
 		return SELoader.exists('${path}${textPath}');
 	}
-	public function loadText(textPath:String):String{
+	@:keep inline public function loadText(textPath:String):String{
+		if(!exists(textPath)) handleError(' Text "${textPath}" doesn\'t exist!');
 		return cache.loadText('${path}${textPath}');
 	}
-	public function loadXML(textPath:String):String{
-		return SELoader.cleanXML(cache.loadText('${path}${textPath}'));
+	@:keep inline public function loadXML(textPath:String):String{
+		if(!exists(textPath)) handleError(' xml "${textPath}" doesn\'t exist!');
+		return cache.loadXML('${path}${textPath}');
 	}
 	public function loadShader(textPath:String,?glslVersion:Dynamic = 120)#if(FLXRUNTIMESHADER) :Null<FlxRuntimeShader> #end{
 		// #if !FLXRUNTIMESHADER
@@ -159,18 +186,15 @@ class HSBrTools {
 
 
 
-	 public function loadSound(soundPath:String):FlxSound{
-		@:privateAccess{
-			return new FlxSound().loadEmbedded(cache.loadSound('${path}${soundPath}'));
-		}
-	}
-	public function loadFlxSound(soundPath:String) return loadSound(soundPath);
+	public function loadSound(soundPath:String):FlxSound{
+		// if(!exists(soundPath)) handleError(' Sound "${soundPath}" doesn\'t exist!');
 
-	public function playSound(soundPath:String,?volume:Float = 2):FlxSound{
-		var sound = loadFlxSound(soundPath);
-		sound.volume = (volume == 2 ? SESave.data.otherVol : volume);
-		FlxG.sound.list.add(sound);
-		return sound.play();
+		return cache.loadFlxSound(getPath(soundPath));
+	}
+	public function loadFlxSound(soundPath:String):FlxSound return loadSound(soundPath);
+	public function playSound(soundPath:String,?volume:Dynamic = 2):FlxSound {
+		if(!exists(soundPath)) handleError(' Sound "${soundPath}" doesn\'t exist!');
+		return cache.playSound(getPath(soundPath),volume);
 	}
 
 	public function unloadSound(soundPath:String){
@@ -192,7 +216,6 @@ class HSBrTools {
 
 	public function cacheSound(soundPath:String){
 		cache.cacheSound('${path}${soundPath}');
-		
 	}
 	public function cacheGraphic(pngPath:String,?dumpGraphic:Bool = false){ // DOES NOT CHECK IF FILE IS VALID!
 		
